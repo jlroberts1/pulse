@@ -22,6 +22,7 @@ ktor = "3.0.1"
 koin = "4.0.0"
 material-kolor = "1.7.1"
 coil = "3.0.4"
+sqldelight = "2.0.2"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -55,10 +56,12 @@ koin-compose-viewmodel = { group = "io.insert-koin", name = "koin-compose-viewmo
 datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
 coil = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
 coil-networking = { group = "io.coil-kt.coil3", name = "coil-network-ktor3", version.ref = "coil" }
+sqldelight-native = { group = "app.cash.sqldelight", name = "native-driver", version.ref = "sqldelight" }
 
 # Android specific dependencies
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
 ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktor" }
+sqldelight-android = { group = "app.cash.sqldelight", name="android-driver", version.ref = "sqldelight" }
 
 # iOS specific dependencies
 ktor-client-darwin = { group = "io.ktor", name = "ktor-client-ios", version.ref = "ktor" }
@@ -73,3 +76,4 @@ composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-mu
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }

@@ -10,7 +10,7 @@ class KTorHttpClientImpl(
         HttpClient {
             expectSuccess = true
             setupContentNegotiation()
-                //setupLogging()
+            setupLogging()
             setupDefaultRequest()
             setupAuth(preferencesRepository)
         }

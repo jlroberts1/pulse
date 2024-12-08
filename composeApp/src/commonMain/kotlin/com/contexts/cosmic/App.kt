@@ -1,20 +1,51 @@
 package com.contexts.cosmic
 
-import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import com.contexts.cosmic.ui.screens.login.LoginScreen
-import com.contexts.cosmic.ui.screens.profile.ProfileScreen
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import com.contexts.cosmic.ui.theme.CosmicTheme
+import com.materialkolor.rememberDynamicMaterialThemeState
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.KoinContext
 
 @Composable
 @Preview
 fun App() {
-    MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        LoginScreen()
+    val isDarkTheme = isSystemInDarkTheme()
+    val isAmoled by rememberSaveable { mutableStateOf(false) }
+    val color = MaterialTheme.colorScheme.primary.toArgb()
+    val seedColor by rememberSaveable { mutableStateOf(color) }
+
+    val state = rememberDynamicMaterialThemeState(
+        seedColor = Color(seedColor),
+        isDark = isDarkTheme,
+        isAmoled = isAmoled,
+    )
+
+    CosmicTheme(state) {
+        KoinContext {
+            Scaffold(
+
+            ) { innerPadding ->
+                Surface(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    MainAppNavHost()
+                }
+            }
+        }
     }
 }
