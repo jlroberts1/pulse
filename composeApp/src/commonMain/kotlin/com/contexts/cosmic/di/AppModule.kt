@@ -1,17 +1,26 @@
 package com.contexts.cosmic.di
 
+import com.contexts.cosmic.data.network.api.AuthenticateAPI
+import com.contexts.cosmic.data.network.httpclient.KTorHttpClientImpl
+import com.contexts.cosmic.data.repository.AuthenticateRepositoryImpl
+import com.contexts.cosmic.data.repository.PreferencesRepositoryImpl
+import com.contexts.cosmic.domain.repository.AuthenticateRepository
+import com.contexts.cosmic.domain.repository.PreferencesRepository
+import io.ktor.client.HttpClient
+import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.dsl.module
-import org.koin.core.context.startKoin
 
 val appModule =
     module {
-
+        single<PreferencesRepository> { PreferencesRepositoryImpl(get()) }
     }
 
 val networkModule =
     module {
-
+        single<HttpClient> { KTorHttpClientImpl(get()).client }
+        single<AuthenticateAPI> { AuthenticateAPI(get()) }
+        factory<AuthenticateRepository> { AuthenticateRepositoryImpl(get()) }
     }
 
 expect val platformModule: Module

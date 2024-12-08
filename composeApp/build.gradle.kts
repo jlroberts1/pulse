@@ -1,5 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -12,12 +10,15 @@ plugins {
 
 kotlin {
     androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -28,9 +29,8 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     sourceSets {
-        
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
@@ -60,6 +60,7 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.kotlinx.datetime)
+            implementation(libs.datastore.preferences)
         }
     }
 }
