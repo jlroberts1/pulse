@@ -61,6 +61,8 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.kotlinx.datetime)
             implementation(libs.datastore.preferences)
+            implementation(libs.coil)
+            implementation(libs.coil.networking)
         }
     }
 }

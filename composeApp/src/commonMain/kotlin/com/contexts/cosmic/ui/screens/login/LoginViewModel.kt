@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.contexts.cosmic.data.network.httpclient.Response
 import com.contexts.cosmic.data.network.httpclient.toErrorMessage
 import com.contexts.cosmic.data.network.model.Token
+import com.contexts.cosmic.data.network.model.UserInfo
 import com.contexts.cosmic.domain.repository.AuthenticateRepository
 import com.contexts.cosmic.domain.repository.PreferencesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,6 +32,12 @@ class LoginViewModel(
                     Token(
                         accessJwt = response.data.accessJwt,
                         refreshJwt = response.data.refreshJwt
+                    )
+                )
+                preferencesRepository.putUserInfo(
+                    UserInfo(
+                        did = response.data.did,
+                        handle = response.data.handle
                     )
                 )
                 _uiState.update { it.copy(success = true, loading = false) }

@@ -2,6 +2,7 @@ package com.contexts.cosmic.data.repository
 
 import com.contexts.cosmic.data.datastore.PreferencesDataSource
 import com.contexts.cosmic.data.network.model.Token
+import com.contexts.cosmic.data.network.model.UserInfo
 import com.contexts.cosmic.domain.repository.PreferencesRepository
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import kotlinx.coroutines.flow.Flow
@@ -31,8 +32,28 @@ class PreferencesRepositoryImpl(private val preferencesDataSource: PreferencesDa
         preferencesDataSource.editValue(REFRESH_JWT, token.refreshJwt)
     }
 
+    override fun getUserInfo(): Flow<UserInfo?> {
+        return combine(
+            preferencesDataSource.getValue(USER_DID, "", String::class),
+            preferencesDataSource.getValue(USER_HANDLE, "", String::class)
+        ) { did, handle ->
+            UserInfo(
+                did = did,
+                handle = handle
+            )
+        }
+    }
+
+    override suspend fun putUserInfo(userInfo: UserInfo) {
+        preferencesDataSource.editValue(USER_DID, userInfo.did)
+        preferencesDataSource.editValue(USER_HANDLE, userInfo.handle)
+    }
+
     companion object {
         const val ACCESS_JWT = "access_jwt"
         const val REFRESH_JWT = "refresh_jwt"
+
+        const val USER_DID = "user_did"
+        const val USER_HANDLE = "user_handle"
     }
 }

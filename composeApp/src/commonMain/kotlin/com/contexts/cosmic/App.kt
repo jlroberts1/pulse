@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.contexts.cosmic.ui.screens.login.LoginScreen
+import com.contexts.cosmic.ui.screens.profile.ProfileScreen
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -14,8 +15,6 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun App() {
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
-        LoginScreen(
-            isLoading = false
-        )
+        LoginScreen()
     }
 }
