@@ -20,7 +20,7 @@ class AuthenticateAPI(private val client: HttpClient) {
         return client.safeRequest<CreateSessionResponse> {
             url {
                 method = HttpMethod.Post
-                path("com.atproto.server.createSession")
+                path("xrpc/com.atproto.server.createSession")
             }
             setBody(request)
         }

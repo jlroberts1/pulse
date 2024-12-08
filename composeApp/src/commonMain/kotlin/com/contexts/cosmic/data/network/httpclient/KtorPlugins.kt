@@ -44,7 +44,7 @@ fun HttpClientConfig<*>.setupLogging() {
 
 fun HttpClientConfig<*>.setupDefaultRequest() {
     install(DefaultRequest) {
-        url("https://bsky.social/xrpc")
+        url("https://bsky.social")
         contentType(ContentType.Application.Json)
         accept(ContentType.Application.Json)
     }
@@ -65,7 +65,7 @@ fun HttpClientConfig<*>.setupAuth(preferencesRepository: PreferencesRepository) 
                                     markAsRefreshTokenRequest()
                                     url {
                                         method = HttpMethod.Post
-                                        path("com.atproto.server.refreshSession")
+                                        path("xrpc/com.atproto.server.refreshSession")
                                     }
                                     header(HttpHeaders.Authorization, "Bearer $it")
                                 }
@@ -89,8 +89,8 @@ fun HttpClientConfig<*>.setupAuth(preferencesRepository: PreferencesRepository) 
             }
             sendWithoutRequest { request ->
                 when (request.url.pathSegments.last()) {
-                    "com.atproto.server.createSession",
-                    "com.atproto.server.refreshSession" -> false
+                    "xrpc/com.atproto.server.createSession",
+                    "xrpc/com.atproto.server.refreshSession" -> false
 
                     else -> true
                 }

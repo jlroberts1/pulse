@@ -6,13 +6,16 @@ import com.contexts.cosmic.data.repository.AuthenticateRepositoryImpl
 import com.contexts.cosmic.data.repository.PreferencesRepositoryImpl
 import com.contexts.cosmic.domain.repository.AuthenticateRepository
 import com.contexts.cosmic.domain.repository.PreferencesRepository
+import com.contexts.cosmic.ui.screens.login.LoginViewModel
 import io.ktor.client.HttpClient
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule =
     module {
+        viewModel { LoginViewModel(get(), get()) }
         single<PreferencesRepository> { PreferencesRepositoryImpl(get()) }
     }
 
