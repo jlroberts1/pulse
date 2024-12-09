@@ -11,8 +11,8 @@ class CosmicApplication : Application() {
             listOf(
                 module {
                     single { applicationContext }
-                }
-            )
+                },
+            ),
         )
     }
 }

@@ -13,11 +13,11 @@ class PreferencesRepositoryImpl(private val preferencesDataSource: PreferencesDa
     override fun getTokens(): Flow<BearerTokens?> {
         return combine(
             preferencesDataSource.getValue(ACCESS_JWT, "", String::class),
-            preferencesDataSource.getValue(REFRESH_JWT, "", String::class)
+            preferencesDataSource.getValue(REFRESH_JWT, "", String::class),
         ) { accessToken, refreshToken ->
             BearerTokens(
                 accessToken = accessToken,
-                refreshToken = refreshToken
+                refreshToken = refreshToken,
             )
         }
     }
@@ -35,11 +35,11 @@ class PreferencesRepositoryImpl(private val preferencesDataSource: PreferencesDa
     override fun getUserInfo(): Flow<UserInfo?> {
         return combine(
             preferencesDataSource.getValue(USER_DID, "", String::class),
-            preferencesDataSource.getValue(USER_HANDLE, "", String::class)
+            preferencesDataSource.getValue(USER_HANDLE, "", String::class),
         ) { did, handle ->
             UserInfo(
                 did = did,
-                handle = handle
+                handle = handle,
             )
         }
     }

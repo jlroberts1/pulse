@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface AuthManager {
     suspend fun getTokens(): BearerTokens?
+
     suspend fun putTokens(token: Token)
+
     fun getAuthState(): Flow<AuthState?>
 }

@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class PostRecord(
     val text: String,
     val createdAt: String,
-    val embed: Embed? = null
+    val embed: Embed? = null,
 )

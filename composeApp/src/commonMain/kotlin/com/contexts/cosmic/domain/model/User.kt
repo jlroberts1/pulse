@@ -12,7 +12,7 @@ data class User(
     val followersCount: Int,
     val followsCount: Int,
     val postsCount: Int,
-    val indexedAt: String?
+    val indexedAt: String?,
 )
 
 fun com.contexts.cosmic.db.User.toUser(): User {
@@ -26,7 +26,7 @@ fun com.contexts.cosmic.db.User.toUser(): User {
         followersCount = followersCount.toInt(),
         followsCount = followsCount.toInt(),
         postsCount = postsCount.toInt(),
-        indexedAt = indexedAt
+        indexedAt = indexedAt,
     )
 }
 
@@ -41,5 +41,5 @@ fun ProfileDTO.toUser() =
         followersCount = this.followersCount,
         followsCount = this.followsCount,
         postsCount = this.postsCount,
-        indexedAt = this.indexedAt ?: ""
+        indexedAt = this.indexedAt ?: "",
     )

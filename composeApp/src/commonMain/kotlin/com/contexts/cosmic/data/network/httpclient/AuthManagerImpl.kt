@@ -14,26 +14,27 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class AuthManagerImpl(private val localDataSource: LocalDataSource) : AuthManager {
-    override suspend fun getTokens(): BearerTokens? = withContext(Dispatchers.IO) {
-        val authState =
-            localDataSource.getAuthState().mapToOne(Dispatchers.IO).first().toAuthState()
-        return@withContext BearerTokens(
-            accessToken = authState.accessJwt,
-            refreshToken = authState.refreshJwt
-        )
-    }
-
-    override suspend fun putTokens(token: Token) = withContext(Dispatchers.IO) {
-        val authState =
-            localDataSource.getAuthState().mapToOne(Dispatchers.IO).first().toAuthState()
-        localDataSource.updateAuthState(
-            authState.copy(
-                accessJwt = token.accessJwt,
-                refreshJwt = token.refreshJwt
+    override suspend fun getTokens(): BearerTokens? =
+        withContext(Dispatchers.IO) {
+            val authState =
+                localDataSource.getAuthState().mapToOne(Dispatchers.IO).first().toAuthState()
+            return@withContext BearerTokens(
+                accessToken = authState.accessJwt,
+                refreshToken = authState.refreshJwt,
             )
-        )
-    }
+        }
 
-    override fun getAuthState(): Flow<AuthState?> =
-        localDataSource.getAuthState().mapToOne(Dispatchers.IO).map { it.toAuthState() }
+    override suspend fun putTokens(token: Token) =
+        withContext(Dispatchers.IO) {
+            val authState =
+                localDataSource.getAuthState().mapToOne(Dispatchers.IO).first().toAuthState()
+            localDataSource.updateAuthState(
+                authState.copy(
+                    accessJwt = token.accessJwt,
+                    refreshJwt = token.refreshJwt,
+                ),
+            )
+        }
+
+    override fun getAuthState(): Flow<AuthState?> = localDataSource.getAuthState().mapToOne(Dispatchers.IO).map { it.toAuthState() }
 }

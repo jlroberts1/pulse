@@ -27,7 +27,7 @@ import org.koin.compose.koinInject
 fun MainAppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    authManager: AuthManager = koinInject()
+    authManager: AuthManager = koinInject(),
 ) {
     var appState by remember {
         mutableStateOf<AppState>(AppState.Loading)
@@ -47,7 +47,7 @@ fun MainAppNavHost(
             NavHost(
                 modifier = modifier,
                 navController = navController,
-                startDestination = NavigationRoutes.Authenticated.NavigationRoute.route
+                startDestination = NavigationRoutes.Authenticated.NavigationRoute.route,
             ) {
                 authenticatedGraph(navController)
                 unauthenticateddGraph(navController)
@@ -58,7 +58,7 @@ fun MainAppNavHost(
             NavHost(
                 modifier = modifier,
                 navController = navController,
-                startDestination = NavigationRoutes.Unauthenticated.NavigationRoute.route
+                startDestination = NavigationRoutes.Unauthenticated.NavigationRoute.route,
             ) {
                 unauthenticateddGraph(navController)
                 authenticatedGraph(navController)
@@ -81,9 +81,7 @@ sealed class NavigationRoutes {
     }
 }
 
-fun NavGraphBuilder.unauthenticateddGraph(
-    navController: NavController
-) {
+fun NavGraphBuilder.unauthenticateddGraph(navController: NavController) {
     navigation(
         route = NavigationRoutes.Unauthenticated.NavigationRoute.route,
         startDestination = NavigationRoutes.Unauthenticated.Login.route,
@@ -96,15 +94,13 @@ fun NavGraphBuilder.unauthenticateddGraph(
                             inclusive = true
                         }
                     }
-                }
+                },
             )
         }
     }
 }
 
-fun NavGraphBuilder.authenticatedGraph(
-    navController: NavController
-) {
+fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
     navigation(
         route = NavigationRoutes.Authenticated.NavigationRoute.route,
         startDestination = NavigationRoutes.Authenticated.Profile.route,

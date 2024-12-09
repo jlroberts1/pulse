@@ -7,5 +7,5 @@ data class RefreshSessionResponse(
     val accessJwt: String,
     val refreshJwt: String,
     val handle: String,
-    val did: String
+    val did: String,
 )

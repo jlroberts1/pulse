@@ -40,7 +40,11 @@ class PreferencesDataSourceImpl() : PreferencesDataSource {
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T : Any> getValue(key: String, defaultValue: T, type: KClass<T>): Flow<T> {
+    override fun <T : Any> getValue(
+        key: String,
+        defaultValue: T,
+        type: KClass<T>,
+    ): Flow<T> {
         return dataStore.data.catch { exception ->
             if (exception is IOException) {
                 emit(emptyPreferences())
@@ -57,7 +61,10 @@ class PreferencesDataSourceImpl() : PreferencesDataSource {
         }
     }
 
-    override suspend fun <T : Any> editValue(key: String, value: T) {
+    override suspend fun <T : Any> editValue(
+        key: String,
+        value: T,
+    ) {
         dataStore.edit { preferences ->
             when (value) {
                 is String -> preferences[stringPreferencesKey(key)] = value
@@ -68,7 +75,10 @@ class PreferencesDataSourceImpl() : PreferencesDataSource {
         }
     }
 
-    override suspend fun <T : Any> clear(key: String, type: KClass<T>) {
+    override suspend fun <T : Any> clear(
+        key: String,
+        type: KClass<T>,
+    ) {
         dataStore.edit { preferences ->
             when (type) {
                 String::class -> preferences.remove(stringPreferencesKey(key))

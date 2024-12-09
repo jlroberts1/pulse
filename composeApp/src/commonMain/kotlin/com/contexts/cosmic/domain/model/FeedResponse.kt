@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FeedResponse(
     val cursor: String? = null,
-    val feed: List<FeedViewPost>
+    val feed: List<FeedViewPost>,
 )

@@ -10,5 +10,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface ProfileRepository {
     suspend fun getProfile(actor: String): Response<ProfileDTO, NetworkError>
+
     suspend fun getMyProfile(myDid: String): Flow<RequestResult<User, AppError>>
 }

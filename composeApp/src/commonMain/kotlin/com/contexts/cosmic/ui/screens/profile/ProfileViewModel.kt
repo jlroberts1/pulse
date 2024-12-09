@@ -11,13 +11,13 @@ class ProfileViewModel(
     private val profileRepository: ProfileRepository,
     authManager: AuthManager,
 ) : ViewModel() {
-
     @OptIn(ExperimentalCoroutinesApi::class)
-    val profile = authManager.getAuthState().flatMapLatest { authState ->
-        if (authState != null) {
-            profileRepository.getMyProfile(authState.userDid)
-        } else {
-            flowOf()
+    val profile =
+        authManager.getAuthState().flatMapLatest { authState ->
+            if (authState != null) {
+                profileRepository.getMyProfile(authState.userDid)
+            } else {
+                flowOf()
+            }
         }
-    }
 }

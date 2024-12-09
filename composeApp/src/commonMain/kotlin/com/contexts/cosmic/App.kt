@@ -26,22 +26,22 @@ fun App() {
     val color = MaterialTheme.colorScheme.primary.toArgb()
     val seedColor by rememberSaveable { mutableStateOf(color) }
 
-    val state = rememberDynamicMaterialThemeState(
-        seedColor = Color(seedColor),
-        isDark = isDarkTheme,
-        isAmoled = isAmoled,
-    )
+    val state =
+        rememberDynamicMaterialThemeState(
+            seedColor = Color(seedColor),
+            isDark = isDarkTheme,
+            isAmoled = isAmoled,
+        )
 
     CosmicTheme(state) {
         KoinContext {
-            Scaffold(
-
-            ) { innerPadding ->
+            Scaffold { innerPadding ->
                 Surface(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
-                    color = MaterialTheme.colorScheme.background
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                    color = MaterialTheme.colorScheme.background,
                 ) {
                     MainAppNavHost()
                 }

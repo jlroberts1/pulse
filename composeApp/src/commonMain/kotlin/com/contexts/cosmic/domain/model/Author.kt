@@ -7,5 +7,5 @@ data class Author(
     val did: String,
     val handle: String,
     val displayName: String? = null,
-    val avatar: String? = null
+    val avatar: String? = null,
 )

@@ -36,8 +36,10 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ProfileScreen() {
     val viewModel: ProfileViewModel = koinViewModel()
-    when (val profileState =
-        viewModel.profile.collectAsStateWithLifecycle(RequestResult.Loading).value) {
+    when (
+        val profileState =
+            viewModel.profile.collectAsStateWithLifecycle(RequestResult.Loading).value
+    ) {
         is RequestResult.Loading -> Loading()
         is RequestResult.Success -> ProfileView(profileState.data)
         is RequestResult.Error -> ErrorView(profileState.error.message)
@@ -48,7 +50,7 @@ fun ProfileScreen() {
 fun Loading() {
     Box(modifier = Modifier.fillMaxSize()) {
         CircularProgressIndicator(
-            modifier = Modifier.align(Alignment.Center)
+            modifier = Modifier.align(Alignment.Center),
         )
     }
 }
@@ -56,31 +58,31 @@ fun Loading() {
 @Composable
 fun ErrorView(
     message: String,
-    //onRetry: () -> Unit
+    // onRetry: () -> Unit
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = "Error",
                 style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = message,
                 style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {},
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Retry")
             }
@@ -89,47 +91,49 @@ fun ErrorView(
 }
 
 @Composable
-fun ProfileView(
-    profile: User,
-) {
+fun ProfileView(profile: User) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
         ) {
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp)
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
             ) {
                 profile.banner?.let { bannerUrl ->
                     AsyncImage(
                         model = bannerUrl,
                         contentDescription = "Profile banner",
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
                     )
                 }
                 profile.avatar?.let { avatarUrl ->
                     AsyncImage(
                         model = avatarUrl,
                         contentDescription = "Profile avatar",
-                        modifier = Modifier
-                            .size(120.dp)
-                            .clip(CircleShape)
-                            .border(2.dp, MaterialTheme.colorScheme.surface, CircleShape)
-                            .align(Alignment.BottomStart),
+                        modifier =
+                            Modifier
+                                .size(120.dp)
+                                .clip(CircleShape)
+                                .border(2.dp, MaterialTheme.colorScheme.surface, CircleShape)
+                                .align(Alignment.BottomStart),
                         contentScale = ContentScale.Crop,
                     )
                 }
             }
 
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
             ) {
                 Text(
                     text = (profile.displayName ?: profile.handle),
@@ -139,14 +143,14 @@ fun ProfileView(
                 Text(
                     text = "@${profile.handle}",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
                 profile.description?.let { description ->
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = description,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
 
@@ -154,39 +158,39 @@ fun ProfileView(
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(24.dp)
+                    horizontalArrangement = Arrangement.spacedBy(24.dp),
                 ) {
                     Column {
                         Text(
                             text = profile.postsCount.toString(),
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
                         )
                         Text(
                             text = "Posts",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                     Column {
                         Text(
                             text = profile.followersCount.toString(),
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
                         )
                         Text(
                             text = "Followers",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                     Column {
                         Text(
                             text = profile.followsCount.toString(),
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
                         )
                         Text(
                             text = "Following",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }

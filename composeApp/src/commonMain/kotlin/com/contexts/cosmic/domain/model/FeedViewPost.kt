@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class FeedViewPost(
     val post: Post,
     val reply: ReplyRef? = null,
-    val reason: FeedReason? = null
+    val reason: FeedReason? = null,
 )

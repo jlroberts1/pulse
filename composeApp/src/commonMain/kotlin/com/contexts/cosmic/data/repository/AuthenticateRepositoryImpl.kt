@@ -20,7 +20,7 @@ class AuthenticateRepositoryImpl(
 ) : AuthenticateRepository {
     override suspend fun createSession(
         identifier: String,
-        password: String
+        password: String,
     ): Response<Unit, NetworkError> {
         return authApi.createSession(identifier, password)
             .onSuccess { response ->
@@ -29,8 +29,8 @@ class AuthenticateRepositoryImpl(
                         userDid = response.did,
                         accessJwt = response.accessJwt,
                         refreshJwt = response.refreshJwt,
-                        lastRefreshed = Clock.System.now().toString()
-                    )
+                        lastRefreshed = Clock.System.now().toString(),
+                    ),
                 )
             }
             .map { response ->

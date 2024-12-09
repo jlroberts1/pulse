@@ -48,12 +48,13 @@ inline fun <T, E : NetworkError> Response<T, E>.onError(action: (E) -> Unit): Re
 fun <T, R> Flow<T>.updateLocal(
     localDataSource: LocalDataSource,
     transform: (T) -> R,
-    saveAction: suspend (LocalDataSource, R) -> Unit
-): Flow<R> = map { item ->
-    transform(item).also { result ->
-        saveAction(localDataSource, result)
+    saveAction: suspend (LocalDataSource, R) -> Unit,
+): Flow<R> =
+    map { item ->
+        transform(item).also { result ->
+            saveAction(localDataSource, result)
+        }
     }
-}
 
 suspend fun <T, E : NetworkError, R> Response<T, E>.handleInChannel(
     channelScope: ProducerScope<RequestResult<R, AppError>>,

@@ -15,5 +15,5 @@ data class ProfileDTO(
     val followsCount: Int = 0,
     val postsCount: Int = 0,
     val indexedAt: String? = null,
-    val labels: List<Label>? = null
+    val labels: List<Label>? = null,
 )

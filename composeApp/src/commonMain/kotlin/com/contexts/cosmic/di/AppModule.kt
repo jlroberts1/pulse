@@ -52,11 +52,12 @@ val appModule =
 expect val platformModule: Module
 expect val sqlDriverModule: Module
 
-internal fun getBaseModules() = listOf(
-    platformModule,
-    sqlDriverModule,
-    appModule
-)
+internal fun getBaseModules() =
+    listOf(
+        platformModule,
+        sqlDriverModule,
+        appModule,
+    )
 
 fun initializeKoin(additionalModules: List<Module>) {
     startKoin {
@@ -69,4 +70,3 @@ fun initializeKoinIos() {
         modules(getBaseModules())
     }
 }
-

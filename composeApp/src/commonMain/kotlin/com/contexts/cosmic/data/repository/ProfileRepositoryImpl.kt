@@ -30,7 +30,7 @@ class ProfileRepositoryImpl(
                 .handleInChannel(
                     channelScope = this,
                     transform = { it.toUser() },
-                    saveAction = { localDataSource.updateProfile(it) }
+                    saveAction = { localDataSource.updateProfile(it) },
                 )
         }
 }

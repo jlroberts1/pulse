@@ -8,5 +8,5 @@ data class CreateSessionResponse(
     val refreshJwt: String,
     val handle: String,
     val did: String,
-    val email: String? = null
+    val email: String? = null,
 )

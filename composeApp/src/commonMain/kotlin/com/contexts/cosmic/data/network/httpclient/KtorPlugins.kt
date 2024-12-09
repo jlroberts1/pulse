@@ -88,7 +88,8 @@ fun HttpClientConfig<*>.setupAuth(authManager: AuthManager) {
             sendWithoutRequest { request ->
                 when (request.url.pathSegments.last()) {
                     "xrpc/com.atproto.server.createSession",
-                    "xrpc/com.atproto.server.refreshSession" -> false
+                    "xrpc/com.atproto.server.refreshSession",
+                    -> false
 
                     else -> true
                 }

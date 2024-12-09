@@ -36,7 +36,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun LoginScreen(
     onNavigateToAuthenticatedRoute: () -> Unit,
-    isLoading: Boolean = false
+    isLoading: Boolean = false,
 ) {
     val viewModel: LoginViewModel = koinViewModel()
     var identifier by remember { mutableStateOf("") }
@@ -45,14 +45,15 @@ fun LoginScreen(
 
     val scope = rememberCoroutineScope()
 
-    val uiState = viewModel.state.collectAsState()
+    val uiState = viewModel.uiState.collectAsState()
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         if (uiState.value.loading) {
             CircularProgressIndicator()
@@ -67,10 +68,11 @@ fun LoginScreen(
             label = { Text("Handle or Email") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next
-            )
+            keyboardOptions =
+                KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next,
+                ),
         )
 
         OutlinedTextField(
@@ -79,33 +81,37 @@ fun LoginScreen(
             label = { Text("Password") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            visualTransformation = if (isPasswordVisible) {
-                VisualTransformation.None
-            } else {
-                PasswordVisualTransformation()
-            },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done
-            ),
+            visualTransformation =
+                if (isPasswordVisible) {
+                    VisualTransformation.None
+                } else {
+                    PasswordVisualTransformation()
+                },
+            keyboardOptions =
+                KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done,
+                ),
             trailingIcon = {
                 IconButton(
-                    onClick = { isPasswordVisible = !isPasswordVisible }
+                    onClick = { isPasswordVisible = !isPasswordVisible },
                 ) {
                     Icon(
-                        imageVector = if (isPasswordVisible) {
-                            Icons.Default.VisibilityOff
-                        } else {
-                            Icons.Default.Visibility
-                        },
-                        contentDescription = if (isPasswordVisible) {
-                            "Hide password"
-                        } else {
-                            "Show password"
-                        }
+                        imageVector =
+                            if (isPasswordVisible) {
+                                Icons.Default.VisibilityOff
+                            } else {
+                                Icons.Default.Visibility
+                            },
+                        contentDescription =
+                            if (isPasswordVisible) {
+                                "Hide password"
+                            } else {
+                                "Show password"
+                            },
                     )
                 }
-            }
+            },
         )
 
         Button(
@@ -115,12 +121,12 @@ fun LoginScreen(
                 }
             },
             modifier = Modifier.fillMaxWidth(),
-            enabled = identifier.isNotBlank() && password.isNotBlank() && !isLoading
+            enabled = identifier.isNotBlank() && password.isNotBlank() && !isLoading,
         ) {
             if (isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.onPrimary,
                 )
             } else {
                 Text("Login")

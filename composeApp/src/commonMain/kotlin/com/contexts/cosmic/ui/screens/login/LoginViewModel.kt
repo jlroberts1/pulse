@@ -14,13 +14,15 @@ data class LoginUiState(
 )
 
 class LoginViewModel(
-    private val authenticateRepository: AuthenticateRepository
+    private val authenticateRepository: AuthenticateRepository,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(LoginUiState())
-    val state = _uiState.asStateFlow()
+    val uiState = _uiState.asStateFlow()
 
-    suspend fun login(identifier: String, password: String) {
+    suspend fun login(
+        identifier: String,
+        password: String,
+    ) {
         _uiState.update { it.copy(loading = true) }
         when (val response = authenticateRepository.createSession(identifier, password)) {
             is Response.Success -> {

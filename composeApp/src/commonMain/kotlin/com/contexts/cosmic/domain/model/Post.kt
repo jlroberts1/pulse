@@ -11,5 +11,5 @@ data class Post(
     val indexedAt: String,
     val replyCount: Int = 0,
     val repostCount: Int = 0,
-    val likeCount: Int = 0
+    val likeCount: Int = 0,
 )

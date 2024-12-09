@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class FeedReason(
-    val type: String
+    val type: String,
 )

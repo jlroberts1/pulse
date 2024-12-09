@@ -6,7 +6,7 @@ data class AuthState(
     val userDid: String,
     val accessJwt: String,
     val refreshJwt: String,
-    val lastRefreshed: String
+    val lastRefreshed: String,
 )
 
 fun Auth_state.toAuthState() =

@@ -13,12 +13,13 @@ actual val platformModule: Module =
         single<PreferencesDataSource> { PreferencesDataSourceImpl(get()) }
     }
 
-actual val sqlDriverModule: Module = module {
-    single<SqlDriver> {
-        AndroidSqliteDriver(
-            schema = Database.Schema,
-            context = get(),
-            name = "cosmic.db"
-        )
+actual val sqlDriverModule: Module =
+    module {
+        single<SqlDriver> {
+            AndroidSqliteDriver(
+                schema = Database.Schema,
+                context = get(),
+                name = "cosmic.db",
+            )
+        }
     }
-}
