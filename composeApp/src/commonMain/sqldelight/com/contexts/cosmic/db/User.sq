@@ -1,0 +1,69 @@
+CREATE TABLE user (
+    did TEXT NOT NULL PRIMARY KEY,
+    handle TEXT NOT NULL,
+    displayName TEXT,
+    description TEXT,
+    avatar TEXT,
+    banner TEXT,
+    followersCount INTEGER NOT NULL DEFAULT 0,
+    followsCount INTEGER NOT NULL DEFAULT 0,
+    postsCount INTEGER NOT NULL DEFAULT 0,
+    indexedAt TEXT NOT NULL
+);
+
+CREATE TABLE auth_state (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    userDid TEXT NOT NULL UNIQUE,
+    accessJwt TEXT NOT NULL,
+    refreshJwt TEXT NOT NULL,
+    lastRefreshed TEXT NOT NULL
+);
+
+selectUser:
+SELECT * FROM user WHERE did = ?;
+
+insertUser:
+INSERT OR REPLACE INTO user(
+    did, handle, displayName, description,
+    avatar, banner, followersCount, followsCount,
+    postsCount, indexedAt
+) VALUES (?, ?, ?, ?, ?,  ?, ?, ?, ?, ?);
+
+updateProfile:
+UPDATE user
+SET
+    handle = ?,
+    displayName = ?,
+    description = ?,
+    avatar = ?,
+    banner = ?,
+    followersCount = ?,
+    followsCount = ?,
+    postsCount = ?,
+    indexedAt = ?
+WHERE did = ?;
+
+getAuthState:
+SELECT *
+FROM auth_state
+LIMIT 1;
+
+upsertAuthState:
+INSERT OR REPLACE INTO auth_state(
+    userDid, accessJwt, refreshJwt,
+    lastRefreshed
+) VALUES ( ?, ?, ?, ?);
+
+updateTokens:
+UPDATE auth_state
+SET
+    accessJwt = ?,
+    refreshJwt = ?,
+    lastRefreshed = ?
+WHERE userDid = ?;
+
+clearAuthState:
+DELETE FROM auth_state;
+
+isLoggedIn:
+SELECT EXISTS(SELECT 1 FROM auth_state LIMIT 1);

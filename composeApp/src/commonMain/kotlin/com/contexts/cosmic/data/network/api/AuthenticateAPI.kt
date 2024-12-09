@@ -1,11 +1,11 @@
 package com.contexts.cosmic.data.network.api
 
-import com.contexts.cosmic.data.network.httpclient.NetworkError
 import com.contexts.cosmic.data.network.httpclient.Response
 import com.contexts.cosmic.data.network.httpclient.invalidateBearerTokens
 import com.contexts.cosmic.data.network.httpclient.safeRequest
 import com.contexts.cosmic.data.network.model.request.CreateSessionRequest
 import com.contexts.cosmic.data.network.model.response.CreateSessionResponse
+import com.contexts.cosmic.exceptions.NetworkError
 import io.ktor.client.HttpClient
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpMethod

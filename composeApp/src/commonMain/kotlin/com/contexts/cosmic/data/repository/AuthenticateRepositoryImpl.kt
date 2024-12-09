@@ -1,20 +1,44 @@
 package com.contexts.cosmic.data.repository
 
+import com.contexts.cosmic.data.local.LocalDataSource
 import com.contexts.cosmic.data.network.api.AuthenticateAPI
-import com.contexts.cosmic.data.network.httpclient.NetworkError
+import com.contexts.cosmic.data.network.api.ProfileAPI
 import com.contexts.cosmic.data.network.httpclient.Response
-import com.contexts.cosmic.data.network.model.response.CreateSessionResponse
+import com.contexts.cosmic.data.network.httpclient.asEmptyDataResult
+import com.contexts.cosmic.data.network.httpclient.map
+import com.contexts.cosmic.data.network.httpclient.onSuccess
+import com.contexts.cosmic.domain.model.AuthState
+import com.contexts.cosmic.domain.model.toUser
 import com.contexts.cosmic.domain.repository.AuthenticateRepository
+import com.contexts.cosmic.exceptions.NetworkError
+import kotlinx.datetime.Clock
 
-class AuthenticateRepositoryImpl(private val api: AuthenticateAPI) : AuthenticateRepository {
+class AuthenticateRepositoryImpl(
+    private val authApi: AuthenticateAPI,
+    private val profileApi: ProfileAPI,
+    private val localDataSource: LocalDataSource,
+) : AuthenticateRepository {
     override suspend fun createSession(
         identifier: String,
         password: String
-    ): Response<CreateSessionResponse, NetworkError> {
-        return api.createSession(identifier, password)
-    }
-
-    override suspend fun clearToken() {
-        api.clearToken()
+    ): Response<Unit, NetworkError> {
+        return authApi.createSession(identifier, password)
+            .onSuccess { response ->
+                localDataSource.updateAuthState(
+                    AuthState(
+                        userDid = response.did,
+                        accessJwt = response.accessJwt,
+                        refreshJwt = response.refreshJwt,
+                        lastRefreshed = Clock.System.now().toString()
+                    )
+                )
+            }
+            .map { response ->
+                profileApi.getProfile(response.did)
+                    .onSuccess { userProfile ->
+                        localDataSource.insertUser(userProfile.toUser())
+                    }
+            }
+            .asEmptyDataResult()
     }
 }

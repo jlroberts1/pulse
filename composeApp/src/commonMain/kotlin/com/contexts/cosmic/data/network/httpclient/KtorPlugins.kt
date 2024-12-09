@@ -2,7 +2,6 @@ package com.contexts.cosmic.data.network.httpclient
 
 import com.contexts.cosmic.data.network.model.Token
 import com.contexts.cosmic.data.network.model.response.RefreshSessionResponse
-import com.contexts.cosmic.domain.repository.PreferencesRepository
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.auth.Auth
@@ -20,7 +19,6 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
 import io.ktor.http.path
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.serialization.json.Json
 
 fun HttpClientConfig<*>.setupContentNegotiation() {
@@ -50,15 +48,15 @@ fun HttpClientConfig<*>.setupDefaultRequest() {
     }
 }
 
-fun HttpClientConfig<*>.setupAuth(preferencesRepository: PreferencesRepository) {
+fun HttpClientConfig<*>.setupAuth(authManager: AuthManager) {
     install(Auth) {
         bearer {
             loadTokens {
-                preferencesRepository.getTokens().firstOrNull()
+                authManager.getTokens()
             }
             refreshTokens {
-                preferencesRepository.getTokens().firstOrNull()?.let { oldTokens ->
-                    oldTokens.refreshToken?.let {
+                authManager.getTokens().let { oldTokens ->
+                    oldTokens?.refreshToken?.let {
                         when (
                             val response =
                                 client.safeRequest<RefreshSessionResponse> {
@@ -76,7 +74,7 @@ fun HttpClientConfig<*>.setupAuth(preferencesRepository: PreferencesRepository) 
                                         accessJwt = response.data.accessJwt,
                                         refreshJwt = response.data.refreshJwt,
                                     )
-                                preferencesRepository.putTokens(tokens)
+                                authManager.putTokens(tokens)
                             }
 
                             is Response.Error -> {
@@ -84,7 +82,7 @@ fun HttpClientConfig<*>.setupAuth(preferencesRepository: PreferencesRepository) 
                             }
                         }
                     }
-                    preferencesRepository.getTokens().firstOrNull()
+                    authManager.getTokens()
                 }
             }
             sendWithoutRequest { request ->

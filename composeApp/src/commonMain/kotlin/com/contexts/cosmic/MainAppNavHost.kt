@@ -18,7 +18,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import com.contexts.cosmic.domain.repository.PreferencesRepository
+import com.contexts.cosmic.data.network.httpclient.AuthManager
 import com.contexts.cosmic.ui.screens.login.LoginScreen
 import com.contexts.cosmic.ui.screens.profile.ProfileScreen
 import org.koin.compose.koinInject
@@ -27,22 +27,17 @@ import org.koin.compose.koinInject
 fun MainAppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    preferencesRepository: PreferencesRepository = koinInject(),
+    authManager: AuthManager = koinInject()
 ) {
     var appState by remember {
         mutableStateOf<AppState>(AppState.Loading)
     }
 
     LaunchedEffect(Unit) {
-        preferencesRepository.getTokens().collect { tokens ->
-            appState  =
-                if (tokens?.accessToken.isNullOrEmpty()) {
-                    AppState.Unauthenticated
-                } else {
-                    AppState.Authenticated
-                }
-        }
+        val tokens = authManager.getTokens()
+        appState = tokens?.let { AppState.Authenticated } ?: AppState.Unauthenticated
     }
+
     when (appState) {
         is AppState.Loading -> {
             SplashScreen()

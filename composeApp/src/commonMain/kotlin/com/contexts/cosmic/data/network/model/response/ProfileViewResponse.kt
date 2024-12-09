@@ -4,7 +4,7 @@ import com.contexts.cosmic.domain.model.Label
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ProfileViewResponse(
+data class ProfileDTO(
     val did: String,
     val handle: String,
     val displayName: String? = null,

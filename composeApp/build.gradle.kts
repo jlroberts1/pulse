@@ -39,6 +39,7 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.sqldelight.android)
+            implementation(libs.napier)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
@@ -66,6 +67,7 @@ kotlin {
             implementation(libs.datastore.preferences)
             implementation(libs.coil)
             implementation(libs.coil.networking)
+            implementation(libs.sqldelight.extensions)
         }
     }
 }
@@ -99,8 +101,8 @@ android {
 
 sqldelight {
     databases {
-        create("CosmicDb") {
-            packageName.set("com.contexts")
+        create("Database") {
+            packageName.set("com.contexts.cosmic.db")
         }
     }
 }

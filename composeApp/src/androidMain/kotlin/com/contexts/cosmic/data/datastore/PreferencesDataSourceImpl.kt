@@ -66,4 +66,4 @@ class PreferencesDataSourceImpl(context: Context) : PreferencesDataSource {
     }
 }
 
-internal const val DATA_STORE_FILE_NAME = "cosmic.preferences_pb"
+internal const val DATA_STORE_FILE_NAME = "sqldelight.preferences_pb"

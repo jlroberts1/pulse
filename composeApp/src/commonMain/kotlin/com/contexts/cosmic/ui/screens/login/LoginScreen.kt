@@ -13,6 +13,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,19 +54,11 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        if (uiState.value.loading) {
+            CircularProgressIndicator()
+        }
         if (uiState.value.success) {
-            Text(
-                text = "Successfully authenticated"
-            )
-        } else if (uiState.value.loading) {
-            Text(
-                text = "Loading..."
-            )
-        } else {
-            Text(
-                text = "Login to Bluesky",
-                //style = MaterialTheme.typography.headlineMedium
-            )
+            onNavigateToAuthenticatedRoute()
         }
 
         OutlinedTextField(
@@ -127,7 +120,7 @@ fun LoginScreen(
             if (isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
-                    //color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             } else {
                 Text("Login")
