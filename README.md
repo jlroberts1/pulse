@@ -1,3 +1,5 @@
+![icon-192](https://github.com/user-attachments/assets/8afd5622-5a8a-4b4b-bf18-fefa383a3095)
+
 Cosmic is a WIP Bluesky client.
 
 This is a Kotlin Multiplatform project targeting Android, iOS.
