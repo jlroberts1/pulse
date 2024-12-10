@@ -10,6 +10,7 @@ import com.contexts.cosmic.domain.model.FeedViewPost
 import com.contexts.cosmic.exceptions.AppError
 import com.contexts.cosmic.extensions.RequestResult
 import com.contexts.cosmic.ui.composables.ErrorView
+import com.contexts.cosmic.ui.composables.FeedItem
 import com.contexts.cosmic.ui.composables.Loading
 import com.contexts.cosmic.ui.screens.profile.composables.Header
 import com.contexts.cosmic.ui.screens.profile.composables.ProfileInfo
@@ -44,7 +45,7 @@ fun FeedView(feed: RequestResult<List<FeedViewPost>, AppError>) {
         }
         is RequestResult.Success -> {
             feed.data.forEach { post ->
-                ProfileFeedCard(post)
+                FeedItem(post)
             }
         }
     }

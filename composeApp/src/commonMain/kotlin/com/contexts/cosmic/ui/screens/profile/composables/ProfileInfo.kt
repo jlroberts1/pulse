@@ -38,7 +38,10 @@ fun ProfileInfo(result: RequestResult<User, AppError>) {
                     Spacer(modifier = Modifier.height(8.dp))
                     AutoLinkText(
                         text = description,
-                        style = MaterialTheme.typography.bodyMedium,
+                        style =
+                            MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            ),
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))

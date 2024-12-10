@@ -10,6 +10,7 @@ import com.contexts.cosmic.domain.model.FeedViewPost
 import com.contexts.cosmic.exceptions.AppError
 import com.contexts.cosmic.extensions.RequestResult
 import com.contexts.cosmic.ui.composables.ErrorView
+import com.contexts.cosmic.ui.composables.FeedItem
 import com.contexts.cosmic.ui.composables.Loading
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -35,7 +36,7 @@ fun FeedView(feed: RequestResult<List<FeedViewPost>, AppError>) {
             is RequestResult.Success -> {
                 items(feed.data.size) {
                     feed.data.forEach { post ->
-                        HomeFeedCard(post)
+                        FeedItem(post)
                     }
                 }
             }
