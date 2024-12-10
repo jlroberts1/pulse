@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/cosmic">
+
+    <target android:name="particle1">
+        <animation-list>
+            <objectAnimator
+                android:duration="12000"
+                android:interpolator="@android:interpolator/linear"
+                android:propertyName="rotation"
+                android:repeatCount="infinite"
+                android:valueFrom="0"
+                android:valueTo="360" />
+        </animation-list>
+    </target>
+
+    <target android:name="particle2">
+        <animation-list>
+            <objectAnimator
+                android:duration="15000"
+                android:interpolator="@android:interpolator/linear"
+                android:propertyName="rotation"
+                android:repeatCount="infinite"
+                android:valueFrom="90"
+                android:valueTo="450" />
+        </animation-list>
+    </target>
+
+    <target android:name="particle3">
+        <animation-list>
+            <objectAnimator
+                android:duration="10000"
+                android:interpolator="@android:interpolator/linear"
+                android:propertyName="rotation"
+                android:repeatCount="infinite"
+                android:valueFrom="270"
+                android:valueTo="630" />
+        </animation-list>
+    </target>
+
+    <target android:name="particle4">
+        <animation-list>
+            <objectAnimator
+                android:duration="8000"
+                android:interpolator="@android:interpolator/linear"
+                android:propertyName="rotation"
+                android:repeatCount="infinite"
+                android:valueFrom="180"
+                android:valueTo="540" />
+        </animation-list>
+    </target>
+
+    <target android:name="particle5">
+        <animation-list>
+            <objectAnimator
+                android:duration="14000"
+                android:interpolator="@android:interpolator/linear"
+                android:propertyName="rotation"
+                android:repeatCount="infinite"
+                android:valueFrom="45"
+                android:valueTo="405" />
+        </animation-list>
+    </target>
+
+    <target android:name="particle6">
+        <animation-list>
+            <objectAnimator
+                android:duration="11000"
+                android:interpolator="@android:interpolator/linear"
+                android:propertyName="rotation"
+                android:repeatCount="infinite"
+                android:valueFrom="135"
+                android:valueTo="495" />
+        </animation-list>
+    </target>
+</animated-vector>

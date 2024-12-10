@@ -34,10 +34,7 @@ import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun LoginScreen(
-    onNavigateToAuthenticatedRoute: () -> Unit,
-    isLoading: Boolean = false,
-) {
+fun LoginScreen(isLoading: Boolean = false) {
     val viewModel: LoginViewModel = koinViewModel()
     var identifier by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -57,9 +54,6 @@ fun LoginScreen(
     ) {
         if (uiState.value.loading) {
             CircularProgressIndicator()
-        }
-        if (uiState.value.success) {
-            onNavigateToAuthenticatedRoute()
         }
 
         OutlinedTextField(

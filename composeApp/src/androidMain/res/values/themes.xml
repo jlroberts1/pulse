@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <!-- Background color of the splash screen -->
+        <item name="windowSplashScreenBackground">@android:color/background_light</item>
+
+        <!-- Your app icon/logo -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/cosmic_splash</item>
+
+        <!-- Optional: Animation duration -->
+        <item name="windowSplashScreenAnimationDuration">200</item>
+
+        <!-- The theme that's applied after splash screen goes away -->
+        <item name="postSplashScreenTheme">@android:style/Theme.Material.Light.NoActionBar</item>
+    </style>
+</resources>

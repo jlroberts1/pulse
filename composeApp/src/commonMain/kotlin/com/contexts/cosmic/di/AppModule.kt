@@ -1,6 +1,7 @@
 package com.contexts.cosmic.di
 
 import app.cash.sqldelight.db.SqlDriver
+import com.contexts.cosmic.MainViewModel
 import com.contexts.cosmic.data.local.LocalDataSource
 import com.contexts.cosmic.data.local.SqldelightDataSource
 import com.contexts.cosmic.data.network.api.AuthenticateAPI
@@ -47,6 +48,7 @@ val appModule =
             )
         }
 
+        viewModel { MainViewModel(get()) }
         viewModel { LoginViewModel(get<AuthenticateRepository>()) }
         viewModel { ProfileViewModel(get<ProfileRepository>(), get<AuthManager>()) }
     }

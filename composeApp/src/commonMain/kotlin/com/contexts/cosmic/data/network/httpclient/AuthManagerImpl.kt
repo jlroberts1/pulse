@@ -10,7 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class AuthManagerImpl(private val localDataSource: LocalDataSource) : AuthManager {
@@ -41,7 +41,7 @@ class AuthManagerImpl(private val localDataSource: LocalDataSource) : AuthManage
         }
 
     override fun getAuthState(): Flow<AuthState?> =
-        localDataSource.getAuthState().mapToOneOrNull(Dispatchers.IO).mapNotNull {
-            it?.toAuthState()
-        }
+        localDataSource.getAuthState()
+            .mapToOneOrNull(Dispatchers.IO)
+            .map { it?.toAuthState() }
 }

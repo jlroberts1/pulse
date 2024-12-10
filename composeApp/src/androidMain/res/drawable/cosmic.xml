@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- Back half of ring -->
+    <path
+        android:name="ring_back"
+        android:fillColor="#00000000"
+        android:pathData="M 35,100 A 65,20 0 0,1 100,80 A 65,20 0 0,1 165,100"
+        android:strokeWidth="3"
+        android:strokeAlpha="0.3"
+        android:strokeColor="#9C27B0" />
+
+    <!-- Planet body -->
+    <path
+        android:name="planet"
+        android:fillColor="#3700B3"
+        android:pathData="M 100,100 m -30,0 a 30,30 0 1,0 60,0 a 30,30 0 1,0 -60,0" />
+
+    <!-- Front half of ring -->
+    <path
+        android:name="ring_front"
+        android:fillColor="#00000000"
+        android:pathData="M 35,100 A 65,20 0 0,0 100,120 A 65,20 0 0,0 165,100"
+        android:strokeWidth="3"
+        android:strokeColor="#9C27B0" />
+
+    <!-- Surface details -->
+    <path
+        android:name="surface_detail1"
+        android:fillColor="#00000000"
+        android:pathData="M 80,90 Q 100,98 120,90"
+        android:strokeWidth="2"
+        android:strokeColor="#4a148c" />
+
+    <path
+        android:name="surface_detail2"
+        android:fillColor="#00000000"
+        android:pathData="M 85,110 Q 100,118 115,110"
+        android:strokeWidth="2"
+        android:strokeColor="#4a148c" />
+
+    <!-- Orbiting particles -->
+    <group android:name="particle1">
+        <path
+            android:fillColor="#00BCD4"
+            android:pathData="M 40,40 m -4,0 a 4,4 0 1,0 8,0 a 4,4 0 1,0 -8,0" />
+    </group>
+
+    <group android:name="particle2">
+        <path
+            android:fillColor="#00BCD4"
+            android:pathData="M 160,40 m -4,0 a 4,4 0 1,0 8,0 a 4,4 0 1,0 -8,0" />
+    </group>
+
+    <group android:name="particle3">
+        <path
+            android:fillColor="#00BCD4"
+            android:pathData="M 40,160 m -4,0 a 4,4 0 1,0 8,0 a 4,4 0 1,0 -8,0" />
+    </group>
+
+    <group android:name="particle4">
+        <path
+            android:fillColor="#FF5722"
+            android:pathData="M 160,160 m -4,0 a 4,4 0 1,0 8,0 a 4,4 0 1,0 -8,0" />
+    </group>
+
+    <group android:name="particle5">
+        <path
+            android:fillColor="#FF5722"
+            android:pathData="M 180,100 m -4,0 a 4,4 0 1,0 8,0 a 4,4 0 1,0 -8,0" />
+    </group>
+
+    <group android:name="particle6">
+        <path
+            android:fillColor="#FF5722"
+            android:pathData="M 100,30 m -4,0 a 4,4 0 1,0 8,0 a 4,4 0 1,0 -8,0" />
+    </group>
+</vector>
