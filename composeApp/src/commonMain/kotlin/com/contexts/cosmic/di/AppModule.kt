@@ -15,6 +15,7 @@ import com.contexts.cosmic.db.Database
 import com.contexts.cosmic.domain.repository.AuthenticateRepository
 import com.contexts.cosmic.domain.repository.PreferencesRepository
 import com.contexts.cosmic.domain.repository.ProfileRepository
+import com.contexts.cosmic.ui.components.SnackbarDelegate
 import com.contexts.cosmic.ui.screens.login.LoginViewModel
 import com.contexts.cosmic.ui.screens.profile.ProfileViewModel
 import io.ktor.client.HttpClient
@@ -25,6 +26,7 @@ import org.koin.dsl.module
 
 val appModule =
     module {
+        single<SnackbarDelegate> { SnackbarDelegate() }
         single<PreferencesRepository> { PreferencesRepositoryImpl(get()) }
         single<Database> { Database(get<SqlDriver>()) }
         single<LocalDataSource> { SqldelightDataSource(get<Database>()) }
