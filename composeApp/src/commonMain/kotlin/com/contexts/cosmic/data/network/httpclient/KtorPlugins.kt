@@ -2,6 +2,7 @@ package com.contexts.cosmic.data.network.httpclient
 
 import com.contexts.cosmic.data.network.model.Token
 import com.contexts.cosmic.data.network.model.response.RefreshSessionResponse
+import com.contexts.cosmic.domain.model.Embed
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.auth.Auth
@@ -20,11 +21,22 @@ import io.ktor.http.contentType
 import io.ktor.http.path
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
 
 fun HttpClientConfig<*>.setupContentNegotiation() {
+    val module =
+        SerializersModule {
+            polymorphic(Embed::class) {
+                subclass(Embed.Images::class, Embed.Images.serializer())
+                subclass(Embed.External::class, Embed.External.serializer())
+            }
+        }
+
     install(ContentNegotiation) {
         json(
             Json {
+                serializersModule = module
                 prettyPrint = true
                 isLenient = true
                 ignoreUnknownKeys = true

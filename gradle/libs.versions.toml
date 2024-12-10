@@ -24,6 +24,7 @@ material-kolor = "1.7.1"
 coil = "3.0.4"
 sqldelight = "2.0.2"
 ktlint = "12.1.2"
+autolinktext = "1.1.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -59,6 +60,7 @@ coil = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil"
 coil-networking = { group = "io.coil-kt.coil3", name = "coil-network-ktor3", version.ref = "coil" }
 sqldelight-native = { group = "app.cash.sqldelight", name = "native-driver", version.ref = "sqldelight" }
 sqldelight-extensions = { group = "app.cash.sqldelight", name = "coroutines-extensions", version.ref = "sqldelight" }
+autolinktext = { module = "sh.calvin.autolinktext:autolinktext", version.ref = "autolinktext" }
 
 # Android specific dependencies
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }

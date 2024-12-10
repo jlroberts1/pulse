@@ -5,6 +5,7 @@ import com.contexts.cosmic.data.network.api.ProfileAPI
 import com.contexts.cosmic.data.network.httpclient.Response
 import com.contexts.cosmic.data.network.httpclient.handleInChannel
 import com.contexts.cosmic.data.network.model.response.ProfileDTO
+import com.contexts.cosmic.domain.model.FeedResponse
 import com.contexts.cosmic.domain.model.User
 import com.contexts.cosmic.domain.model.toUser
 import com.contexts.cosmic.domain.repository.ProfileRepository
@@ -33,4 +34,8 @@ class ProfileRepositoryImpl(
                     saveAction = { localDataSource.updateProfile(it) },
                 )
         }
+
+    override suspend fun getProfileFeed(myDid: String): Response<FeedResponse, NetworkError> {
+        return profileAPI.getAuthorFeed(myDid)
+    }
 }

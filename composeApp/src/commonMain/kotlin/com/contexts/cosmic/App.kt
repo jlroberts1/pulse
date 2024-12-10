@@ -2,7 +2,6 @@ package com.contexts.cosmic
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -39,8 +38,7 @@ fun App() {
                 Surface(
                     modifier =
                         Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding),
+                            .fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
                     MainAppNavHost()

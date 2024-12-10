@@ -68,6 +68,7 @@ kotlin {
             implementation(libs.coil)
             implementation(libs.coil.networking)
             implementation(libs.sqldelight.extensions)
+            implementation(libs.autolinktext)
         }
     }
 }
