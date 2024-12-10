@@ -4,4 +4,6 @@ import io.ktor.client.HttpClient
 
 interface KTorHttpClient {
     val client: HttpClient
+
+    suspend fun refresh()
 }

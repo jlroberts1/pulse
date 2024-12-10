@@ -23,6 +23,7 @@ suspend inline fun <reified T> HttpClient.safeRequest(block: HttpRequestBuilder.
     } catch (exception: ClientRequestException) {
         println(exception)
         when (exception.response.status.value) {
+            400 -> Response.Error(NetworkError.Http.UNAUTHORIZED)
             401 -> Response.Error(NetworkError.Http.UNAUTHORIZED)
             403 -> Response.Error(NetworkError.Http.UNAUTHORIZED)
             404 -> Response.Error(NetworkError.Http.UNAUTHORIZED)

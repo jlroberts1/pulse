@@ -6,6 +6,7 @@ import com.contexts.cosmic.domain.model.Embed
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.DEFAULT
@@ -64,37 +65,41 @@ fun HttpClientConfig<*>.setupAuth(authManager: AuthManager) {
     install(Auth) {
         bearer {
             loadTokens {
-                authManager.getTokens()
+                val token = authManager.getTokens()
+                println("$token")
+                token
             }
             refreshTokens {
-                authManager.getTokens().let { oldTokens ->
-                    oldTokens?.refreshToken?.let {
-                        when (
-                            val response =
-                                client.safeRequest<RefreshSessionResponse> {
-                                    markAsRefreshTokenRequest()
-                                    url {
-                                        method = HttpMethod.Post
-                                        path("xrpc/com.atproto.server.refreshSession")
-                                    }
-                                    header(HttpHeaders.Authorization, "Bearer $it")
+                authManager.getTokens()?.let { oldTokens ->
+                    when (
+                        val response =
+                            client.safeRequest<RefreshSessionResponse> {
+                                markAsRefreshTokenRequest()
+                                url {
+                                    method = HttpMethod.Post
+                                    path("xrpc/com.atproto.server.refreshSession")
                                 }
-                        ) {
-                            is Response.Success -> {
-                                val tokens =
-                                    Token(
-                                        accessJwt = response.data.accessJwt,
-                                        refreshJwt = response.data.refreshJwt,
-                                    )
-                                authManager.putTokens(tokens)
+                                header(HttpHeaders.Authorization, "Bearer ${oldTokens.refreshToken}")
                             }
+                    ) {
+                        is Response.Success -> {
+                            val tokens =
+                                Token(
+                                    accessJwt = response.data.accessJwt,
+                                    refreshJwt = response.data.refreshJwt,
+                                )
+                            authManager.putTokens(tokens)
+                            BearerTokens(
+                                tokens.accessJwt,
+                                tokens.refreshJwt,
+                            )
+                        }
 
-                            is Response.Error -> {
-                                println("Error refreshing token: ${response.error}")
-                            }
+                        is Response.Error -> {
+                            println("Error refreshing token: ${response.error}")
+                            null
                         }
                     }
-                    authManager.getTokens()
                 }
             }
             sendWithoutRequest { request ->
