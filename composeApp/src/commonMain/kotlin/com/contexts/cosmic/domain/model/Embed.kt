@@ -29,6 +29,13 @@ sealed class Embed {
     ) : Embed()
 
     @Serializable
+    @SerialName("app.bsky.embed.recordWithMedia")
+    data class RecordWithMedia(
+        val record: Record,
+        val media: Embed,
+    ) : Embed()
+
+    @Serializable
     @SerialName("app.bsky.embed.video")
     data class Video(
         val aspectRatio: AspectRatio,
@@ -56,6 +63,13 @@ sealed class EmbedView {
     @SerialName("app.bsky.embed.record#view")
     data class Record(
         val record: EmbeddedRecord,
+    ) : EmbedView()
+
+    @Serializable
+    @SerialName("app.bsky.embed.recordWithMedia#view")
+    data class RecordWithMedia(
+        val record: Record,
+        val media: EmbedView,
     ) : EmbedView()
 
     @Serializable

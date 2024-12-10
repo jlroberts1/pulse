@@ -12,5 +12,4 @@ data class Record(
     val langs: List<String>? = null,
     val embed: Embed? = null,
     val reply: Reply? = null,
-    val facets: List<Facet>? = null,
 )

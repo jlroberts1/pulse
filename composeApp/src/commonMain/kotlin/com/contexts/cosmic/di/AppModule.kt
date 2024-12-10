@@ -5,18 +5,22 @@ import com.contexts.cosmic.MainViewModel
 import com.contexts.cosmic.data.local.LocalDataSource
 import com.contexts.cosmic.data.local.SqldelightDataSource
 import com.contexts.cosmic.data.network.api.AuthenticateAPI
+import com.contexts.cosmic.data.network.api.FeedAPI
 import com.contexts.cosmic.data.network.api.ProfileAPI
 import com.contexts.cosmic.data.network.httpclient.AuthManager
 import com.contexts.cosmic.data.network.httpclient.AuthManagerImpl
 import com.contexts.cosmic.data.network.httpclient.KTorHttpClientImpl
 import com.contexts.cosmic.data.repository.AuthenticateRepositoryImpl
+import com.contexts.cosmic.data.repository.FeedRepositoryImpl
 import com.contexts.cosmic.data.repository.PreferencesRepositoryImpl
 import com.contexts.cosmic.data.repository.ProfileRepositoryImpl
 import com.contexts.cosmic.db.Database
 import com.contexts.cosmic.domain.repository.AuthenticateRepository
+import com.contexts.cosmic.domain.repository.FeedRepository
 import com.contexts.cosmic.domain.repository.PreferencesRepository
 import com.contexts.cosmic.domain.repository.ProfileRepository
 import com.contexts.cosmic.ui.components.SnackbarDelegate
+import com.contexts.cosmic.ui.screens.home.HomeViewModel
 import com.contexts.cosmic.ui.screens.login.LoginViewModel
 import com.contexts.cosmic.ui.screens.profile.ProfileViewModel
 import io.ktor.client.HttpClient
@@ -35,10 +39,14 @@ val appModule =
         single<HttpClient> { KTorHttpClientImpl(get<AuthManager>()).client }
 
         single<ProfileAPI> { ProfileAPI(get<HttpClient>()) }
+        single<FeedAPI> { FeedAPI(get<HttpClient>()) }
         single<AuthenticateAPI> { AuthenticateAPI(get<HttpClient>()) }
 
         single<ProfileRepository> {
             ProfileRepositoryImpl(get<ProfileAPI>(), get<LocalDataSource>())
+        }
+        single<FeedRepository> {
+            FeedRepositoryImpl(get<FeedAPI>())
         }
         single<AuthenticateRepository> {
             AuthenticateRepositoryImpl(
@@ -49,6 +57,7 @@ val appModule =
         }
 
         viewModel { MainViewModel(get()) }
+        viewModel { HomeViewModel(get()) }
         viewModel { LoginViewModel(get<AuthenticateRepository>()) }
         viewModel { ProfileViewModel(get<ProfileRepository>(), get<AuthManager>()) }
     }

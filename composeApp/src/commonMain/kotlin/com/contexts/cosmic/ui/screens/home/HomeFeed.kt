@@ -1,11 +1,10 @@
-package com.contexts.cosmic.ui.screens.profile
+package com.contexts.cosmic.ui.screens.home
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -30,7 +29,7 @@ import com.contexts.cosmic.ui.screens.profile.composables.EmbedVideoView
 import sh.calvin.autolinktext.AutoLinkText
 
 @Composable
-fun ProfileFeedCard(feedPost: FeedViewPost) {
+fun HomeFeedCard(feedPost: FeedViewPost) {
     ElevatedCard(
         modifier =
             Modifier
@@ -71,7 +70,7 @@ fun ProfileFeedCard(feedPost: FeedViewPost) {
                             fontWeight = FontWeight.Bold,
                         )
                         Text(
-                            text = feedPost.post.author.handle,
+                            text = feedPost.post.author.handle ?: "",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
