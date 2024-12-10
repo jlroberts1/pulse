@@ -66,6 +66,7 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.datastore.preferences)
             implementation(libs.coil)
+            implementation(libs.coil.gif)
             implementation(libs.coil.networking)
             implementation(libs.sqldelight.extensions)
             implementation(libs.autolinktext)

@@ -28,9 +28,7 @@ fun ProfileScreen() {
         ) {
             item { Header(profile.value) }
             item { ProfileInfo(profile.value) }
-            item {
-                FeedView(feed.value)
-            }
+            item { FeedView(feed.value) }
         }
     }
 }
@@ -46,7 +44,7 @@ fun FeedView(feed: RequestResult<List<FeedViewPost>, AppError>) {
         }
         is RequestResult.Success -> {
             feed.data.forEach { post ->
-                ProfileFeed(post)
+                ProfileFeedCard(post)
             }
         }
     }

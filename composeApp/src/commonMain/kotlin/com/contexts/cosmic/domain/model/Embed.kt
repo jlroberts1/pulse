@@ -25,7 +25,14 @@ sealed class Embed {
     @Serializable
     @SerialName("app.bsky.embed.record")
     data class Record(
-        val record: EmbeddedRecord,
+        val record: RecordEmbed,
+    ) : Embed()
+
+    @Serializable
+    @SerialName("app.bsky.embed.video")
+    data class Video(
+        val aspectRatio: AspectRatio,
+        val video: VideoEmbed,
     ) : Embed()
 }
 
@@ -49,6 +56,15 @@ sealed class EmbedView {
     @SerialName("app.bsky.embed.record#view")
     data class Record(
         val record: EmbeddedRecord,
+    ) : EmbedView()
+
+    @Serializable
+    @SerialName("app.bsky.embed.video#view")
+    data class Video(
+        val cid: String,
+        val playlist: String,
+        val thumbnail: String,
+        val aspectRatio: AspectRatio,
     ) : EmbedView()
 }
 
@@ -82,11 +98,26 @@ data class ExternalView(
 )
 
 @Serializable
+data class RecordEmbed(
+    val uri: String,
+    val cid: String,
+)
+
+@Serializable
 data class ExternalEmbed(
     val uri: String,
     val title: String,
     val description: String?,
     val thumb: BlobReference? = null,
+)
+
+@Serializable
+data class VideoEmbed(
+    @SerialName("\$type")
+    val type: String = "blob",
+    val ref: Link,
+    val mimeType: String,
+    val size: Int,
 )
 
 @Serializable

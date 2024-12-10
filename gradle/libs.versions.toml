@@ -57,6 +57,7 @@ koin-compose = { group = "io.insert-koin", name = "koin-compose", version.ref = 
 koin-compose-viewmodel = { group = "io.insert-koin", name = "koin-compose-viewmodel", version.ref = "koin" }
 datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
 coil = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+coil-gif = { group = "io.coil-kt.coil3", name = "coil-gif", version.ref = "coil" }
 coil-networking = { group = "io.coil-kt.coil3", name = "coil-network-ktor3", version.ref = "coil" }
 sqldelight-native = { group = "app.cash.sqldelight", name = "native-driver", version.ref = "sqldelight" }
 sqldelight-extensions = { group = "app.cash.sqldelight", name = "coroutines-extensions", version.ref = "sqldelight" }
@@ -71,7 +72,15 @@ sqldelight-android = { group = "app.cash.sqldelight", name = "android-driver", v
 ktor-client-darwin = { group = "io.ktor", name = "ktor-client-ios", version.ref = "ktor" }
 
 [bundles]
-ktor-common = ["ktor-client-core", "ktor-client-serialization", "ktor-client-json", "ktor-client-logging", "ktor-serialization-json", "ktor-content-negotiation", "ktor-client-auth"]
+ktor-common = [
+    "ktor-client-core",
+    "ktor-client-serialization",
+    "ktor-client-json",
+    "ktor-client-logging",
+    "ktor-serialization-json",
+    "ktor-content-negotiation",
+    "ktor-client-auth"
+]
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

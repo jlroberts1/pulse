@@ -41,7 +41,7 @@ fun Header(result: RequestResult<User, AppError>) {
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .height(240.dp)
+                        .height(280.dp)
                         .background(MaterialTheme.colorScheme.surfaceVariant),
             ) {
                 Text(
@@ -57,7 +57,7 @@ fun Header(result: RequestResult<User, AppError>) {
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .height(240.dp)
+                        .height(280.dp)
                         .background(MaterialTheme.colorScheme.surfaceVariant),
             ) {
                 result.data.banner?.let { bannerUrl ->
@@ -91,7 +91,7 @@ fun Header(result: RequestResult<User, AppError>) {
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    Spacer(modifier = Modifier.padding(8.dp))
+                    Spacer(modifier = Modifier.padding(18.dp))
                     result.data.avatar?.let { avatarUrl ->
                         AsyncImage(
                             model = avatarUrl,
