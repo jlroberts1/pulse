@@ -86,7 +86,7 @@ sealed class EmbedView {
 data class ImageEmbed(
     val alt: String,
     val image: BlobReference,
-    val aspectRatio: AspectRatio,
+    val aspectRatio: AspectRatio? = null,
 )
 
 @Serializable
