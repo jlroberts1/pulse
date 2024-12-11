@@ -11,7 +11,10 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -59,6 +62,7 @@ fun App(
     val snackbarHostState = remember { SnackbarHostState() }
     val authState by viewModel.authState.collectAsState()
 
+    val scaffoldViewState by viewModel.scaffoldViewState.collectAsState()
     snackbarDelegate.apply {
         this.snackbarHostState = snackbarHostState
         coroutineScope = rememberCoroutineScope()
@@ -84,8 +88,19 @@ fun App(
         KoinContext {
             Scaffold(
                 modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-                topBar = { TopBar(navController, scrollBehavior) },
+                topBar = { TopBar(scaffoldViewState, navController, scrollBehavior) },
                 snackbarHost = { SnackbarHost(snackbarHostState, snackbarDelegate) },
+                floatingActionButton = {
+                    if (scaffoldViewState.showFab) {
+                        FloatingActionButton(
+                            onClick = { scaffoldViewState.fabOnClick() },
+                            containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
+                            elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
+                        ) {
+                            scaffoldViewState.fabIcon()
+                        }
+                    }
+                },
                 bottomBar = {
                     AnimatedVisibility(
                         visible = showBottomBar,

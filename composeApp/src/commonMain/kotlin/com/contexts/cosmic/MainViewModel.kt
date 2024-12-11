@@ -21,6 +21,9 @@ class MainViewModel(
     private val _authState = MutableStateFlow<AuthenticationState>(AuthenticationState.Loading)
     val authState = _authState.asStateFlow()
 
+    private val _scaffoldViewState = MutableStateFlow(ScaffoldViewState())
+    val scaffoldViewState = _scaffoldViewState.asStateFlow()
+
     init {
         viewModelScope.launch {
             authManager.getAuthState().collect { authState ->
@@ -31,5 +34,9 @@ class MainViewModel(
                     }
             }
         }
+    }
+
+    fun updateScaffoldViewState(newState: ScaffoldViewState) {
+        _scaffoldViewState.value = newState
     }
 }
