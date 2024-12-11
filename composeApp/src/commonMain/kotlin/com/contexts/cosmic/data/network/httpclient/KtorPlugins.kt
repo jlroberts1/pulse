@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2024. James Roberts
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+
 package com.contexts.cosmic.data.network.httpclient
 
 import com.contexts.cosmic.data.network.model.Token
@@ -88,7 +97,10 @@ fun HttpClientConfig<*>.setupAuth(authManager: AuthManager) {
                                     method = HttpMethod.Post
                                     path("xrpc/com.atproto.server.refreshSession")
                                 }
-                                header(HttpHeaders.Authorization, "Bearer ${oldTokens.refreshToken}")
+                                header(
+                                    HttpHeaders.Authorization,
+                                    "Bearer ${oldTokens.refreshToken}",
+                                )
                             }
                     ) {
                         is Response.Success -> {

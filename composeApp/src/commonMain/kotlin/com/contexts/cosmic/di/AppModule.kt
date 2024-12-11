@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2024. James Roberts
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+
 package com.contexts.cosmic.di
 
 import app.cash.sqldelight.db.SqlDriver
@@ -38,7 +47,12 @@ val appModule =
         single<LocalDataSource> { SqldelightDataSource(get<Database>()) }
         single<AuthManager> { AuthManagerImpl(get<LocalDataSource>()) }
         single<TokenRefreshManager> { TokenRefreshManager() }
-        single<HttpClient> { KTorHttpClientImpl(get<AuthManager>(), get<TokenRefreshManager>()).client }
+        single<HttpClient> {
+            KTorHttpClientImpl(
+                get<AuthManager>(),
+                get<TokenRefreshManager>(),
+            ).client
+        }
 
         single<ProfileAPI> { ProfileAPI(get<HttpClient>()) }
         single<FeedAPI> { FeedAPI(get<HttpClient>()) }

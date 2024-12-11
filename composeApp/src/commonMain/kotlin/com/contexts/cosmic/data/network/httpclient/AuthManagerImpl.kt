@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2024. James Roberts
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+
 package com.contexts.cosmic.data.network.httpclient
 
 import app.cash.sqldelight.coroutines.mapToOneOrNull
@@ -17,7 +26,8 @@ class AuthManagerImpl(private val localDataSource: LocalDataSource) : AuthManage
     override suspend fun getTokens(): BearerTokens? =
         withContext(Dispatchers.IO) {
             val authState =
-                localDataSource.getAuthState().mapToOneOrNull(Dispatchers.IO).firstOrNull()?.toAuthState()
+                localDataSource.getAuthState().mapToOneOrNull(Dispatchers.IO).firstOrNull()
+                    ?.toAuthState()
             authState?.let {
                 return@withContext BearerTokens(
                     accessToken = authState.accessJwt,
@@ -29,7 +39,8 @@ class AuthManagerImpl(private val localDataSource: LocalDataSource) : AuthManage
     override suspend fun putTokens(token: Token) =
         withContext(Dispatchers.IO) {
             val authState =
-                localDataSource.getAuthState().mapToOneOrNull(Dispatchers.IO).firstOrNull()?.toAuthState()
+                localDataSource.getAuthState().mapToOneOrNull(Dispatchers.IO).firstOrNull()
+                    ?.toAuthState()
             authState?.let {
                 localDataSource.updateAuthState(
                     authState.copy(

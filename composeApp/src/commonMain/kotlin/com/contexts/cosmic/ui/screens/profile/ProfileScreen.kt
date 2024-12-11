@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2024. James Roberts
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+
 package com.contexts.cosmic.ui.screens.profile
 
 import androidx.compose.foundation.layout.Box
@@ -41,9 +50,11 @@ fun FeedView(feed: RequestResult<List<FeedViewPost>, AppError>) {
         is RequestResult.Loading -> {
             Loading()
         }
+
         is RequestResult.Error -> {
             ErrorView(feed.error.message)
         }
+
         is RequestResult.Success -> {
             feed.data.forEach { post ->
                 FeedItem(post)
