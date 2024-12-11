@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,12 +28,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.contexts.cosmic.domain.model.EmbedView
-import com.contexts.cosmic.domain.model.FeedViewPost
 import com.contexts.cosmic.extensions.toRelativeTime
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import sh.calvin.autolinktext.AutoLinkText
 
 @Composable
-fun FeedItem(feedPost: FeedViewPost) {
+fun FeedItem(
+    authorAvatar: String? = "",
+    authorName: String? = "",
+    authorHandle: String = "",
+    indexedAt: String = "",
+    postRecordText: String = "",
+    embedView: EmbedView? = null,
+) {
     Column(
         modifier =
             Modifier
@@ -42,17 +48,11 @@ fun FeedItem(feedPost: FeedViewPost) {
                 .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        HorizontalDivider(
-            modifier =
-                Modifier
-                    .fillMaxWidth(),
-            thickness = 1.dp,
-        )
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             AsyncImage(
-                model = feedPost.post.author.avatar,
+                model = authorAvatar,
                 contentDescription = "Profile avatar",
                 modifier =
                     Modifier
@@ -65,68 +65,80 @@ fun FeedItem(feedPost: FeedViewPost) {
                         ),
                 contentScale = ContentScale.Crop,
             )
+        }
 
-            Column(
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Text(
-                        text = feedPost.post.author.displayName ?: "",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Text(
-                        text = feedPost.post.author.handle ?: "",
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        text = feedPost.post.indexedAt.toRelativeTime(),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                    )
-                }
-                AutoLinkText(
-                    text = feedPost.post.record.text,
-                    style =
-                        MaterialTheme.typography.bodyMedium.copy(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        ),
+                Text(
+                    text = authorName ?: "",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
                 )
-                Spacer(modifier = Modifier.padding(4.dp))
-                feedPost.post.embed?.let { embed ->
-                    when (embed) {
-                        is EmbedView.RecordWithMedia -> {
-                        }
+                Text(
+                    text = authorHandle,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    text = indexedAt.toRelativeTime(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                )
+            }
+            AutoLinkText(
+                text = postRecordText,
+                style =
+                    MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    ),
+            )
+            Spacer(modifier = Modifier.padding(4.dp))
+            embedView?.let { embed ->
+                when (embed) {
+                    is EmbedView.RecordWithMedia -> {
+                    }
 
-                        is EmbedView.Video -> {
-                            EmbedVideoView(
-                                embed.thumbnail,
-                                embed.playlist,
-                            )
-                        }
+                    is EmbedView.Video -> {
+                        EmbedVideoView(
+                            embed.thumbnail,
+                            embed.playlist,
+                        )
+                    }
 
-                        is EmbedView.Record -> {
-                            EmbedRecordView(embed)
-                        }
+                    is EmbedView.Record -> {
+                        EmbedRecordView(embed)
+                    }
 
-                        is EmbedView.External -> {
-                            EmbedExternalView(
-                                embed.external.uri,
-                                embed.external.thumb,
-                                embed.external.title,
-                                embed.external.description,
-                            )
-                        }
+                    is EmbedView.External -> {
+                        EmbedExternalView(
+                            embed.external.uri,
+                            embed.external.thumb,
+                            embed.external.title,
+                            embed.external.description,
+                        )
+                    }
 
-                        is EmbedView.Images -> {
-                            EmbedImageView(embed.images)
-                        }
+                    is EmbedView.Images -> {
+                        EmbedImageView(embed.images)
                     }
                 }
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun FeedPostPreview() {
+    FeedItem(
+        authorAvatar = "https://i.pravatar.cc/300",
+        authorName = "Bob Barkley",
+        authorHandle = "@bob.bsky.social",
+        indexedAt = "2024-12-11T15:30:45.123Z",
+        postRecordText = "Test description for the preview that wraps to the next line on mobile",
+    )
 }

@@ -80,7 +80,6 @@ kotlin {
             implementation(libs.coil)
             implementation(libs.coil.gif)
             implementation(libs.coil.networking)
-            implementation(libs.sqldelight.runtime)
             implementation(libs.sqldelight.extensions)
             implementation(libs.autolinktext)
         }
@@ -111,6 +110,9 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+    buildFeatures {
+        compose = true
     }
 }
 

@@ -47,7 +47,14 @@ fun FeedView(feed: RequestResult<List<FeedViewPost>, AppError>) {
             is RequestResult.Success -> {
                 items(feed.data.size) {
                     feed.data.forEach { post ->
-                        FeedItem(post)
+                        FeedItem(
+                            authorAvatar = post.post.author.avatar,
+                            authorName = post.post.author.displayName,
+                            authorHandle = post.post.author.handle,
+                            indexedAt = post.post.indexedAt,
+                            postRecordText = post.post.record.text,
+                            embedView = post.post.embed,
+                        )
                     }
                 }
             }

@@ -13,7 +13,6 @@ import com.contexts.cosmic.data.network.model.Token
 import com.contexts.cosmic.data.network.model.response.RefreshSessionResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpSend
-import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.plugin
 import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders
@@ -61,15 +60,10 @@ class KTorHttpClientImpl(
                             refreshJwt = response.data.refreshJwt,
                         )
                     authManager.putTokens(tokens)
-                    BearerTokens(
-                        tokens.accessJwt,
-                        tokens.refreshJwt,
-                    )
                 }
 
                 is Response.Error -> {
                     println("Error refreshing token: ${response.error}")
-                    null
                 }
             }
         }
