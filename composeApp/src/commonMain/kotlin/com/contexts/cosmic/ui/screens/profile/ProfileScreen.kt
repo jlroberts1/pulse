@@ -21,6 +21,7 @@ fun ProfileScreen() {
     val viewModel: ProfileViewModel = koinViewModel()
     val profile = viewModel.profile.collectAsState(RequestResult.Loading)
     val feed = viewModel.feed.collectAsState(RequestResult.Loading)
+
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             modifier =

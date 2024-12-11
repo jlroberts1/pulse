@@ -19,6 +19,7 @@ import com.contexts.cosmic.ui.screens.settings.SettingsScreen
 @Composable
 fun AuthenticatedNavigation(
     navController: NavHostController,
+    updateScaffoldViewState: (ScaffoldViewState) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     NavHost(
@@ -26,14 +27,15 @@ fun AuthenticatedNavigation(
         startDestination = NavigationRoutes.Authenticated.NavigationRoute.route,
         modifier = modifier,
     ) {
-        authenticatedGraph(navController)
-        unauthenticateddGraph(navController)
+        authenticatedGraph(navController, updateScaffoldViewState)
+        unauthenticateddGraph(navController, updateScaffoldViewState)
     }
 }
 
 @Composable
 fun UnauthenticatedNavigation(
     navController: NavHostController,
+    updateScaffoldViewState: (ScaffoldViewState) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     NavHost(
@@ -41,8 +43,8 @@ fun UnauthenticatedNavigation(
         startDestination = NavigationRoutes.Unauthenticated.NavigationRoute.route,
         modifier = modifier,
     ) {
-        unauthenticateddGraph(navController)
-        authenticatedGraph(navController)
+        unauthenticateddGraph(navController, updateScaffoldViewState)
+        authenticatedGraph(navController, updateScaffoldViewState)
     }
 }
 
@@ -70,38 +72,86 @@ sealed class NavigationRoutes {
     }
 }
 
-fun NavGraphBuilder.unauthenticateddGraph(navController: NavController) {
+fun NavGraphBuilder.unauthenticateddGraph(
+    navController: NavController,
+    updateScaffoldViewState: (ScaffoldViewState) -> Unit,
+) {
     navigation(
         route = NavigationRoutes.Unauthenticated.NavigationRoute.route,
         startDestination = NavigationRoutes.Unauthenticated.Login.route,
     ) {
         composable(route = NavigationRoutes.Unauthenticated.Login.route) {
+            updateScaffoldViewState(
+                ScaffoldViewState(
+                    showTopAppBar = false,
+                    showFab = false,
+                ),
+            )
             LoginScreen()
         }
     }
 }
 
-fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
+fun NavGraphBuilder.authenticatedGraph(
+    navController: NavController,
+    updateScaffoldViewState: (ScaffoldViewState) -> Unit,
+) {
     navigation(
         route = NavigationRoutes.Authenticated.NavigationRoute.route,
         startDestination = NavigationRoutes.Authenticated.Home.route,
     ) {
         composable(route = NavigationRoutes.Authenticated.Home.route) {
+            updateScaffoldViewState(
+                ScaffoldViewState(
+                    showTopAppBar = true,
+                    showFab = true,
+                ),
+            )
             HomeScreen()
         }
         composable(route = NavigationRoutes.Authenticated.Search.route) {
+            updateScaffoldViewState(
+                ScaffoldViewState(
+                    showTopAppBar = true,
+                    showFab = true,
+                ),
+            )
             SearchScreen()
         }
         composable(route = NavigationRoutes.Authenticated.Messages.route) {
+            updateScaffoldViewState(
+                ScaffoldViewState(
+                    showTopAppBar = true,
+                    showFab = true,
+                ),
+            )
             MessageScreen()
         }
         composable(route = NavigationRoutes.Authenticated.Notifications.route) {
+            updateScaffoldViewState(
+                ScaffoldViewState(
+                    showTopAppBar = true,
+                    showFab = true,
+                ),
+            )
             NotificationsScreen()
         }
         composable(route = NavigationRoutes.Authenticated.Profile.route) {
+            updateScaffoldViewState(
+                ScaffoldViewState(
+                    showTopAppBar = false,
+                    showFab = false,
+                ),
+            )
             ProfileScreen()
         }
         composable(route = NavigationRoutes.Authenticated.Settings.route) {
+            updateScaffoldViewState(
+                ScaffoldViewState(
+                    showTopAppBar = true,
+                    showFab = false,
+                ),
+            )
             SettingsScreen()
         }
     }

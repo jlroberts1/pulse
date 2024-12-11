@@ -88,7 +88,11 @@ fun App(
         KoinContext {
             Scaffold(
                 modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-                topBar = { TopBar(scaffoldViewState, navController, scrollBehavior) },
+                topBar = {
+                    if (scaffoldViewState.showTopAppBar) {
+                        TopBar(scaffoldViewState, navController, scrollBehavior)
+                    }
+                },
                 snackbarHost = { SnackbarHost(snackbarHostState, snackbarDelegate) },
                 floatingActionButton = {
                     if (scaffoldViewState.showFab) {
@@ -122,7 +126,10 @@ fun App(
                                     },
                                     icon = {
                                         val icon = getIconForScreen(screen)
-                                        Icon(icon.image, contentDescription = icon.contentDescription)
+                                        Icon(
+                                            icon.image,
+                                            contentDescription = icon.contentDescription,
+                                        )
                                     },
                                 )
                             }
@@ -143,15 +150,18 @@ fun App(
                                     Splash()
                                 }
                             }
+
                             AuthenticationState.Authenticated ->
                                 AuthenticatedNavigation(
                                     navController,
+                                    updateScaffoldViewState = { viewModel.updateScaffoldViewState(it) },
                                     modifier = Modifier.padding(innerPadding),
                                 )
 
                             AuthenticationState.Unauthenticated ->
                                 UnauthenticatedNavigation(
                                     navController,
+                                    updateScaffoldViewState = { viewModel.updateScaffoldViewState(it) },
                                     modifier = Modifier.padding(innerPadding),
                                 )
                         }
@@ -167,8 +177,18 @@ private fun getIconForScreen(screen: NavigationRoutes): NavigationIcon {
     return when (screen) {
         NavigationRoutes.Authenticated.Home -> NavigationIcon(Icons.Default.Home, "Home")
         NavigationRoutes.Authenticated.Search -> NavigationIcon(Icons.Default.Search, "Search")
-        NavigationRoutes.Authenticated.Messages -> NavigationIcon(Icons.AutoMirrored.Filled.Message, "Messages")
-        NavigationRoutes.Authenticated.Notifications -> NavigationIcon(Icons.Default.Notifications, "Notifications")
+        NavigationRoutes.Authenticated.Messages ->
+            NavigationIcon(
+                Icons.AutoMirrored.Filled.Message,
+                "Messages",
+            )
+
+        NavigationRoutes.Authenticated.Notifications ->
+            NavigationIcon(
+                Icons.Default.Notifications,
+                "Notifications",
+            )
+
         NavigationRoutes.Authenticated.Profile -> NavigationIcon(Icons.Default.Person, "Profile")
         else -> NavigationIcon(Icons.Default.Home, "Home")
     }
