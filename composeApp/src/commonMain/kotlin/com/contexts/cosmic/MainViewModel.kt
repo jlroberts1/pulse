@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.contexts.cosmic.data.network.httpclient.AuthManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 sealed interface AuthenticationState {
@@ -23,6 +24,30 @@ class MainViewModel(
 
     private val _scaffoldViewState = MutableStateFlow(ScaffoldViewState())
     val scaffoldViewState = _scaffoldViewState.asStateFlow()
+
+    private val _bottomSheetVisible = MutableStateFlow(false)
+    val bottomSheetVisible = _bottomSheetVisible.asStateFlow()
+
+    private val _fabVisibility = MutableStateFlow(1f)
+    val fabVisibility = _fabVisibility.asStateFlow()
+
+    fun updateFabVisibility(scrollDelta: Float) {
+        _fabVisibility.update { currentVisibility ->
+            if (scrollDelta < 0) {
+                (currentVisibility - (-scrollDelta / 100f)).coerceIn(0f, 1f)
+            } else {
+                (currentVisibility + (scrollDelta / 100f)).coerceIn(0f, 1f)
+            }
+        }
+    }
+
+    fun showBottomSheet() {
+        _bottomSheetVisible.update { true }
+    }
+
+    fun hideBottomSheet() {
+        _bottomSheetVisible.update { false }
+    }
 
     init {
         viewModelScope.launch {

@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Message
@@ -11,6 +12,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.sharp.Add
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -23,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -32,12 +35,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.contexts.cosmic.domain.model.NavigationIcon
+import com.contexts.cosmic.ui.components.FabScrollBehavior
 import com.contexts.cosmic.ui.components.SnackbarDelegate
+import com.contexts.cosmic.ui.composables.AddPostBottomSheet
 import com.contexts.cosmic.ui.composables.SnackbarHost
 import com.contexts.cosmic.ui.composables.Splash
 import com.contexts.cosmic.ui.composables.TopBar
@@ -68,7 +75,9 @@ fun App(
         coroutineScope = rememberCoroutineScope()
     }
 
-    val state =
+    val bottomSheetVisible by viewModel.bottomSheetVisible.collectAsState()
+
+    val themeState =
         rememberDynamicMaterialThemeState(
             seedColor = Color(seedColor),
             isDark = isDarkTheme,
@@ -82,26 +91,36 @@ fun App(
             navBackStackEntry?.destination?.route in bottomNavDestinations.map { it.route }
         }
 
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val fabVisibility by viewModel.fabVisibility.collectAsState()
 
-    CosmicTheme(state) {
+    val scrollBehavior =
+        rememberFabScrollBehavior(
+            onScroll = { delta -> viewModel.updateFabVisibility(delta) },
+        )
+
+    CosmicTheme(themeState) {
         KoinContext {
             Scaffold(
                 modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                 topBar = {
                     if (scaffoldViewState.showTopAppBar) {
-                        TopBar(scaffoldViewState, navController, scrollBehavior)
+                        TopBar(scaffoldViewState, navController, scrollBehavior.topBarBehavior)
                     }
                 },
                 snackbarHost = { SnackbarHost(snackbarHostState, snackbarDelegate) },
                 floatingActionButton = {
                     if (scaffoldViewState.showFab) {
                         FloatingActionButton(
-                            onClick = { scaffoldViewState.fabOnClick() },
+                            onClick = { viewModel.showBottomSheet() },
                             containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
                             elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
+                            modifier =
+                                Modifier.graphicsLayer {
+                                    alpha = fabVisibility
+                                    translationY = 100f * (1f - fabVisibility)
+                                },
                         ) {
-                            scaffoldViewState.fabIcon()
+                            Icon(Icons.Sharp.Add, "Add")
                         }
                     }
                 },
@@ -109,7 +128,9 @@ fun App(
                     AnimatedVisibility(
                         visible = showBottomBar,
                     ) {
-                        NavigationBar {
+                        NavigationBar(
+                            modifier = Modifier.height(72.dp),
+                        ) {
                             val currentRoute = navBackStackEntry?.destination?.route
                             bottomNavDestinations.forEach { screen ->
                                 val selected = currentRoute == screen.route
@@ -166,6 +187,12 @@ fun App(
                                 )
                         }
                     }
+
+                    if (bottomSheetVisible) {
+                        AddPostBottomSheet(
+                            onDismiss = { viewModel.hideBottomSheet() },
+                        )
+                    }
                 }
             }
         }
@@ -191,6 +218,17 @@ private fun getIconForScreen(screen: NavigationRoutes): NavigationIcon {
 
         NavigationRoutes.Authenticated.Profile -> NavigationIcon(Icons.Default.Person, "Profile")
         else -> NavigationIcon(Icons.Default.Home, "Home")
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun rememberFabScrollBehavior(onScroll: (Float) -> Unit): FabScrollBehavior {
+    val topBarState = rememberTopAppBarState()
+    val topBarBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(topBarState)
+
+    return remember(topBarBehavior) {
+        FabScrollBehavior(topBarBehavior, onScroll)
     }
 }
 
