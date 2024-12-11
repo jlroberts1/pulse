@@ -22,10 +22,6 @@ import coil3.compose.AsyncImage
 import com.contexts.cosmic.domain.model.EmbedView
 import com.contexts.cosmic.domain.model.FeedViewPost
 import com.contexts.cosmic.extensions.toRelativeTime
-import com.contexts.cosmic.ui.screens.profile.composables.EmbedExternalView
-import com.contexts.cosmic.ui.screens.profile.composables.EmbedImageView
-import com.contexts.cosmic.ui.screens.profile.composables.EmbedRecordView
-import com.contexts.cosmic.ui.screens.profile.composables.EmbedVideoView
 import sh.calvin.autolinktext.AutoLinkText
 
 @Composable
@@ -100,7 +96,6 @@ fun FeedItem(feedPost: FeedViewPost) {
                             EmbedVideoView(
                                 embed.thumbnail,
                                 embed.playlist,
-                                embed.aspectRatio,
                             )
                         }
 

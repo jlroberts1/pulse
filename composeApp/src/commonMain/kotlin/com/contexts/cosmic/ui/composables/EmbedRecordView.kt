@@ -1,4 +1,4 @@
-package com.contexts.cosmic.ui.screens.profile.composables
+package com.contexts.cosmic.ui.composables
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
