@@ -9,6 +9,7 @@
 
 package com.contexts.cosmic.di
 
+import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
 import com.contexts.cosmic.data.datastore.PreferencesDataSource
 import com.contexts.cosmic.data.datastore.PreferencesDataSourceImpl
@@ -25,7 +26,7 @@ actual val platformModule: Module =
 
 actual val sqlDriverModule: Module =
     module {
-        single {
+        single<SqlDriver> {
             NativeSqliteDriver(Database.Schema, "cosmic.db")
         }
     }

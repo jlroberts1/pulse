@@ -93,9 +93,3 @@ fun initializeKoin(additionalModules: List<Module>) {
         modules(getBaseModules() + additionalModules)
     }
 }
-
-fun initializeKoinIos() {
-    startKoin {
-        modules(getBaseModules())
-    }
-}
