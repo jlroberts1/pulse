@@ -13,6 +13,7 @@ import io.ktor.http.path
 
 class KTorHttpClientImpl(
     private val authManager: AuthManager,
+    private val tokenRefreshManager: TokenRefreshManager,
 ) : KTorHttpClient {
     override val client: HttpClient by lazy {
         HttpClient {
@@ -22,17 +23,12 @@ class KTorHttpClientImpl(
             setupDefaultRequest()
             setupAuth(authManager)
         }.apply {
-            // Bluesky returns 400 instead of 401 on expired tokens
-            // Ktor only tries to refresh tokens on 400
-            // Intercept and attempt to refresh before failing
             this.plugin(HttpSend).intercept { request ->
-                val originalCall = execute(request)
-                if (originalCall.response.status.value == 400) {
-                    refresh()
-                    execute(request)
-                } else {
-                    originalCall
-                }
+                tokenRefreshManager.executeWithRefresh(
+                    request = request,
+                    originalExecute = { execute(request) },
+                    refresh = { refresh() },
+                )
             }
         }
     }

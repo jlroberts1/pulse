@@ -10,6 +10,7 @@ import com.contexts.cosmic.data.network.api.ProfileAPI
 import com.contexts.cosmic.data.network.httpclient.AuthManager
 import com.contexts.cosmic.data.network.httpclient.AuthManagerImpl
 import com.contexts.cosmic.data.network.httpclient.KTorHttpClientImpl
+import com.contexts.cosmic.data.network.httpclient.TokenRefreshManager
 import com.contexts.cosmic.data.repository.AuthenticateRepositoryImpl
 import com.contexts.cosmic.data.repository.FeedRepositoryImpl
 import com.contexts.cosmic.data.repository.PreferencesRepositoryImpl
@@ -36,7 +37,8 @@ val appModule =
         single<Database> { Database(get<SqlDriver>()) }
         single<LocalDataSource> { SqldelightDataSource(get<Database>()) }
         single<AuthManager> { AuthManagerImpl(get<LocalDataSource>()) }
-        single<HttpClient> { KTorHttpClientImpl(get<AuthManager>()).client }
+        single<TokenRefreshManager> { TokenRefreshManager() }
+        single<HttpClient> { KTorHttpClientImpl(get<AuthManager>(), get<TokenRefreshManager>()).client }
 
         single<ProfileAPI> { ProfileAPI(get<HttpClient>()) }
         single<FeedAPI> { FeedAPI(get<HttpClient>()) }

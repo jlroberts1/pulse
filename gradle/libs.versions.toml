@@ -26,7 +26,6 @@ sqldelight = "2.0.2"
 ktlint = "12.1.2"
 autolinktext = "1.1.1"
 splashscreen-android = "1.0.1"
-kmpicon = "1.2.6"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
