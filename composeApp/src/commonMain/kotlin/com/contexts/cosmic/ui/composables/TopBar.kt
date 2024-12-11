@@ -24,7 +24,7 @@ fun TopBar(
     TopAppBar(
         colors =
             TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
+//                containerColor = MaterialTheme.colorScheme.primaryContainer, ,
                 titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             ),
         scrollBehavior = scrollBehavior,

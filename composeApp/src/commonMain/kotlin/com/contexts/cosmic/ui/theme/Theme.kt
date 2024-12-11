@@ -37,9 +37,3 @@ fun CosmicTheme(
         )
     }
 }
-
-object AppTheme {
-    val dimens: Dimensions
-        @Composable
-        get() = LocalAppDimens.current
-}

@@ -56,6 +56,11 @@ fun LoginScreen(isLoading: Boolean = false) {
             CircularProgressIndicator()
         }
 
+        Text(
+            text = "COSMIC",
+            style = MaterialTheme.typography.titleLarge,
+        )
+
         OutlinedTextField(
             value = identifier,
             onValueChange = { identifier = it },

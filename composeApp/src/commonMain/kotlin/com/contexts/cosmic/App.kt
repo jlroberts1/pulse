@@ -57,7 +57,7 @@ fun App(
 ) {
     val isDarkTheme = isSystemInDarkTheme()
     val isAmoled by rememberSaveable { mutableStateOf(false) }
-    val color = MaterialTheme.colorScheme.primary.toArgb()
+    val color = Color(0xFF0023FF).toArgb()
     val seedColor by rememberSaveable { mutableStateOf(color) }
     val snackbarHostState = remember { SnackbarHostState() }
     val authState by viewModel.authState.collectAsState()
@@ -76,11 +76,11 @@ fun App(
         )
 
     val navController = rememberNavController()
-
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
     val showBottomBar =
-        navController
-            .currentBackStackEntryAsState()
-            .value?.destination?.route in bottomNavDestinations.map { it.route }
+        remember(navBackStackEntry) {
+            navBackStackEntry?.destination?.route in bottomNavDestinations.map { it.route }
+        }
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
@@ -106,8 +106,9 @@ fun App(
                         visible = showBottomBar,
                     ) {
                         NavigationBar {
+                            val currentRoute = navBackStackEntry?.destination?.route
                             bottomNavDestinations.forEach { screen ->
-                                val selected = navController.currentBackStackEntry?.destination?.route == screen.route
+                                val selected = currentRoute == screen.route
                                 NavigationBarItem(
                                     selected = selected,
                                     onClick = {

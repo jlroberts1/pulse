@@ -42,6 +42,7 @@ kotlin {
             implementation(libs.sqldelight.android)
             implementation(libs.splashscreen.android)
             implementation(libs.koin.android)
+            implementation(libs.androidx.material)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
