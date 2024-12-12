@@ -37,11 +37,11 @@ class MainViewModel(
     private val _bottomSheetVisible = MutableStateFlow(false)
     val bottomSheetVisible = _bottomSheetVisible.asStateFlow()
 
-    private val _fabVisibility = MutableStateFlow(1f)
-    val fabVisibility = _fabVisibility.asStateFlow()
+    private val _controlsVisibility = MutableStateFlow(1f)
+    val controlsVisibility = _controlsVisibility.asStateFlow()
 
-    fun updateFabVisibility(scrollDelta: Float) {
-        _fabVisibility.update { currentVisibility ->
+    fun updateControlsVisibility(scrollDelta: Float) {
+        _controlsVisibility.update { currentVisibility ->
             if (scrollDelta < 0) {
                 (currentVisibility - (-scrollDelta / 100f)).coerceIn(0f, 1f)
             } else {

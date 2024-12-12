@@ -12,6 +12,9 @@ package com.contexts.cosmic
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -47,6 +50,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -100,11 +104,11 @@ fun App(
             navBackStackEntry?.destination?.route in bottomNavDestinations.map { it.route }
         }
 
-    val fabVisibility by viewModel.fabVisibility.collectAsState()
+    val controlsVisibility by viewModel.controlsVisibility.collectAsState()
 
     val scrollBehavior =
         rememberFabScrollBehavior(
-            onScroll = { delta -> viewModel.updateFabVisibility(delta) },
+            onScroll = { delta -> viewModel.updateControlsVisibility(delta) },
         )
 
     CosmicTheme(themeState) {
@@ -125,8 +129,8 @@ fun App(
                             elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
                             modifier =
                                 Modifier.graphicsLayer {
-                                    alpha = fabVisibility
-                                    translationY = 100f * (1f - fabVisibility)
+                                    alpha = controlsVisibility
+                                    translationY = 100f * (1f - controlsVisibility)
                                 },
                         ) {
                             Icon(Icons.Sharp.Add, "Add")
@@ -136,6 +140,11 @@ fun App(
                 bottomBar = {
                     AnimatedVisibility(
                         visible = showBottomBar,
+                        modifier =
+                            Modifier.graphicsLayer {
+                                alpha = controlsVisibility
+                                translationY = 100f * (1f - controlsVisibility)
+                            },
                     ) {
                         NavigationBar(
                             modifier = Modifier.height(72.dp),
@@ -167,6 +176,13 @@ fun App(
                     }
                 },
             ) { innerPadding ->
+                val newPadding =
+                    PaddingValues(
+                        top = innerPadding.calculateTopPadding(),
+                        bottom = 0.dp,
+                        start = innerPadding.calculateStartPadding(LocalLayoutDirection.current),
+                        end = innerPadding.calculateEndPadding(LocalLayoutDirection.current),
+                    )
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
@@ -185,14 +201,14 @@ fun App(
                                 AuthenticatedNavigation(
                                     navController,
                                     updateScaffoldViewState = { viewModel.updateScaffoldViewState(it) },
-                                    modifier = Modifier.padding(innerPadding),
+                                    modifier = Modifier.padding(newPadding),
                                 )
 
                             AuthenticationState.Unauthenticated ->
                                 UnauthenticatedNavigation(
                                     navController,
                                     updateScaffoldViewState = { viewModel.updateScaffoldViewState(it) },
-                                    modifier = Modifier.padding(innerPadding),
+                                    modifier = Modifier.padding(newPadding),
                                 )
                         }
                     }
