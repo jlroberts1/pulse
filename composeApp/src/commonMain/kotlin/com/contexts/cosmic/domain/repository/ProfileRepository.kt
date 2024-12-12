@@ -9,9 +9,9 @@
 
 package com.contexts.cosmic.domain.repository
 
+import app.bsky.actor.GetProfileResponse
+import app.bsky.feed.GetAuthorFeedResponse
 import com.contexts.cosmic.data.network.httpclient.Response
-import com.contexts.cosmic.data.network.model.response.ProfileDTO
-import com.contexts.cosmic.domain.model.FeedResponse
 import com.contexts.cosmic.domain.model.User
 import com.contexts.cosmic.exceptions.AppError
 import com.contexts.cosmic.exceptions.NetworkError
@@ -19,9 +19,9 @@ import com.contexts.cosmic.extensions.RequestResult
 import kotlinx.coroutines.flow.Flow
 
 interface ProfileRepository {
-    suspend fun getProfile(actor: String): Response<ProfileDTO, NetworkError>
+    suspend fun getProfile(actor: String): Response<GetProfileResponse, NetworkError>
 
     suspend fun getMyProfile(myDid: String): Flow<RequestResult<User, AppError>>
 
-    suspend fun getProfileFeed(myDid: String): Response<FeedResponse, NetworkError>
+    suspend fun getProfileFeed(myDid: String): Response<GetAuthorFeedResponse, NetworkError>
 }

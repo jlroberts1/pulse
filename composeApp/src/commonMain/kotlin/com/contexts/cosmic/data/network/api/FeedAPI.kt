@@ -9,9 +9,9 @@
 
 package com.contexts.cosmic.data.network.api
 
+import app.bsky.feed.GetTimelineResponse
 import com.contexts.cosmic.data.network.httpclient.Response
 import com.contexts.cosmic.data.network.httpclient.safeRequest
-import com.contexts.cosmic.domain.model.FeedResponse
 import com.contexts.cosmic.exceptions.NetworkError
 import io.ktor.client.HttpClient
 import io.ktor.http.HttpMethod
@@ -22,7 +22,7 @@ class FeedAPI(private val client: HttpClient) {
         limit: Int = 50,
         cursor: String? = null,
         algorithm: String? = null,
-    ): Response<FeedResponse, NetworkError> {
+    ): Response<GetTimelineResponse, NetworkError> {
         return client.safeRequest {
             url {
                 method = HttpMethod.Get

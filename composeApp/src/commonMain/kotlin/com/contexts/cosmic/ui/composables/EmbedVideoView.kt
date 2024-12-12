@@ -23,15 +23,16 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.contexts.cosmic.util.UrlHandler
 import org.koin.compose.koinInject
+import sh.christian.ozone.api.Uri
 
 @Composable
 fun EmbedVideoView(
-    thumbnail: String,
-    playlist: String,
+    thumbnail: Uri?,
+    playlist: Uri,
     urlHandler: UrlHandler = koinInject(),
 ) {
     Surface(
-        onClick = { urlHandler.openUrl(playlist) },
+        onClick = { urlHandler.openUrl(playlist.uri) },
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
         border =
@@ -41,7 +42,7 @@ fun EmbedVideoView(
             ),
     ) {
         AsyncImage(
-            model = thumbnail,
+            model = thumbnail?.uri,
             contentDescription = null,
             modifier =
                 Modifier

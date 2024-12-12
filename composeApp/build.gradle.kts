@@ -17,6 +17,7 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.sqldelight)
     alias(libs.plugins.ktlint)
+    alias(libs.plugins.ozoneGenerator)
 }
 
 kotlin {
@@ -37,6 +38,7 @@ kotlin {
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
+            binaryOption("bundleId", "com.contexts.cosmic")
             isStatic = true
         }
     }
@@ -82,6 +84,7 @@ kotlin {
             implementation(libs.coil.networking)
             implementation(libs.sqldelight.extensions)
             implementation(libs.autolinktext)
+            api(libs.ozone)
         }
     }
 }
@@ -126,4 +129,16 @@ sqldelight {
 
 dependencies {
     debugImplementation(compose.uiTooling)
+    lexicons(libs.ozone)
+}
+
+lexicons {
+    namespace.set("com.contexts.cosmic")
+
+    defaults {
+        generateUnknownsForEnums.set(true)
+        generateUnknownsForSealedTypes.set(true)
+    }
+
+    outputDirectory.set(project.layout.buildDirectory.dir("out"))
 }

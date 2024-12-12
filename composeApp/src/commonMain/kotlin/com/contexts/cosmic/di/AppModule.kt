@@ -11,6 +11,7 @@ package com.contexts.cosmic.di
 
 import app.cash.sqldelight.db.SqlDriver
 import com.contexts.cosmic.MainViewModel
+import com.contexts.cosmic.data.local.InstantAdapter
 import com.contexts.cosmic.data.local.LocalDataSource
 import com.contexts.cosmic.data.local.SqldelightDataSource
 import com.contexts.cosmic.data.network.api.AuthenticateAPI
@@ -25,6 +26,7 @@ import com.contexts.cosmic.data.repository.FeedRepositoryImpl
 import com.contexts.cosmic.data.repository.PreferencesRepositoryImpl
 import com.contexts.cosmic.data.repository.ProfileRepositoryImpl
 import com.contexts.cosmic.db.Database
+import com.contexts.cosmic.db.User
 import com.contexts.cosmic.domain.repository.AuthenticateRepository
 import com.contexts.cosmic.domain.repository.FeedRepository
 import com.contexts.cosmic.domain.repository.PreferencesRepository
@@ -43,7 +45,8 @@ val appModule =
     module {
         single<SnackbarDelegate> { SnackbarDelegate() }
         single<PreferencesRepository> { PreferencesRepositoryImpl(get()) }
-        single<Database> { Database(get<SqlDriver>()) }
+        single { User.Adapter(indexedAtAdapter = InstantAdapter) }
+        single<Database> { Database(get<SqlDriver>(), get()) }
         single<LocalDataSource> { SqldelightDataSource(get<Database>()) }
         single<AuthManager> { AuthManagerImpl(get<LocalDataSource>()) }
         single<TokenRefreshManager> { TokenRefreshManager() }

@@ -9,17 +9,17 @@
 
 package com.contexts.cosmic.data.network.api
 
+import app.bsky.actor.GetProfileResponse
+import app.bsky.feed.GetAuthorFeedResponse
 import com.contexts.cosmic.data.network.httpclient.Response
 import com.contexts.cosmic.data.network.httpclient.safeRequest
-import com.contexts.cosmic.data.network.model.response.ProfileDTO
-import com.contexts.cosmic.domain.model.FeedResponse
 import com.contexts.cosmic.exceptions.NetworkError
 import io.ktor.client.HttpClient
 import io.ktor.http.HttpMethod
 import io.ktor.http.path
 
 class ProfileAPI(private val client: HttpClient) {
-    suspend fun getProfile(actor: String): Response<ProfileDTO, NetworkError> {
+    suspend fun getProfile(actor: String): Response<GetProfileResponse, NetworkError> {
         return client.safeRequest {
             url {
                 method = HttpMethod.Get
@@ -29,7 +29,7 @@ class ProfileAPI(private val client: HttpClient) {
         }
     }
 
-    suspend fun getMyProfile(myDid: String): Response<ProfileDTO, NetworkError> {
+    suspend fun getMyProfile(myDid: String): Response<GetProfileResponse, NetworkError> {
         return getProfile(myDid)
     }
 
@@ -37,7 +37,7 @@ class ProfileAPI(private val client: HttpClient) {
         actor: String,
         limit: Int = 50,
         cursor: String? = null,
-    ): Response<FeedResponse, NetworkError> {
+    ): Response<GetAuthorFeedResponse, NetworkError> {
         return client.safeRequest {
             url {
                 method = HttpMethod.Get

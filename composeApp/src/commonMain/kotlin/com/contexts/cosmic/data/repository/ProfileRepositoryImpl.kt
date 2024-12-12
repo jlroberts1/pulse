@@ -9,12 +9,12 @@
 
 package com.contexts.cosmic.data.repository
 
+import app.bsky.actor.GetProfileResponse
+import app.bsky.feed.GetAuthorFeedResponse
 import com.contexts.cosmic.data.local.LocalDataSource
 import com.contexts.cosmic.data.network.api.ProfileAPI
 import com.contexts.cosmic.data.network.httpclient.Response
 import com.contexts.cosmic.data.network.httpclient.handleInChannel
-import com.contexts.cosmic.data.network.model.response.ProfileDTO
-import com.contexts.cosmic.domain.model.FeedResponse
 import com.contexts.cosmic.domain.model.User
 import com.contexts.cosmic.domain.model.toUser
 import com.contexts.cosmic.domain.repository.ProfileRepository
@@ -28,7 +28,7 @@ class ProfileRepositoryImpl(
     private val profileAPI: ProfileAPI,
     private val localDataSource: LocalDataSource,
 ) : ProfileRepository {
-    override suspend fun getProfile(actor: String): Response<ProfileDTO, NetworkError> {
+    override suspend fun getProfile(actor: String): Response<GetProfileResponse, NetworkError> {
         return profileAPI.getProfile(actor)
     }
 
@@ -44,7 +44,7 @@ class ProfileRepositoryImpl(
                 )
         }
 
-    override suspend fun getProfileFeed(myDid: String): Response<FeedResponse, NetworkError> {
+    override suspend fun getProfileFeed(myDid: String): Response<GetAuthorFeedResponse, NetworkError> {
         return profileAPI.getAuthorFeed(myDid)
     }
 }

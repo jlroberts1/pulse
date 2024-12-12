@@ -22,11 +22,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import app.bsky.embed.ImagesViewImage
 import coil3.compose.AsyncImage
-import com.contexts.cosmic.domain.model.ImageView
 
 @Composable
-fun EmbedImageView(images: List<ImageView>) {
+fun EmbedImageView(images: List<ImagesViewImage>) {
     val pagerState = rememberPagerState(pageCount = { images.size })
     HorizontalPager(
         state = pagerState,
@@ -36,7 +36,7 @@ fun EmbedImageView(images: List<ImageView>) {
                 .fillMaxWidth(),
     ) { page ->
         AsyncImage(
-            model = images[page].fullsize,
+            model = images[page].fullsize.uri,
             contentDescription = images[page].alt,
             modifier =
                 Modifier

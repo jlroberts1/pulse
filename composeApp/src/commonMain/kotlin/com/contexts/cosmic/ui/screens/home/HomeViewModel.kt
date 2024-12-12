@@ -11,8 +11,8 @@ package com.contexts.cosmic.ui.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.bsky.feed.FeedViewPost
 import com.contexts.cosmic.data.network.httpclient.Response
-import com.contexts.cosmic.domain.model.FeedViewPost
 import com.contexts.cosmic.domain.repository.FeedRepository
 import com.contexts.cosmic.exceptions.AppError
 import com.contexts.cosmic.extensions.RequestResult

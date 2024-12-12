@@ -11,9 +11,9 @@ package com.contexts.cosmic.ui.screens.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.bsky.feed.FeedViewPost
 import com.contexts.cosmic.data.network.httpclient.AuthManager
 import com.contexts.cosmic.data.network.httpclient.Response
-import com.contexts.cosmic.domain.model.FeedViewPost
 import com.contexts.cosmic.domain.repository.ProfileRepository
 import com.contexts.cosmic.exceptions.AppError
 import com.contexts.cosmic.extensions.RequestResult

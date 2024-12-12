@@ -26,6 +26,7 @@ sqldelight = "2.0.2"
 ktlint = "12.1.2"
 autolinktext = "1.1.1"
 splashscreen-android = "1.0.1"
+ozone = "0.3.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -62,7 +63,8 @@ coil-networking = { group = "io.coil-kt.coil3", name = "coil-network-ktor3", ver
 sqldelight-runtime = { group = "app.cash.sqldelight", name = "runtime", version.ref = "sqldelight" }
 sqldelight-native = { group = "app.cash.sqldelight", name = "native-driver", version.ref = "sqldelight" }
 sqldelight-extensions = { group = "app.cash.sqldelight", name = "coroutines-extensions", version.ref = "sqldelight" }
-autolinktext = { module = "sh.calvin.autolinktext:autolinktext", version.ref = "autolinktext" }
+autolinktext = { group = "sh.calvin.autolinktext", name = "autolinktext", version.ref = "autolinktext" }
+ozone = { group = "sh.christian.ozone", name = "bluesky", version.ref = "ozone" }
 
 # Android specific dependencies
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
@@ -92,3 +94,4 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+ozoneGenerator = { id = "sh.christian.ozone.generator", version.ref = "ozone" }

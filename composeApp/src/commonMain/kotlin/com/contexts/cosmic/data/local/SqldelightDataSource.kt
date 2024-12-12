@@ -34,18 +34,20 @@ class SqldelightDataSource(
 
     override suspend fun insertUser(user: User) =
         withContext(Dispatchers.IO) {
-            database.userQueries.insertUser(
-                did = user.did,
-                handle = user.handle,
-                displayName = user.displayName,
-                description = user.description,
-                avatar = user.avatar,
-                banner = user.banner,
-                followersCount = user.followersCount.toLong(),
-                followsCount = user.followsCount.toLong(),
-                postsCount = user.postsCount.toLong(),
-                indexedAt = user.indexedAt ?: "",
-            )
+            database.run {
+                userQueries.insertUser(
+                    did = user.did,
+                    handle = user.handle,
+                    displayName = user.displayName,
+                    description = user.description,
+                    avatar = user.avatar,
+                    banner = user.banner,
+                    followersCount = user.followersCount,
+                    followsCount = user.followsCount,
+                    postsCount = user.postsCount,
+                    indexedAt = user.indexedAt,
+                )
+            }
         }
 
     override suspend fun updateProfile(user: User) =
@@ -56,10 +58,10 @@ class SqldelightDataSource(
                 description = user.description,
                 avatar = user.avatar,
                 banner = user.banner,
-                followersCount = user.followersCount.toLong(),
-                followsCount = user.followsCount.toLong(),
-                postsCount = user.postsCount.toLong(),
-                indexedAt = user.indexedAt ?: "",
+                followersCount = user.followersCount,
+                followsCount = user.followsCount,
+                postsCount = user.postsCount,
+                indexedAt = user.indexedAt,
                 did = user.did,
             )
         }

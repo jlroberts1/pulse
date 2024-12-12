@@ -15,7 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import com.contexts.cosmic.domain.model.FeedViewPost
+import app.bsky.feed.FeedViewPost
 import com.contexts.cosmic.exceptions.AppError
 import com.contexts.cosmic.extensions.RequestResult
 import com.contexts.cosmic.ui.composables.ErrorView
@@ -46,14 +46,13 @@ fun FeedView(feed: RequestResult<List<FeedViewPost>, AppError>) {
 
             is RequestResult.Success -> {
                 items(feed.data.size) {
-                    feed.data.forEach { post ->
+                    feed.data.forEach { item ->
                         FeedItem(
-                            authorAvatar = post.post.author.avatar,
-                            authorName = post.post.author.displayName,
-                            authorHandle = post.post.author.handle,
-                            indexedAt = post.post.indexedAt,
-                            postRecordText = post.post.record.text,
-                            embedView = post.post.embed,
+                            post = item.post,
+                            onReplyClick = {},
+                            onRepostClick = {},
+                            onLikeClick = {},
+                            onMenuClick = {},
                         )
                     }
                 }

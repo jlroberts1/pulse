@@ -1,3 +1,4 @@
+
 CREATE TABLE user (
     did TEXT NOT NULL PRIMARY KEY,
     handle TEXT NOT NULL,
@@ -8,7 +9,7 @@ CREATE TABLE user (
     followersCount INTEGER NOT NULL DEFAULT 0,
     followsCount INTEGER NOT NULL DEFAULT 0,
     postsCount INTEGER NOT NULL DEFAULT 0,
-    indexedAt TEXT NOT NULL
+    indexedAt INTEGER AS kotlinx.datetime.Instant
 );
 
 CREATE TABLE auth_state (

@@ -33,17 +33,18 @@ import coil3.compose.AsyncImage
 import com.contexts.cosmic.extensions.isGifEmbed
 import com.contexts.cosmic.util.UrlHandler
 import org.koin.compose.koinInject
+import sh.christian.ozone.api.Uri
 
 @Composable
 fun EmbedExternalView(
-    uri: String,
-    thumb: String? = null,
+    uri: Uri,
+    thumb: Uri? = null,
     title: String,
     description: String? = null,
     urlHandler: UrlHandler = koinInject(),
 ) {
     Surface(
-        onClick = { urlHandler.openUrl(uri) },
+        onClick = { urlHandler.openUrl(uri.uri) },
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
         border =
@@ -52,7 +53,7 @@ fun EmbedExternalView(
                 MaterialTheme.colorScheme.outlineVariant,
             ),
     ) {
-        if (uri.isGifEmbed()) {
+        if (uri.uri.isGifEmbed()) {
             Box(
                 modifier =
                     Modifier
@@ -60,7 +61,7 @@ fun EmbedExternalView(
                         .height(200.dp),
             ) {
                 AsyncImage(
-                    model = uri,
+                    model = uri.uri,
                     contentDescription = description ?: "",
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
@@ -74,7 +75,7 @@ fun EmbedExternalView(
                         .height(240.dp),
             ) {
                 AsyncImage(
-                    model = thumb,
+                    model = thumb?.uri,
                     contentDescription = null,
                     modifier =
                         Modifier
@@ -112,7 +113,7 @@ fun EmbedExternalView(
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.9f),
                         )
                         Text(
-                            text = uri,
+                            text = uri.uri,
                             style = MaterialTheme.typography.labelSmall,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
