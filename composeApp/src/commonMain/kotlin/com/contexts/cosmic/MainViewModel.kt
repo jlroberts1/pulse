@@ -12,6 +12,7 @@ package com.contexts.cosmic
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.contexts.cosmic.data.network.httpclient.AuthManager
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -56,6 +57,20 @@ class MainViewModel(
 
     fun hideBottomSheet() {
         _bottomSheetVisible.update { false }
+    }
+
+    suspend fun onPullToRefreshTrigger() {
+        _scaffoldViewState.update {
+            it.copy(
+                isRefreshing = true,
+            )
+        }
+        delay(1000L)
+        _scaffoldViewState.update {
+            it.copy(
+                isRefreshing = false,
+            )
+        }
     }
 
     init {

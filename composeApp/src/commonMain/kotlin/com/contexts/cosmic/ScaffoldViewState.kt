@@ -16,4 +16,5 @@ data class ScaffoldViewState(
     val topBarActions: @Composable () -> Unit = {},
     val showTopAppBar: Boolean = true,
     val showFab: Boolean = true,
+    val isRefreshing: Boolean = false,
 )

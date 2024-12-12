@@ -58,11 +58,13 @@ import com.contexts.cosmic.domain.model.NavigationIcon
 import com.contexts.cosmic.ui.components.FabScrollBehavior
 import com.contexts.cosmic.ui.components.SnackbarDelegate
 import com.contexts.cosmic.ui.composables.AddPostBottomSheet
+import com.contexts.cosmic.ui.composables.PullToRefreshBox
 import com.contexts.cosmic.ui.composables.SnackbarHost
 import com.contexts.cosmic.ui.composables.Splash
 import com.contexts.cosmic.ui.composables.TopBar
 import com.contexts.cosmic.ui.theme.CosmicTheme
 import com.materialkolor.rememberDynamicMaterialThemeState
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinContext
 import org.koin.compose.koinInject
@@ -81,6 +83,7 @@ fun App(
     val seedColor by rememberSaveable { mutableStateOf(color) }
     val snackbarHostState = remember { SnackbarHostState() }
     val authState by viewModel.authState.collectAsState()
+    val scope = rememberCoroutineScope()
 
     val scaffoldViewState by viewModel.scaffoldViewState.collectAsState()
     snackbarDelegate.apply {
@@ -183,40 +186,56 @@ fun App(
                         start = innerPadding.calculateStartPadding(LocalLayoutDirection.current),
                         end = innerPadding.calculateEndPadding(LocalLayoutDirection.current),
                     )
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background,
-                ) {
-                    AnimatedContent(
-                        targetState = authState,
-                    ) { state ->
-                        when (state) {
-                            AuthenticationState.Loading -> {
-                                if (getPlatform().isIOS()) {
-                                    Splash()
-                                }
-                            }
-
-                            AuthenticationState.Authenticated ->
-                                AuthenticatedNavigation(
-                                    navController,
-                                    updateScaffoldViewState = { viewModel.updateScaffoldViewState(it) },
-                                    modifier = Modifier.padding(newPadding),
-                                )
-
-                            AuthenticationState.Unauthenticated ->
-                                UnauthenticatedNavigation(
-                                    navController,
-                                    updateScaffoldViewState = { viewModel.updateScaffoldViewState(it) },
-                                    modifier = Modifier.padding(newPadding),
-                                )
+                PullToRefreshBox(
+                    isRefreshing = scaffoldViewState.isRefreshing,
+                    onRefresh = {
+                        scope.launch {
+                            viewModel.onPullToRefreshTrigger()
                         }
-                    }
+                    },
+                    modifier = Modifier.padding(newPadding),
+                ) {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background,
+                    ) {
+                        AnimatedContent(
+                            targetState = authState,
+                        ) { state ->
+                            when (state) {
+                                AuthenticationState.Loading -> {
+                                    if (getPlatform().isIOS()) {
+                                        Splash()
+                                    }
+                                }
 
-                    if (bottomSheetVisible) {
-                        AddPostBottomSheet(
-                            onDismiss = { viewModel.hideBottomSheet() },
-                        )
+                                AuthenticationState.Authenticated ->
+                                    AuthenticatedNavigation(
+                                        navController,
+                                        updateScaffoldViewState = {
+                                            viewModel.updateScaffoldViewState(
+                                                it,
+                                            )
+                                        },
+                                    )
+
+                                AuthenticationState.Unauthenticated ->
+                                    UnauthenticatedNavigation(
+                                        navController,
+                                        updateScaffoldViewState = {
+                                            viewModel.updateScaffoldViewState(
+                                                it,
+                                            )
+                                        },
+                                    )
+                            }
+                        }
+
+                        if (bottomSheetVisible) {
+                            AddPostBottomSheet(
+                                onDismiss = { viewModel.hideBottomSheet() },
+                            )
+                        }
                     }
                 }
             }
