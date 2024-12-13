@@ -54,6 +54,7 @@ kotlin {
             implementation(libs.splashscreen.android)
             implementation(libs.koin.android)
             implementation(libs.androidx.material)
+            implementation(libs.accompanist.permissions)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
