@@ -27,6 +27,7 @@ ktlint = "12.1.2"
 autolinktext = "1.1.1"
 splashscreen-android = "1.0.1"
 ozone = "0.3.0"
+napier = "2.7.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -65,7 +66,7 @@ sqldelight-native = { group = "app.cash.sqldelight", name = "native-driver", ver
 sqldelight-extensions = { group = "app.cash.sqldelight", name = "coroutines-extensions", version.ref = "sqldelight" }
 autolinktext = { group = "sh.calvin.autolinktext", name = "autolinktext", version.ref = "autolinktext" }
 ozone = { group = "sh.christian.ozone", name = "bluesky", version.ref = "ozone" }
-
+napier = { group = "io.github.aakira", name = "napier", version.ref = "napier" }
 # Android specific dependencies
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
 ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktor" }

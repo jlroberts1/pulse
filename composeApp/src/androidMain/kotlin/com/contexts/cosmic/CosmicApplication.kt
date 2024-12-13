@@ -11,11 +11,14 @@ package com.contexts.cosmic
 
 import android.app.Application
 import com.contexts.cosmic.di.initializeKoin
+import io.github.aakira.napier.DebugAntilog
+import io.github.aakira.napier.Napier
 import org.koin.dsl.module
 
 class CosmicApplication : Application() {
     override fun onCreate() {
         super.onCreate()
+        Napier.base(DebugAntilog())
         initializeKoin(
             listOf(
                 module {

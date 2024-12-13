@@ -11,13 +11,13 @@ package com.contexts.cosmic.data.network.httpclient
 
 import com.contexts.cosmic.data.network.model.Token
 import com.contexts.cosmic.data.network.model.response.RefreshSessionResponse
+import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.logging.DEFAULT
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
@@ -48,7 +48,12 @@ fun HttpClientConfig<*>.setupContentNegotiation() {
 
 fun HttpClientConfig<*>.setupLogging() {
     install(Logging) {
-        logger = Logger.DEFAULT
+        logger =
+            object : Logger {
+                override fun log(message: String) {
+                    Napier.d("HttpClient: $message")
+                }
+            }
         level = LogLevel.ALL
     }
 }

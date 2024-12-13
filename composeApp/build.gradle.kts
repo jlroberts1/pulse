@@ -84,6 +84,7 @@ kotlin {
             implementation(libs.coil.networking)
             implementation(libs.sqldelight.extensions)
             implementation(libs.autolinktext)
+            implementation(libs.napier)
             api(libs.ozone)
         }
     }
