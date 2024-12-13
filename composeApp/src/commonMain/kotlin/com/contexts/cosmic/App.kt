@@ -110,7 +110,7 @@ fun App(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val showBottomBar =
         remember(navBackStackEntry) {
-            navBackStackEntry?.destination?.route in bottomNavDestinations.map { it.route }
+            navBackStackEntry?.destination?.route in topLevelDestinations.map { it.route }
         }
 
     val controlsVisibility by viewModel.controlsVisibility.collectAsState()
@@ -123,14 +123,18 @@ fun App(
     LaunchedEffect(authState) {
         when (authState) {
             is AuthenticationState.Authenticated -> {
-                navController.navigate(NavigationRoutes.Authenticated.route) {
-                    popUpTo(NavigationRoutes.Unauthenticated.route) { inclusive = true }
+                navController.navigate(NavigationRoutes.Authenticated.NavigationRoute.route) {
+                    popUpTo(NavigationRoutes.Authenticated.NavigationRoute.route) {
+                        inclusive = true
+                    }
                 }
             }
 
             is AuthenticationState.Unauthenticated -> {
-                navController.navigate(NavigationRoutes.Unauthenticated.route) {
-                    popUpTo(NavigationRoutes.Authenticated.route) { inclusive = true }
+                navController.navigate(NavigationRoutes.Unauthenticated.NavigationRoute.route) {
+                    popUpTo(NavigationRoutes.Unauthenticated.NavigationRoute.route) {
+                        inclusive = true
+                    }
                 }
             }
 
@@ -177,7 +181,7 @@ fun App(
                             modifier = Modifier.height(72.dp),
                         ) {
                             val currentRoute = navBackStackEntry?.destination?.route
-                            bottomNavDestinations.forEach { screen ->
+                            topLevelDestinations.forEach { screen ->
                                 val selected = currentRoute == screen.route
                                 NavigationBarItem(
                                     selected = selected,
@@ -245,21 +249,21 @@ fun App(
 @Composable
 private fun getIconForScreen(screen: NavigationRoutes): NavigationIcon {
     return when (screen) {
-        NavigationRoutes.Home -> NavigationIcon(Icons.Default.Home, "Home")
-        NavigationRoutes.Search -> NavigationIcon(Icons.Default.Search, "Search")
-        NavigationRoutes.Messages ->
+        NavigationRoutes.Authenticated.Home -> NavigationIcon(Icons.Default.Home, "Home")
+        NavigationRoutes.Authenticated.Search -> NavigationIcon(Icons.Default.Search, "Search")
+        NavigationRoutes.Authenticated.Messages ->
             NavigationIcon(
                 Icons.AutoMirrored.Filled.Message,
                 "Messages",
             )
 
-        NavigationRoutes.Notifications ->
+        NavigationRoutes.Authenticated.Notifications ->
             NavigationIcon(
                 Icons.Default.Notifications,
                 "Notifications",
             )
 
-        NavigationRoutes.Profile -> NavigationIcon(Icons.Default.Person, "Profile")
+        NavigationRoutes.Authenticated.Profile -> NavigationIcon(Icons.Default.Person, "Profile")
         else -> NavigationIcon(Icons.Default.Home, "Home")
     }
 }
@@ -275,11 +279,11 @@ fun rememberFabScrollBehavior(onScroll: (Float) -> Unit): FabScrollBehavior {
     }
 }
 
-val bottomNavDestinations =
+val topLevelDestinations =
     listOf(
-        NavigationRoutes.Home,
-        NavigationRoutes.Search,
-        NavigationRoutes.Messages,
-        NavigationRoutes.Notifications,
-        NavigationRoutes.Profile,
+        NavigationRoutes.Authenticated.Home,
+        NavigationRoutes.Authenticated.Search,
+        NavigationRoutes.Authenticated.Messages,
+        NavigationRoutes.Authenticated.Notifications,
+        NavigationRoutes.Authenticated.Profile,
     )

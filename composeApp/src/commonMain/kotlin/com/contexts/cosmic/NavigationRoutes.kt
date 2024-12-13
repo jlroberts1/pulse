@@ -35,7 +35,7 @@ fun RootNav(
 ) {
     NavHost(
         navController = navController,
-        startDestination = NavigationRoutes.Unauthenticated.route,
+        startDestination = NavigationRoutes.Authenticated.NavigationRoute.route,
         modifier = modifier,
     ) {
         authenticatedGraph(navController, updateScaffoldViewState)
@@ -43,24 +43,28 @@ fun RootNav(
     }
 }
 
-sealed class NavigationRoutes(val route: String) {
-    data object Unauthenticated : NavigationRoutes("unauthenticated")
+sealed class NavigationRoutes {
+    sealed class Unauthenticated(val route: String) : NavigationRoutes() {
+        data object NavigationRoute : Unauthenticated("unauthenticated")
 
-    data object Authenticated : NavigationRoutes("authenticated")
+        data object Login : Unauthenticated("login")
+    }
 
-    data object Login : NavigationRoutes("login")
+    sealed class Authenticated(val route: String) : NavigationRoutes() {
+        data object NavigationRoute : Authenticated("authenticated")
 
-    data object Home : NavigationRoutes("home")
+        data object Home : Authenticated("home")
 
-    data object Search : NavigationRoutes("search")
+        data object Search : Authenticated("search")
 
-    data object Messages : NavigationRoutes("messages")
+        data object Messages : Authenticated("messages")
 
-    data object Notifications : NavigationRoutes("notifications")
+        data object Notifications : Authenticated("notifications")
 
-    data object Profile : NavigationRoutes("profile")
+        data object Profile : Authenticated("profile")
 
-    data object Settings : NavigationRoutes("settings")
+        data object Settings : Authenticated("settings")
+    }
 }
 
 fun NavGraphBuilder.unauthenticatedGraph(
@@ -68,17 +72,25 @@ fun NavGraphBuilder.unauthenticatedGraph(
     updateScaffoldViewState: (ScaffoldViewState) -> Unit,
 ) {
     navigation(
-        route = NavigationRoutes.Unauthenticated.route,
-        startDestination = NavigationRoutes.Login.route,
+        route = NavigationRoutes.Unauthenticated.NavigationRoute.route,
+        startDestination = NavigationRoutes.Unauthenticated.Login.route,
     ) {
-        composable(route = NavigationRoutes.Login.route) {
+        composable(route = NavigationRoutes.Unauthenticated.Login.route) {
             updateScaffoldViewState(
                 ScaffoldViewState(
                     showTopAppBar = false,
                     showFab = false,
                 ),
             )
-            LoginScreen()
+            LoginScreen(
+                onNavigateToHome = {
+                    navController.navigate(NavigationRoutes.Authenticated.NavigationRoute.route) {
+                        popUpTo(NavigationRoutes.Authenticated.NavigationRoute.route) {
+                            inclusive = true
+                        }
+                    }
+                },
+            )
         }
     }
 }
@@ -88,10 +100,10 @@ fun NavGraphBuilder.authenticatedGraph(
     updateScaffoldViewState: (ScaffoldViewState) -> Unit,
 ) {
     navigation(
-        route = NavigationRoutes.Authenticated.route,
-        startDestination = NavigationRoutes.Home.route,
+        route = NavigationRoutes.Authenticated.NavigationRoute.route,
+        startDestination = NavigationRoutes.Authenticated.Home.route,
     ) {
-        composable(route = NavigationRoutes.Home.route) {
+        composable(route = NavigationRoutes.Authenticated.Home.route) {
             updateScaffoldViewState(
                 ScaffoldViewState(
                     showTopAppBar = true,
@@ -101,7 +113,7 @@ fun NavGraphBuilder.authenticatedGraph(
                             when (it) {
                                 is HomeOverflowMenuAction.Settings ->
                                     navController.navigate(
-                                        NavigationRoutes.Settings.route,
+                                        NavigationRoutes.Authenticated.Settings.route,
                                     )
                                 is HomeOverflowMenuAction.Logout -> Unit
                             }
@@ -111,7 +123,7 @@ fun NavGraphBuilder.authenticatedGraph(
             )
             HomeScreen()
         }
-        composable(route = NavigationRoutes.Search.route) {
+        composable(route = NavigationRoutes.Authenticated.Search.route) {
             updateScaffoldViewState(
                 ScaffoldViewState(
                     showTopAppBar = true,
@@ -120,7 +132,7 @@ fun NavGraphBuilder.authenticatedGraph(
             )
             SearchScreen()
         }
-        composable(route = NavigationRoutes.Messages.route) {
+        composable(route = NavigationRoutes.Authenticated.Messages.route) {
             updateScaffoldViewState(
                 ScaffoldViewState(
                     showTopAppBar = true,
@@ -129,7 +141,7 @@ fun NavGraphBuilder.authenticatedGraph(
             )
             MessageScreen()
         }
-        composable(route = NavigationRoutes.Notifications.route) {
+        composable(route = NavigationRoutes.Authenticated.Notifications.route) {
             updateScaffoldViewState(
                 ScaffoldViewState(
                     showTopAppBar = true,
@@ -138,7 +150,7 @@ fun NavGraphBuilder.authenticatedGraph(
             )
             NotificationsScreen()
         }
-        composable(route = NavigationRoutes.Profile.route) {
+        composable(route = NavigationRoutes.Authenticated.Profile.route) {
             updateScaffoldViewState(
                 ScaffoldViewState(
                     showTopAppBar = false,
@@ -147,7 +159,7 @@ fun NavGraphBuilder.authenticatedGraph(
             )
             ProfileScreen()
         }
-        composable(route = NavigationRoutes.Settings.route) {
+        composable(route = NavigationRoutes.Authenticated.Settings.route) {
             updateScaffoldViewState(
                 ScaffoldViewState(
                     showTopAppBar = true,

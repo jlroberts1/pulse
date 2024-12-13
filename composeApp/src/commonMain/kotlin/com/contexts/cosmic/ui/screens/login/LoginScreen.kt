@@ -27,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,7 +48,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun LoginScreen(isLoading: Boolean = false) {
+fun LoginScreen(onNavigateToHome: () -> Unit) {
     val viewModel: LoginViewModel = koinViewModel()
     var identifier by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -55,7 +56,7 @@ fun LoginScreen(isLoading: Boolean = false) {
 
     val scope = rememberCoroutineScope()
 
-    val uiState = viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
     Column(
         modifier =
@@ -65,8 +66,14 @@ fun LoginScreen(isLoading: Boolean = false) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        if (uiState.value.loading) {
+        if (uiState.loading) {
             CircularProgressIndicator()
+        }
+
+        if (uiState.success) {
+            LaunchedEffect(Unit) {
+                onNavigateToHome()
+            }
         }
 
         Image(
@@ -140,16 +147,9 @@ fun LoginScreen(isLoading: Boolean = false) {
                 }
             },
             modifier = Modifier.fillMaxWidth(),
-            enabled = identifier.isNotBlank() && password.isNotBlank() && !isLoading,
+            enabled = identifier.isNotBlank() && password.isNotBlank() && !uiState.loading,
         ) {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                )
-            } else {
-                Text("Login")
-            }
+            Text("Login")
         }
     }
 }

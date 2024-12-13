@@ -22,6 +22,7 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import com.contexts.cosmic.ScaffoldViewState
+import com.contexts.cosmic.topLevelDestinations
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +41,10 @@ fun TopBar(
         title = { Text(scaffoldViewState.topAppBarTitle) },
         actions = { scaffoldViewState.topBarActions() },
         navigationIcon = {
-            if (navController.previousBackStackEntry != null) {
+            val topLevelRoutes = topLevelDestinations.map { it.route }
+            if (navController.previousBackStackEntry != null &&
+                !topLevelRoutes.contains(navController.currentDestination?.route)
+            ) {
                 IconButton(onClick = { navController.navigateUp() }) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
                 }
