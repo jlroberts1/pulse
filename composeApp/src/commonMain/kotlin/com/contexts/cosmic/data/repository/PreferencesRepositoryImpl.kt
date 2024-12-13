@@ -9,6 +9,8 @@
 
 package com.contexts.cosmic.data.repository
 
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.toUpperCase
 import com.contexts.cosmic.data.datastore.PreferencesDataSource
 import com.contexts.cosmic.domain.repository.PreferencesRepository
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +29,7 @@ class PreferencesRepositoryImpl(private val preferencesDataSource: PreferencesDa
 
     override fun getTheme(): Flow<Theme> =
         preferencesDataSource.getValue(THEME, "system", String::class)
-            .map { Theme.valueOf(it) }
+            .map { Theme.valueOf(it.toUpperCase(Locale.current)) }
             .flowOn(Dispatchers.IO)
 
     companion object {

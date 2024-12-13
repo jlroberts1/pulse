@@ -55,7 +55,9 @@ fun SettingsScreen() {
             currentTheme = theme.value.name,
             onDismiss = { showThemeDialog = false },
             onThemeSelected = { newTheme ->
-                viewModel.updateTheme(Theme.valueOf(newTheme.toUpperCase(Locale.current)))
+                viewModel.updateTheme(
+                    Theme.valueOf(newTheme.toUpperCase(Locale.current)),
+                )
             },
         )
     }

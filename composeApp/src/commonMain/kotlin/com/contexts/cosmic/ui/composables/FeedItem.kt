@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -167,8 +166,6 @@ fun FeedItem(
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(8.dp))
-
             Row(
                 modifier =
                     Modifier
@@ -185,7 +182,7 @@ fun FeedItem(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
-                            modifier = Modifier.size(18.dp),
+                            modifier = Modifier.size(14.dp),
                             imageVector = Icons.AutoMirrored.Filled.Reply,
                             contentDescription = "Reply",
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -211,7 +208,7 @@ fun FeedItem(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
-                            modifier = Modifier.size(18.dp),
+                            modifier = Modifier.size(14.dp),
                             imageVector = Icons.Default.Repeat,
                             contentDescription = "Repost",
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -237,7 +234,7 @@ fun FeedItem(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
-                            modifier = Modifier.size(18.dp),
+                            modifier = Modifier.size(14.dp),
                             imageVector = Icons.Default.Favorite,
                             contentDescription = "Like",
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -259,7 +256,7 @@ fun FeedItem(
                     modifier = Modifier.weight(1f),
                 ) {
                     Icon(
-                        modifier = Modifier.size(18.dp),
+                        modifier = Modifier.size(14.dp),
                         imageVector = Icons.Default.MoreVert,
                         contentDescription = "More options",
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
