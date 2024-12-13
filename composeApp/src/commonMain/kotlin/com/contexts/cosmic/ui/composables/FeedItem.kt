@@ -80,7 +80,6 @@ fun FeedItem(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 AsyncImage(
                     model = authorAvatar?.uri,
@@ -126,7 +125,7 @@ fun FeedItem(
                 }
             }
             AutoLinkText(
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp),
                 text = postRecordText,
                 style =
                     MaterialTheme.typography.bodyMedium.copy(
@@ -182,7 +181,7 @@ fun FeedItem(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
-                            modifier = Modifier.size(14.dp),
+                            modifier = Modifier.size(16.dp),
                             imageVector = Icons.AutoMirrored.Filled.Reply,
                             contentDescription = "Reply",
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -208,7 +207,7 @@ fun FeedItem(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
-                            modifier = Modifier.size(14.dp),
+                            modifier = Modifier.size(16.dp),
                             imageVector = Icons.Default.Repeat,
                             contentDescription = "Repost",
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -234,7 +233,7 @@ fun FeedItem(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
-                            modifier = Modifier.size(14.dp),
+                            modifier = Modifier.size(16.dp),
                             imageVector = Icons.Default.Favorite,
                             contentDescription = "Like",
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -256,7 +255,7 @@ fun FeedItem(
                     modifier = Modifier.weight(1f),
                 ) {
                     Icon(
-                        modifier = Modifier.size(14.dp),
+                        modifier = Modifier.size(16.dp),
                         imageVector = Icons.Default.MoreVert,
                         contentDescription = "More options",
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
