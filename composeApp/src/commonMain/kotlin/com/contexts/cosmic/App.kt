@@ -58,7 +58,6 @@ import com.contexts.cosmic.data.repository.Theme
 import com.contexts.cosmic.domain.model.NavigationIcon
 import com.contexts.cosmic.ui.components.FabScrollBehavior
 import com.contexts.cosmic.ui.components.SnackbarDelegate
-import com.contexts.cosmic.ui.composables.AddPostBottomSheet
 import com.contexts.cosmic.ui.composables.PullToRefreshBox
 import com.contexts.cosmic.ui.composables.SnackbarHost
 import com.contexts.cosmic.ui.composables.TopBar
@@ -96,8 +95,6 @@ fun App(
         this.snackbarHostState = snackbarHostState
         coroutineScope = rememberCoroutineScope()
     }
-
-    val bottomSheetVisible by viewModel.bottomSheetVisible.collectAsState()
 
     val themeState =
         rememberDynamicMaterialThemeState(
@@ -155,7 +152,9 @@ fun App(
                 floatingActionButton = {
                     if (scaffoldViewState.showFab) {
                         FloatingActionButton(
-                            onClick = { viewModel.showBottomSheet() },
+                            onClick = {
+                                navController.navigate(NavigationRoutes.Authenticated.AddPost.route)
+                            },
                             containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
                             elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
                             modifier =
@@ -233,12 +232,6 @@ fun App(
                                 viewModel.updateScaffoldViewState(it)
                             },
                         )
-
-                        if (bottomSheetVisible) {
-                            AddPostBottomSheet(
-                                onDismiss = { viewModel.hideBottomSheet() },
-                            )
-                        }
                     }
                 }
             }

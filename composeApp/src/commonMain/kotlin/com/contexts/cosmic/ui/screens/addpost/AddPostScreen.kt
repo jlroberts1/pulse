@@ -7,13 +7,15 @@
  * (at your option) any later version.
  */
 
-package com.contexts.cosmic.ui.composables
+package com.contexts.cosmic.ui.screens.addpost
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,16 +28,14 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Gif
 import androidx.compose.material.icons.filled.Photo
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -61,9 +61,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddPostBottomSheet(onDismiss: () -> Unit) {
+fun AddPostScreen() {
     val coroutineScope = rememberCoroutineScope()
     var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
     var launchCamera by remember { mutableStateOf(value = false) }
@@ -200,9 +199,10 @@ fun AddPostBottomSheet(onDismiss: () -> Unit) {
         }
     }
 
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = rememberModalBottomSheetState(),
+    Box(
+        modifier =
+            Modifier
+                .fillMaxSize(),
     ) {
         Column(
             modifier =
@@ -210,13 +210,6 @@ fun AddPostBottomSheet(onDismiss: () -> Unit) {
                     .fillMaxWidth()
                     .padding(16.dp),
         ) {
-            Text(
-                text = charactersLeft.toString(),
-                modifier =
-                    Modifier
-                        .padding(8.dp)
-                        .align(Alignment.End),
-            )
             OutlinedTextField(
                 value = postText,
                 minLines = 6,
@@ -226,6 +219,14 @@ fun AddPostBottomSheet(onDismiss: () -> Unit) {
                 },
                 label = { Text("Add new post") },
                 modifier = Modifier.fillMaxWidth(),
+            )
+
+            Text(
+                text = charactersLeft.toString(),
+                modifier =
+                    Modifier
+                        .padding(8.dp)
+                        .align(Alignment.End),
             )
 
             if (imageBitmap != null) {
@@ -239,36 +240,32 @@ fun AddPostBottomSheet(onDismiss: () -> Unit) {
                     contentScale = ContentScale.Crop,
                 )
             }
+        }
 
-            Row(
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .padding(8.dp),
-                verticalAlignment = Alignment.Bottom,
-            ) {
+        BottomAppBar(
+            modifier =
+                Modifier
+                    .align(Alignment.BottomCenter),
+            actions = {
                 IconButton(onClick = { launchCamera = true }) {
                     Icon(Icons.Default.Camera, "Camera")
                 }
-
                 IconButton(onClick = { launchGallery = true }) {
                     Icon(Icons.Default.Photo, "Gallery")
                 }
-
                 IconButton(onClick = {}) {
                     Icon(Icons.Default.Gif, "Gif")
                 }
-
                 Spacer(modifier = Modifier.weight(1f))
-
                 FloatingActionButton(
-                    onClick = onDismiss,
+                    onClick = { },
                     modifier =
                         Modifier
                             .padding(8.dp),
                 ) {
                     Icon(Icons.AutoMirrored.Filled.Send, "Send")
                 }
-            }
-        }
+            },
+        )
     }
 }

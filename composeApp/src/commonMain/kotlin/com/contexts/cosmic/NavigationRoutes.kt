@@ -17,6 +17,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.contexts.cosmic.ui.screens.addpost.AddPostScreen
 import com.contexts.cosmic.ui.screens.home.HomeOverflowMenu
 import com.contexts.cosmic.ui.screens.home.HomeOverflowMenuAction
 import com.contexts.cosmic.ui.screens.home.HomeScreen
@@ -64,6 +65,8 @@ sealed class NavigationRoutes {
         data object Profile : Authenticated("profile")
 
         data object Settings : Authenticated("settings")
+
+        data object AddPost : Authenticated("add_post")
     }
 }
 
@@ -168,6 +171,16 @@ fun NavGraphBuilder.authenticatedGraph(
                 ),
             )
             SettingsScreen()
+        }
+        composable(route = NavigationRoutes.Authenticated.AddPost.route) {
+            updateScaffoldViewState(
+                ScaffoldViewState(
+                    showTopAppBar = true,
+                    topAppBarTitle = "Add new post",
+                    showFab = false,
+                ),
+            )
+            AddPostScreen()
         }
     }
 }
