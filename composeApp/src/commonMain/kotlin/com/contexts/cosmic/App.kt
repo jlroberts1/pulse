@@ -9,7 +9,6 @@
 
 package com.contexts.cosmic
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,6 +38,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,7 +58,10 @@ import com.contexts.cosmic.data.repository.Theme
 import com.contexts.cosmic.domain.model.NavigationIcon
 import com.contexts.cosmic.ui.components.FabScrollBehavior
 import com.contexts.cosmic.ui.components.SnackbarDelegate
-import com.contexts.cosmic.ui.composables.*
+import com.contexts.cosmic.ui.composables.AddPostBottomSheet
+import com.contexts.cosmic.ui.composables.PullToRefreshBox
+import com.contexts.cosmic.ui.composables.SnackbarHost
+import com.contexts.cosmic.ui.composables.TopBar
 import com.contexts.cosmic.ui.theme.CosmicTheme
 import com.materialkolor.rememberDynamicMaterialThemeState
 import kotlinx.coroutines.launch
@@ -116,6 +119,24 @@ fun App(
         rememberFabScrollBehavior(
             onScroll = { delta -> viewModel.updateControlsVisibility(delta) },
         )
+
+    LaunchedEffect(authState) {
+        when (authState) {
+            is AuthenticationState.Authenticated -> {
+                navController.navigate(NavigationRoutes.Authenticated.route) {
+                    popUpTo(NavigationRoutes.Unauthenticated.route) { inclusive = true }
+                }
+            }
+
+            is AuthenticationState.Unauthenticated -> {
+                navController.navigate(NavigationRoutes.Unauthenticated.route) {
+                    popUpTo(NavigationRoutes.Authenticated.route) { inclusive = true }
+                }
+            }
+
+            null -> Unit
+        }
+    }
 
     CosmicTheme(themeState) {
         KoinContext {
@@ -202,37 +223,12 @@ fun App(
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background,
                     ) {
-                        AnimatedContent(
-                            targetState = authState,
-                        ) { state ->
-                            when (state) {
-                                AuthenticationState.Loading -> {
-                                    if (getPlatform().isIOS()) {
-                                        Loading()
-                                    }
-                                }
-
-                                AuthenticationState.Authenticated ->
-                                    AuthenticatedNavigation(
-                                        navController,
-                                        updateScaffoldViewState = {
-                                            viewModel.updateScaffoldViewState(
-                                                it,
-                                            )
-                                        },
-                                    )
-
-                                AuthenticationState.Unauthenticated ->
-                                    UnauthenticatedNavigation(
-                                        navController,
-                                        updateScaffoldViewState = {
-                                            viewModel.updateScaffoldViewState(
-                                                it,
-                                            )
-                                        },
-                                    )
-                            }
-                        }
+                        RootNav(
+                            navController,
+                            updateScaffoldViewState = {
+                                viewModel.updateScaffoldViewState(it)
+                            },
+                        )
 
                         if (bottomSheetVisible) {
                             AddPostBottomSheet(
@@ -249,21 +245,21 @@ fun App(
 @Composable
 private fun getIconForScreen(screen: NavigationRoutes): NavigationIcon {
     return when (screen) {
-        NavigationRoutes.Authenticated.Home -> NavigationIcon(Icons.Default.Home, "Home")
-        NavigationRoutes.Authenticated.Search -> NavigationIcon(Icons.Default.Search, "Search")
-        NavigationRoutes.Authenticated.Messages ->
+        NavigationRoutes.Home -> NavigationIcon(Icons.Default.Home, "Home")
+        NavigationRoutes.Search -> NavigationIcon(Icons.Default.Search, "Search")
+        NavigationRoutes.Messages ->
             NavigationIcon(
                 Icons.AutoMirrored.Filled.Message,
                 "Messages",
             )
 
-        NavigationRoutes.Authenticated.Notifications ->
+        NavigationRoutes.Notifications ->
             NavigationIcon(
                 Icons.Default.Notifications,
                 "Notifications",
             )
 
-        NavigationRoutes.Authenticated.Profile -> NavigationIcon(Icons.Default.Person, "Profile")
+        NavigationRoutes.Profile -> NavigationIcon(Icons.Default.Person, "Profile")
         else -> NavigationIcon(Icons.Default.Home, "Home")
     }
 }
@@ -281,9 +277,9 @@ fun rememberFabScrollBehavior(onScroll: (Float) -> Unit): FabScrollBehavior {
 
 val bottomNavDestinations =
     listOf(
-        NavigationRoutes.Authenticated.Home,
-        NavigationRoutes.Authenticated.Search,
-        NavigationRoutes.Authenticated.Messages,
-        NavigationRoutes.Authenticated.Notifications,
-        NavigationRoutes.Authenticated.Profile,
+        NavigationRoutes.Home,
+        NavigationRoutes.Search,
+        NavigationRoutes.Messages,
+        NavigationRoutes.Notifications,
+        NavigationRoutes.Profile,
     )

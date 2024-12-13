@@ -24,7 +24,7 @@ class MainActivityViewModel(
 
     init {
         viewModelScope.launch {
-            mainViewModel.authState.map { it is AuthenticationState.Loading }
+            mainViewModel.authState.map { it == null }
                 .collect { _isLoading.value = it }
         }
     }

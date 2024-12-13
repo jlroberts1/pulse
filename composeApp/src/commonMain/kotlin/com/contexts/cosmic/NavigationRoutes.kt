@@ -28,68 +28,50 @@ import com.contexts.cosmic.ui.screens.search.SearchScreen
 import com.contexts.cosmic.ui.screens.settings.SettingsScreen
 
 @Composable
-fun AuthenticatedNavigation(
+fun RootNav(
     navController: NavHostController,
     updateScaffoldViewState: (ScaffoldViewState) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     NavHost(
         navController = navController,
-        startDestination = NavigationRoutes.Authenticated.NavigationRoute.route,
+        startDestination = NavigationRoutes.Unauthenticated.route,
         modifier = modifier,
     ) {
         authenticatedGraph(navController, updateScaffoldViewState)
+        unauthenticatedGraph(navController, updateScaffoldViewState)
     }
 }
 
-@Composable
-fun UnauthenticatedNavigation(
-    navController: NavHostController,
-    updateScaffoldViewState: (ScaffoldViewState) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    NavHost(
-        navController = navController,
-        startDestination = NavigationRoutes.Unauthenticated.NavigationRoute.route,
-        modifier = modifier,
-    ) {
-        unauthenticateddGraph(navController, updateScaffoldViewState)
-    }
+sealed class NavigationRoutes(val route: String) {
+    data object Unauthenticated : NavigationRoutes("unauthenticated")
+
+    data object Authenticated : NavigationRoutes("authenticated")
+
+    data object Login : NavigationRoutes("login")
+
+    data object Home : NavigationRoutes("home")
+
+    data object Search : NavigationRoutes("search")
+
+    data object Messages : NavigationRoutes("messages")
+
+    data object Notifications : NavigationRoutes("notifications")
+
+    data object Profile : NavigationRoutes("profile")
+
+    data object Settings : NavigationRoutes("settings")
 }
 
-sealed class NavigationRoutes {
-    sealed class Unauthenticated(val route: String) : NavigationRoutes() {
-        data object NavigationRoute : Unauthenticated("unauthenticated")
-
-        data object Login : Unauthenticated("login")
-    }
-
-    sealed class Authenticated(val route: String) : NavigationRoutes() {
-        data object NavigationRoute : Authenticated("authenticated")
-
-        data object Home : Authenticated("home")
-
-        data object Search : Authenticated("search")
-
-        data object Messages : Authenticated("messages")
-
-        data object Notifications : Authenticated("notifications")
-
-        data object Profile : Authenticated("profile")
-
-        data object Settings : Authenticated("settings")
-    }
-}
-
-fun NavGraphBuilder.unauthenticateddGraph(
+fun NavGraphBuilder.unauthenticatedGraph(
     navController: NavController,
     updateScaffoldViewState: (ScaffoldViewState) -> Unit,
 ) {
     navigation(
-        route = NavigationRoutes.Unauthenticated.NavigationRoute.route,
-        startDestination = NavigationRoutes.Unauthenticated.Login.route,
+        route = NavigationRoutes.Unauthenticated.route,
+        startDestination = NavigationRoutes.Login.route,
     ) {
-        composable(route = NavigationRoutes.Unauthenticated.Login.route) {
+        composable(route = NavigationRoutes.Login.route) {
             updateScaffoldViewState(
                 ScaffoldViewState(
                     showTopAppBar = false,
@@ -106,10 +88,10 @@ fun NavGraphBuilder.authenticatedGraph(
     updateScaffoldViewState: (ScaffoldViewState) -> Unit,
 ) {
     navigation(
-        route = NavigationRoutes.Authenticated.NavigationRoute.route,
-        startDestination = NavigationRoutes.Authenticated.Home.route,
+        route = NavigationRoutes.Authenticated.route,
+        startDestination = NavigationRoutes.Home.route,
     ) {
-        composable(route = NavigationRoutes.Authenticated.Home.route) {
+        composable(route = NavigationRoutes.Home.route) {
             updateScaffoldViewState(
                 ScaffoldViewState(
                     showTopAppBar = true,
@@ -119,7 +101,7 @@ fun NavGraphBuilder.authenticatedGraph(
                             when (it) {
                                 is HomeOverflowMenuAction.Settings ->
                                     navController.navigate(
-                                        NavigationRoutes.Authenticated.Settings.route,
+                                        NavigationRoutes.Settings.route,
                                     )
                                 is HomeOverflowMenuAction.Logout -> Unit
                             }
@@ -129,7 +111,7 @@ fun NavGraphBuilder.authenticatedGraph(
             )
             HomeScreen()
         }
-        composable(route = NavigationRoutes.Authenticated.Search.route) {
+        composable(route = NavigationRoutes.Search.route) {
             updateScaffoldViewState(
                 ScaffoldViewState(
                     showTopAppBar = true,
@@ -138,7 +120,7 @@ fun NavGraphBuilder.authenticatedGraph(
             )
             SearchScreen()
         }
-        composable(route = NavigationRoutes.Authenticated.Messages.route) {
+        composable(route = NavigationRoutes.Messages.route) {
             updateScaffoldViewState(
                 ScaffoldViewState(
                     showTopAppBar = true,
@@ -147,7 +129,7 @@ fun NavGraphBuilder.authenticatedGraph(
             )
             MessageScreen()
         }
-        composable(route = NavigationRoutes.Authenticated.Notifications.route) {
+        composable(route = NavigationRoutes.Notifications.route) {
             updateScaffoldViewState(
                 ScaffoldViewState(
                     showTopAppBar = true,
@@ -156,7 +138,7 @@ fun NavGraphBuilder.authenticatedGraph(
             )
             NotificationsScreen()
         }
-        composable(route = NavigationRoutes.Authenticated.Profile.route) {
+        composable(route = NavigationRoutes.Profile.route) {
             updateScaffoldViewState(
                 ScaffoldViewState(
                     showTopAppBar = false,
@@ -165,7 +147,7 @@ fun NavGraphBuilder.authenticatedGraph(
             )
             ProfileScreen()
         }
-        composable(route = NavigationRoutes.Authenticated.Settings.route) {
+        composable(route = NavigationRoutes.Settings.route) {
             updateScaffoldViewState(
                 ScaffoldViewState(
                     showTopAppBar = true,

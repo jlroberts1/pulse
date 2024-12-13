@@ -23,8 +23,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 sealed interface AuthenticationState {
-    data object Loading : AuthenticationState
-
     data object Authenticated : AuthenticationState
 
     data object Unauthenticated : AuthenticationState
@@ -34,7 +32,7 @@ class MainViewModel(
     private val authManager: AuthManager,
     preferencesRepository: PreferencesRepository,
 ) : ViewModel() {
-    private val _authState = MutableStateFlow<AuthenticationState>(AuthenticationState.Loading)
+    private val _authState = MutableStateFlow<AuthenticationState?>(null)
     val authState = _authState.asStateFlow()
 
     private val _scaffoldViewState = MutableStateFlow(ScaffoldViewState())
