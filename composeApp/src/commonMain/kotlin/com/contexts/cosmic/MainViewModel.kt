@@ -12,9 +12,13 @@ package com.contexts.cosmic
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.contexts.cosmic.data.network.httpclient.AuthManager
+import com.contexts.cosmic.data.repository.Theme
+import com.contexts.cosmic.domain.repository.PreferencesRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -28,6 +32,7 @@ sealed interface AuthenticationState {
 
 class MainViewModel(
     private val authManager: AuthManager,
+    preferencesRepository: PreferencesRepository,
 ) : ViewModel() {
     private val _authState = MutableStateFlow<AuthenticationState>(AuthenticationState.Loading)
     val authState = _authState.asStateFlow()
@@ -40,6 +45,10 @@ class MainViewModel(
 
     private val _controlsVisibility = MutableStateFlow(1f)
     val controlsVisibility = _controlsVisibility.asStateFlow()
+
+    val currentTheme =
+        preferencesRepository.getTheme()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), Theme.SYSTEM)
 
     fun updateControlsVisibility(scrollDelta: Float) {
         _controlsVisibility.update { currentVisibility ->

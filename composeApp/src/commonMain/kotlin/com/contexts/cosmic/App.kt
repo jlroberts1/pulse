@@ -54,6 +54,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.contexts.cosmic.data.repository.Theme
 import com.contexts.cosmic.domain.model.NavigationIcon
 import com.contexts.cosmic.ui.components.FabScrollBehavior
 import com.contexts.cosmic.ui.components.SnackbarDelegate
@@ -73,7 +74,13 @@ fun App(
     viewModel: MainViewModel = koinViewModel(),
     snackbarDelegate: SnackbarDelegate = koinInject(),
 ) {
-    val isDarkTheme = isSystemInDarkTheme()
+    val currentTheme by viewModel.currentTheme.collectAsState()
+    val isDarkTheme =
+        when (currentTheme) {
+            Theme.SYSTEM -> isSystemInDarkTheme()
+            Theme.DARK -> true
+            Theme.LIGHT -> false
+        }
     val isAmoled by rememberSaveable { mutableStateOf(false) }
     val color = Color(0xFF0023FF).toArgb()
     val seedColor by rememberSaveable { mutableStateOf(color) }

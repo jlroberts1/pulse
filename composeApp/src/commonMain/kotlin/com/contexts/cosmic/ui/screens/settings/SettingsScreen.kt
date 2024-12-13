@@ -9,8 +9,54 @@
 
 package com.contexts.cosmic.ui.screens.settings
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.capitalize
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.toUpperCase
+import com.contexts.cosmic.data.repository.Theme
+import com.contexts.cosmic.ui.screens.settings.composables.Preference
+import com.contexts.cosmic.ui.screens.settings.composables.ThemeSelectionDialog
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun SettingsScreen() {
+    val viewModel: SettingsViewModel = koinViewModel()
+    val scrollState = rememberScrollState()
+    var showThemeDialog by remember { mutableStateOf(false) }
+    val theme = viewModel.theme.collectAsState()
+    Column(
+        modifier =
+            Modifier.fillMaxSize()
+                .verticalScroll(scrollState),
+    ) {
+        val currentTheme =
+            theme.value.name
+                .lowercase()
+                .capitalize(Locale.current)
+        Preference(
+            title = "Theme",
+            summary = "Currently set as $currentTheme",
+            onClicked = {
+                showThemeDialog = true
+            },
+        )
+        ThemeSelectionDialog(
+            isVisible = showThemeDialog,
+            currentTheme = theme.value.name,
+            onDismiss = { showThemeDialog = false },
+            onThemeSelected = { newTheme ->
+                viewModel.updateTheme(Theme.valueOf(newTheme.toUpperCase(Locale.current)))
+            },
+        )
+    }
 }

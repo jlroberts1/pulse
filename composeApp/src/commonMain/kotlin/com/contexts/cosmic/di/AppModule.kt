@@ -35,6 +35,7 @@ import com.contexts.cosmic.ui.components.SnackbarDelegate
 import com.contexts.cosmic.ui.screens.home.HomeViewModel
 import com.contexts.cosmic.ui.screens.login.LoginViewModel
 import com.contexts.cosmic.ui.screens.profile.ProfileViewModel
+import com.contexts.cosmic.ui.screens.settings.SettingsViewModel
 import io.ktor.client.HttpClient
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
@@ -75,8 +76,9 @@ val appModule =
             )
         }
 
-        viewModel { MainViewModel(get()) }
+        viewModel { MainViewModel(get(), get()) }
         viewModel { HomeViewModel(get()) }
+        viewModel { SettingsViewModel(get()) }
         viewModel { LoginViewModel(get<AuthenticateRepository>()) }
         viewModel { ProfileViewModel(get<ProfileRepository>(), get<AuthManager>()) }
     }
