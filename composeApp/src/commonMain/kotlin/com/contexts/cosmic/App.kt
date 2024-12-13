@@ -57,11 +57,7 @@ import androidx.navigation.compose.rememberNavController
 import com.contexts.cosmic.domain.model.NavigationIcon
 import com.contexts.cosmic.ui.components.FabScrollBehavior
 import com.contexts.cosmic.ui.components.SnackbarDelegate
-import com.contexts.cosmic.ui.composables.AddPostBottomSheet
-import com.contexts.cosmic.ui.composables.PullToRefreshBox
-import com.contexts.cosmic.ui.composables.SnackbarHost
-import com.contexts.cosmic.ui.composables.Splash
-import com.contexts.cosmic.ui.composables.TopBar
+import com.contexts.cosmic.ui.composables.*
 import com.contexts.cosmic.ui.theme.CosmicTheme
 import com.materialkolor.rememberDynamicMaterialThemeState
 import kotlinx.coroutines.launch
@@ -205,7 +201,7 @@ fun App(
                             when (state) {
                                 AuthenticationState.Loading -> {
                                     if (getPlatform().isIOS()) {
-                                        Splash()
+                                        Loading()
                                     }
                                 }
 

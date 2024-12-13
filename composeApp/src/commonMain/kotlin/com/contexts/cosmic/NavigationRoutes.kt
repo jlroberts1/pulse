@@ -17,6 +17,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.contexts.cosmic.ui.screens.home.HomeOverflowMenu
+import com.contexts.cosmic.ui.screens.home.HomeOverflowMenuAction
 import com.contexts.cosmic.ui.screens.home.HomeScreen
 import com.contexts.cosmic.ui.screens.login.LoginScreen
 import com.contexts.cosmic.ui.screens.messages.MessageScreen
@@ -37,7 +39,6 @@ fun AuthenticatedNavigation(
         modifier = modifier,
     ) {
         authenticatedGraph(navController, updateScaffoldViewState)
-        unauthenticateddGraph(navController, updateScaffoldViewState)
     }
 }
 
@@ -53,7 +54,6 @@ fun UnauthenticatedNavigation(
         modifier = modifier,
     ) {
         unauthenticateddGraph(navController, updateScaffoldViewState)
-        authenticatedGraph(navController, updateScaffoldViewState)
     }
 }
 
@@ -114,6 +114,17 @@ fun NavGraphBuilder.authenticatedGraph(
                 ScaffoldViewState(
                     showTopAppBar = true,
                     showFab = true,
+                    topBarActions = {
+                        HomeOverflowMenu {
+                            when (it) {
+                                is HomeOverflowMenuAction.Settings ->
+                                    navController.navigate(
+                                        NavigationRoutes.Authenticated.Settings.route,
+                                    )
+                                is HomeOverflowMenuAction.Logout -> Unit
+                            }
+                        }
+                    },
                 ),
             )
             HomeScreen()
@@ -158,6 +169,7 @@ fun NavGraphBuilder.authenticatedGraph(
             updateScaffoldViewState(
                 ScaffoldViewState(
                     showTopAppBar = true,
+                    topAppBarTitle = "Settings",
                     showFab = false,
                 ),
             )

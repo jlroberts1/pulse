@@ -9,6 +9,7 @@
 
 package com.contexts.cosmic.ui.screens.login
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,7 +40,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import cosmic.composeapp.generated.resources.Res
+import cosmic.composeapp.generated.resources.app_icon
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -65,6 +69,12 @@ fun LoginScreen(isLoading: Boolean = false) {
             CircularProgressIndicator()
         }
 
+        Image(
+            painter = painterResource(Res.drawable.app_icon),
+            contentDescription = "Cosmic",
+            modifier = Modifier.size(120.dp),
+        )
+
         Text(
             text = "COSMIC",
             style = MaterialTheme.typography.titleLarge,
@@ -78,6 +88,7 @@ fun LoginScreen(isLoading: Boolean = false) {
             singleLine = true,
             keyboardOptions =
                 KeyboardOptions(
+                    autoCorrectEnabled = false,
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next,
                 ),

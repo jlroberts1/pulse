@@ -9,15 +9,12 @@
 
 package com.contexts.cosmic.ui.screens.home
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import app.bsky.feed.FeedViewPost
-import com.contexts.cosmic.exceptions.AppError
 import com.contexts.cosmic.extensions.RequestResult
 import com.contexts.cosmic.ui.composables.ErrorView
 import com.contexts.cosmic.ui.composables.FeedItem
@@ -27,16 +24,12 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun HomeScreen() {
     val viewModel: HomeViewModel = koinViewModel()
-    val feed = viewModel.feed.collectAsState(RequestResult.Loading)
-    Column(modifier = Modifier.fillMaxSize()) {
-        FeedView(feed.value)
-    }
-}
+    val feedState = viewModel.feed.collectAsState(RequestResult.Loading)
 
-@Composable
-fun FeedView(feed: RequestResult<List<FeedViewPost>, AppError>) {
-    LazyColumn {
-        when (feed) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        when (val feed = feedState.value) {
             is RequestResult.Loading -> {
                 item { Loading() }
             }
