@@ -12,9 +12,11 @@ package com.contexts.cosmic
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.contexts.cosmic.data.network.httpclient.AuthManager
+import com.contexts.cosmic.data.network.httpclient.Response
 import com.contexts.cosmic.data.repository.Theme
+import com.contexts.cosmic.domain.repository.NotificationsRepository
 import com.contexts.cosmic.domain.repository.PreferencesRepository
-import kotlinx.coroutines.delay
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,7 +32,8 @@ sealed interface AuthenticationState {
 
 class MainViewModel(
     private val authManager: AuthManager,
-    preferencesRepository: PreferencesRepository,
+    private val notificationsRepository: NotificationsRepository,
+    private val preferencesRepository: PreferencesRepository,
 ) : ViewModel() {
     private val _authState = MutableStateFlow<AuthenticationState?>(null)
     val authState = _authState.asStateFlow()
@@ -40,6 +43,10 @@ class MainViewModel(
 
     private val _controlsVisibility = MutableStateFlow(1f)
     val controlsVisibility = _controlsVisibility.asStateFlow()
+
+    val unreadCount =
+        preferencesRepository.getUnreadCount()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), 0L)
 
     val currentTheme =
         preferencesRepository.getTheme()
@@ -55,20 +62,6 @@ class MainViewModel(
         }
     }
 
-    suspend fun onPullToRefreshTrigger() {
-        _scaffoldViewState.update {
-            it.copy(
-                isRefreshing = true,
-            )
-        }
-        delay(1000L)
-        _scaffoldViewState.update {
-            it.copy(
-                isRefreshing = false,
-            )
-        }
-    }
-
     init {
         viewModelScope.launch {
             authManager.getAuthState().collect { authState ->
@@ -77,6 +70,20 @@ class MainViewModel(
                         null -> AuthenticationState.Unauthenticated
                         else -> AuthenticationState.Authenticated
                     }
+            }
+        }
+        getUnreadCount()
+    }
+
+    private fun getUnreadCount() {
+        viewModelScope.launch {
+            when (val response = notificationsRepository.getUnreadCount()) {
+                is Response.Success -> {
+                    preferencesRepository.updateUnreadCount(response.data.count)
+                }
+                is Response.Error -> {
+                    Napier.e("Error getting unread count ${response.error}")
+                }
             }
         }
     }

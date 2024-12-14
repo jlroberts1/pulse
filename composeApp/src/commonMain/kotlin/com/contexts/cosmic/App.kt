@@ -24,6 +24,8 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.sharp.Add
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -35,11 +37,13 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,12 +62,10 @@ import com.contexts.cosmic.data.repository.Theme
 import com.contexts.cosmic.domain.model.NavigationIcon
 import com.contexts.cosmic.ui.components.FabScrollBehavior
 import com.contexts.cosmic.ui.components.SnackbarDelegate
-import com.contexts.cosmic.ui.composables.PullToRefreshBox
 import com.contexts.cosmic.ui.composables.SnackbarHost
 import com.contexts.cosmic.ui.composables.TopBar
 import com.contexts.cosmic.ui.theme.CosmicTheme
 import com.materialkolor.rememberDynamicMaterialThemeState
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinContext
 import org.koin.compose.koinInject
@@ -88,7 +90,8 @@ fun App(
     val seedColor by rememberSaveable { mutableStateOf(color) }
     val snackbarHostState = remember { SnackbarHostState() }
     val authState by viewModel.authState.collectAsState()
-    val scope = rememberCoroutineScope()
+    val unreadCount by viewModel.unreadCount.collectAsState()
+    val unreadCountState by remember { derivedStateOf { unreadCount } }
 
     val scaffoldViewState by viewModel.scaffoldViewState.collectAsState()
     snackbarDelegate.apply {
@@ -195,10 +198,27 @@ fun App(
                                     },
                                     icon = {
                                         val icon = getIconForScreen(screen)
-                                        Icon(
-                                            icon.image,
-                                            contentDescription = icon.contentDescription,
-                                        )
+                                        if (screen.route == NavigationRoutes.Authenticated.Notifications.route) {
+                                            BadgedBox(
+                                                badge = {
+                                                    if (unreadCountState != 0L) {
+                                                        Badge {
+                                                            Text(text = unreadCountState.toString())
+                                                        }
+                                                    }
+                                                },
+                                            ) {
+                                                Icon(
+                                                    imageVector = icon.image,
+                                                    contentDescription = icon.contentDescription,
+                                                )
+                                            }
+                                        } else {
+                                            Icon(
+                                                imageVector = icon.image,
+                                                contentDescription = icon.contentDescription,
+                                            )
+                                        }
                                     },
                                 )
                             }
@@ -213,26 +233,17 @@ fun App(
                         start = innerPadding.calculateStartPadding(LocalLayoutDirection.current),
                         end = innerPadding.calculateEndPadding(LocalLayoutDirection.current),
                     )
-                PullToRefreshBox(
-                    isRefreshing = scaffoldViewState.isRefreshing,
-                    onRefresh = {
-                        scope.launch {
-                            viewModel.onPullToRefreshTrigger()
-                        }
-                    },
-                    modifier = Modifier.padding(newPadding),
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background,
                 ) {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colorScheme.background,
-                    ) {
-                        RootNav(
-                            navController,
-                            updateScaffoldViewState = {
-                                viewModel.updateScaffoldViewState(it)
-                            },
-                        )
-                    }
+                    RootNav(
+                        navController,
+                        updateScaffoldViewState = {
+                            viewModel.updateScaffoldViewState(it)
+                        },
+                        modifier = Modifier.padding(newPadding),
+                    )
                 }
             }
         }

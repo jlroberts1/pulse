@@ -14,33 +14,43 @@ import androidx.lifecycle.viewModelScope
 import app.bsky.feed.FeedViewPost
 import com.contexts.cosmic.data.network.httpclient.Response
 import com.contexts.cosmic.domain.repository.FeedRepository
-import com.contexts.cosmic.exceptions.AppError
-import com.contexts.cosmic.extensions.RequestResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+
+data class HomeUiState(
+    val feed: List<FeedViewPost> = emptyList(),
+    val loading: Boolean = false,
+    val error: String? = null,
+)
 
 class HomeViewModel(
     private val feedRepository: FeedRepository,
 ) : ViewModel() {
-    private val _feed =
-        MutableStateFlow<RequestResult<List<FeedViewPost>, AppError>>(RequestResult.Loading)
-    val feed = _feed.asStateFlow()
+    private val _uiState = MutableStateFlow(HomeUiState())
+    val uiState = _uiState.asStateFlow()
 
     init {
         loadFeed()
     }
 
-    private fun loadFeed() {
+    fun loadFeed() {
         viewModelScope.launch {
-            _feed.value = RequestResult.Loading
+            _uiState.update { it.copy(loading = true, error = null) }
             when (val response = feedRepository.getTimeline()) {
                 is Response.Success -> {
-                    _feed.value = RequestResult.Success(response.data.feed)
+                    _uiState.update {
+                        it.copy(
+                            feed = response.data.feed,
+                            loading = false,
+                            error = null,
+                        )
+                    }
                 }
 
                 is Response.Error -> {
-                    _feed.value = RequestResult.Error(response.error)
+                    _uiState.update { it.copy(loading = false, error = response.error.message) }
                 }
             }
         }

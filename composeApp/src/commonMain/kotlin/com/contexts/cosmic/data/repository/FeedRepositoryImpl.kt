@@ -14,13 +14,7 @@ import com.contexts.cosmic.data.network.api.FeedAPI
 import com.contexts.cosmic.data.network.httpclient.Response
 import com.contexts.cosmic.domain.repository.FeedRepository
 import com.contexts.cosmic.exceptions.NetworkError
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.withContext
 
 class FeedRepositoryImpl(private val feedAPI: FeedAPI) : FeedRepository {
-    override suspend fun getTimeline(): Response<GetTimelineResponse, NetworkError> =
-        withContext(Dispatchers.IO) {
-            feedAPI.getTimeline()
-        }
+    override suspend fun getTimeline(): Response<GetTimelineResponse, NetworkError> = feedAPI.getTimeline()
 }

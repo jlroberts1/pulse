@@ -9,24 +9,38 @@
 
 package com.contexts.cosmic.ui.screens.notifications
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import com.contexts.cosmic.extensions.RequestResult
+import com.contexts.cosmic.ui.composables.NotificationItem
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun NotificationsScreen() {
-    Column(
-        modifier =
-            Modifier
-                .background(Color.Yellow)
-                .fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Text("Notifications screen")
+    val viewModel: NotificationsViewModel = koinViewModel()
+    val notificationState by viewModel.notifications.collectAsState()
+    when (val notifications = notificationState) {
+        is RequestResult.Loading -> {}
+        is RequestResult.Error -> {
+        }
+        is RequestResult.Success -> {
+            LazyColumn(
+                modifier =
+                    Modifier
+                        .fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                items(notifications.data) { notification ->
+                    NotificationItem(notification)
+                }
+            }
+        }
     }
 }

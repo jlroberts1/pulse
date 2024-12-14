@@ -10,44 +10,51 @@
 package com.contexts.cosmic.ui.screens.home
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import com.contexts.cosmic.extensions.RequestResult
-import com.contexts.cosmic.ui.composables.ErrorView
+import androidx.compose.ui.unit.dp
+import com.contexts.cosmic.ui.components.SnackbarDelegate
 import com.contexts.cosmic.ui.composables.FeedItem
-import com.contexts.cosmic.ui.composables.Loading
+import com.contexts.cosmic.ui.composables.PullToRefreshBox
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(snackbarDelegate: SnackbarDelegate = koinInject()) {
     val viewModel: HomeViewModel = koinViewModel()
-    val feedState = viewModel.feed.collectAsState(RequestResult.Loading)
+    val uiState by viewModel.uiState.collectAsState()
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+    PullToRefreshBox(
+        isRefreshing = uiState.loading,
+        onRefresh = { viewModel.loadFeed() },
     ) {
-        when (val feed = feedState.value) {
-            is RequestResult.Loading -> {
-                item { Loading() }
-            }
+        uiState.error?.let {
+            snackbarDelegate.showSnackbar(
+                message = it,
+            )
+        }
 
-            is RequestResult.Error -> {
-                item { ErrorView(feed.error.message) }
-            }
-
-            is RequestResult.Success -> {
-                items(feed.data) { item ->
-                    FeedItem(
-                        post = item.post,
-                        onReplyClick = {},
-                        onRepostClick = {},
-                        onLikeClick = {},
-                        onMenuClick = {},
-                    )
-                }
+        LazyColumn(
+            modifier =
+                Modifier
+                    .padding(horizontal = 4.dp)
+                    .fillMaxSize(),
+        ) {
+            items(uiState.feed) { item ->
+                FeedItem(
+                    post = item.post,
+                    onReplyClick = {},
+                    onRepostClick = {},
+                    onLikeClick = {},
+                    onMenuClick = {},
+                )
             }
         }
     }

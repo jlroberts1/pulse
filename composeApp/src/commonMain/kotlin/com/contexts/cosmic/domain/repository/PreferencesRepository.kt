@@ -16,4 +16,8 @@ interface PreferencesRepository {
     suspend fun updateTheme(theme: Theme)
 
     fun getTheme(): Flow<Theme>
+
+    suspend fun updateUnreadCount(unreadCount: Long)
+
+    fun getUnreadCount(): Flow<Long>
 }

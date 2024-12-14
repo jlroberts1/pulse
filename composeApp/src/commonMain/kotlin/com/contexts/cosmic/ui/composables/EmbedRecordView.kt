@@ -23,7 +23,6 @@ import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.BrokenImage
-import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.LinkOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -38,10 +37,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.bsky.embed.RecordViewRecordUnion
 import coil3.compose.AsyncImage
+import com.contexts.cosmic.extensions.getRecordText
 
 @Composable
-fun EmbedRecordView(embed: RecordViewRecordUnion) {
-    when (embed) {
+fun EmbedRecordView(record: RecordViewRecordUnion) {
+    when (record) {
         is RecordViewRecordUnion.ViewRecord -> {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
@@ -56,12 +56,12 @@ fun EmbedRecordView(embed: RecordViewRecordUnion) {
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Text(
-                        text = embed.value.author.displayName ?: "",
+                        text = record.value.author.displayName ?: "",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
                     )
                     Text(
-                        text = embed.getRecordText() ?: "",
+                        text = record.getRecordText() ?: "",
                         style = MaterialTheme.typography.bodySmall,
                         maxLines = 3,
                         overflow = TextOverflow.Ellipsis,
@@ -138,7 +138,7 @@ fun EmbedRecordView(embed: RecordViewRecordUnion) {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     AsyncImage(
-                        model = embed.value.avatar?.uri,
+                        model = record.value.avatar?.uri,
                         contentDescription = null,
                         modifier =
                             Modifier
@@ -147,12 +147,12 @@ fun EmbedRecordView(embed: RecordViewRecordUnion) {
                     )
                     Column {
                         Text(
-                            text = embed.value.displayName ?: "",
+                            text = record.value.displayName ?: "",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
                         )
                         Text(
-                            text = embed.value.description ?: "",
+                            text = record.value.description ?: "",
                             style = MaterialTheme.typography.bodySmall,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
@@ -175,12 +175,12 @@ fun EmbedRecordView(embed: RecordViewRecordUnion) {
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Text(
-                        text = embed.value.name ?: "List",
+                        text = record.value.name ?: "List",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
                     )
                     Text(
-                        text = "List with ${embed.value.purpose ?: "unknown"} purpose",
+                        text = "List with ${record.value.purpose ?: "unknown"} purpose",
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
@@ -227,7 +227,7 @@ fun EmbedRecordView(embed: RecordViewRecordUnion) {
                         tint = MaterialTheme.colorScheme.primary,
                     )
                     Text(
-                        text = embed.value.creator.displayName ?: "Labeler",
+                        text = record.value.creator.displayName ?: "Labeler",
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }

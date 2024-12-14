@@ -16,6 +16,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -50,6 +51,7 @@ class PreferencesDataSourceImpl(context: Context) : PreferencesDataSource {
                 String::class -> preferences[stringPreferencesKey(key)] as? T ?: defaultValue
                 Int::class -> preferences[intPreferencesKey(key)] as? T ?: defaultValue
                 Boolean::class -> preferences[booleanPreferencesKey(key)] as? T ?: defaultValue
+                Long::class -> preferences[longPreferencesKey(key)] as? T ?: defaultValue
                 else -> throw IllegalArgumentException("Unsupported Type")
             }
         }
@@ -64,6 +66,7 @@ class PreferencesDataSourceImpl(context: Context) : PreferencesDataSource {
                 is String -> preferences[stringPreferencesKey(key)] = value
                 is Int -> preferences[intPreferencesKey(key)] = value
                 is Boolean -> preferences[booleanPreferencesKey(key)] = value
+                is Long -> preferences[longPreferencesKey(key)] = value
                 else -> throw IllegalArgumentException("Unsupported Type")
             }
         }

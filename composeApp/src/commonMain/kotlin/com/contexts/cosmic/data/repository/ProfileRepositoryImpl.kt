@@ -26,16 +26,12 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.withContext
 
 class ProfileRepositoryImpl(
     private val profileAPI: ProfileAPI,
     private val localDataSource: LocalDataSource,
 ) : ProfileRepository {
-    override suspend fun getProfile(actor: String): Response<GetProfileResponse, NetworkError> =
-        withContext(Dispatchers.IO) {
-            profileAPI.getProfile(actor)
-        }
+    override suspend fun getProfile(actor: String): Response<GetProfileResponse, NetworkError> = profileAPI.getProfile(actor)
 
     override suspend fun getMyProfile(myDid: String): Flow<RequestResult<User, AppError>> =
         channelFlow {
@@ -49,8 +45,5 @@ class ProfileRepositoryImpl(
                 )
         }.flowOn(Dispatchers.IO)
 
-    override suspend fun getProfileFeed(myDid: String): Response<GetAuthorFeedResponse, NetworkError> =
-        withContext(Dispatchers.IO) {
-            profileAPI.getAuthorFeed(myDid)
-        }
+    override suspend fun getProfileFeed(myDid: String): Response<GetAuthorFeedResponse, NetworkError> = profileAPI.getAuthorFeed(myDid)
 }

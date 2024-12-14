@@ -13,27 +13,24 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import com.contexts.cosmic.data.datastore.PreferencesDataSource
 import com.contexts.cosmic.domain.repository.PreferencesRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 
 class PreferencesRepositoryImpl(private val preferencesDataSource: PreferencesDataSource) :
     PreferencesRepository {
-    override suspend fun updateTheme(theme: Theme) =
-        withContext(Dispatchers.IO) {
-            preferencesDataSource.editValue(THEME, theme.name)
-        }
+    override suspend fun updateTheme(theme: Theme) = preferencesDataSource.editValue(THEME, theme.name)
 
     override fun getTheme(): Flow<Theme> =
         preferencesDataSource.getValue(THEME, "system", String::class)
             .map { Theme.valueOf(it.toUpperCase(Locale.current)) }
-            .flowOn(Dispatchers.IO)
+
+    override suspend fun updateUnreadCount(unreadCount: Long) = preferencesDataSource.editValue(UNREAD_COUNT, unreadCount)
+
+    override fun getUnreadCount(): Flow<Long> = preferencesDataSource.getValue(UNREAD_COUNT, 0L, Long::class)
 
     companion object {
         const val THEME = "theme"
+        const val UNREAD_COUNT = "unread_count"
     }
 }
 

@@ -38,13 +38,13 @@ class SnackbarDelegate(
             }
 
     fun showSnackbar(
-        state: SnackbarState,
+        state: SnackbarState? = SnackbarState.DEFAULT,
         message: String,
         actionLabel: String? = null,
         onDismissAction: Boolean = false,
         duration: SnackbarDuration = SnackbarDuration.Short,
     ) {
-        this.snackbarState = state
+        this.snackbarState = state ?: SnackbarState.DEFAULT
         coroutineScope?.launch {
             snackbarHostState?.showSnackbar(message, actionLabel, onDismissAction, duration)
         }
