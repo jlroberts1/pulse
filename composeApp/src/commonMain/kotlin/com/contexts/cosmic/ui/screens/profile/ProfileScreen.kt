@@ -52,6 +52,7 @@ fun ProfileScreen() {
                             onRepostClick = {},
                             onLikeClick = {},
                             onMenuClick = {},
+                            onMediaClick = {},
                         )
                     }
                 }

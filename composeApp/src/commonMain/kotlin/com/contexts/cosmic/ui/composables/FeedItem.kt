@@ -26,6 +26,7 @@ fun FeedItem(
     onRepostClick: () -> Unit,
     onLikeClick: () -> Unit,
     onMenuClick: () -> Unit,
+    onMediaClick: (String) -> Unit,
 ) {
     ElevatedCard(
         modifier = Modifier.padding(top = 8.dp),
@@ -43,7 +44,12 @@ fun FeedItem(
                 indexedAt = post.indexedAt,
             )
             PostMessageText(post.getPostText())
-            post.embed?.let { EmbedView(it) }
+            post.embed?.let {
+                EmbedView(
+                    embed = it,
+                    onClick = { media -> onMediaClick(media) },
+                )
+            }
             FeedItemInteractions(
                 replyCount = post.replyCount,
                 repostCount = post.replyCount,

@@ -13,7 +13,10 @@ import androidx.compose.runtime.Composable
 import app.bsky.feed.PostViewEmbedUnion
 
 @Composable
-fun EmbedView(embed: PostViewEmbedUnion) {
+fun EmbedView(
+    embed: PostViewEmbedUnion,
+    onClick: (String) -> Unit,
+) {
     when (embed) {
         is PostViewEmbedUnion.RecordWithMediaView -> {
         }
@@ -41,7 +44,10 @@ fun EmbedView(embed: PostViewEmbedUnion) {
         }
 
         is PostViewEmbedUnion.ImagesView -> {
-            EmbedImageView(embed.value.images)
+            EmbedImageView(
+                embed.value.images,
+                onClick = { onClick(it) },
+            )
         }
 
         is PostViewEmbedUnion.Unknown -> {

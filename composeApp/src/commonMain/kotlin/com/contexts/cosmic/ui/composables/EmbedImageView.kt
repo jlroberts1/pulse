@@ -9,6 +9,7 @@
 
 package com.contexts.cosmic.ui.composables
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,7 +27,10 @@ import app.bsky.embed.ImagesViewImage
 import coil3.compose.AsyncImage
 
 @Composable
-fun EmbedImageView(images: List<ImagesViewImage>) {
+fun EmbedImageView(
+    images: List<ImagesViewImage>,
+    onClick: (String) -> Unit,
+) {
     val pagerState = rememberPagerState(pageCount = { images.size })
     HorizontalPager(
         state = pagerState,
@@ -40,6 +44,7 @@ fun EmbedImageView(images: List<ImagesViewImage>) {
             contentDescription = images[page].alt,
             modifier =
                 Modifier
+                    .clickable { onClick(images[page].fullsize.uri) }
                     .padding(end = 4.dp)
                     .fillMaxSize()
                     .clip(RoundedCornerShape(8.dp)),
