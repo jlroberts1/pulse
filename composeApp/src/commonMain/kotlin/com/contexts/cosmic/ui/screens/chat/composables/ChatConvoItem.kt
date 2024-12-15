@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-package com.contexts.cosmic.ui.composables
+package com.contexts.cosmic.ui.screens.chat.composables
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,6 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import chat.bsky.convo.ConvoView
+import com.contexts.cosmic.ui.composables.MultiProfileAvatar
+import com.contexts.cosmic.ui.composables.UnreadCountBadge
 
 @Composable
 fun ChatConvoItem(

@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-package com.contexts.cosmic.ui.composables
+package com.contexts.cosmic.ui.screens.chat.composables
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text

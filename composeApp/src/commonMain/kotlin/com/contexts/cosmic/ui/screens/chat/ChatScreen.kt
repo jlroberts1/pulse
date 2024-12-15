@@ -20,8 +20,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.contexts.cosmic.ui.components.SnackbarDelegate
-import com.contexts.cosmic.ui.composables.ChatConvoItem
 import com.contexts.cosmic.ui.composables.PullToRefreshBox
+import com.contexts.cosmic.ui.screens.chat.composables.ChatConvoItem
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 

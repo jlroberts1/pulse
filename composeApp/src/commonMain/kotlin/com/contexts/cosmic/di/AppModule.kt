@@ -16,6 +16,7 @@ import com.contexts.cosmic.data.local.DidDocumentAdapter
 import com.contexts.cosmic.data.local.InstantAdapter
 import com.contexts.cosmic.data.local.LocalDataSource
 import com.contexts.cosmic.data.local.SqldelightDataSource
+import com.contexts.cosmic.data.network.api.ActorAPI
 import com.contexts.cosmic.data.network.api.AuthenticateAPI
 import com.contexts.cosmic.data.network.api.ChatAPI
 import com.contexts.cosmic.data.network.api.FeedAPI
@@ -25,6 +26,7 @@ import com.contexts.cosmic.data.network.httpclient.AuthManager
 import com.contexts.cosmic.data.network.httpclient.AuthManagerImpl
 import com.contexts.cosmic.data.network.httpclient.KTorHttpClientImpl
 import com.contexts.cosmic.data.network.httpclient.TokenRefreshManager
+import com.contexts.cosmic.data.repository.ActorRepositoryImpl
 import com.contexts.cosmic.data.repository.AuthenticateRepositoryImpl
 import com.contexts.cosmic.data.repository.ChatRepositoryImpl
 import com.contexts.cosmic.data.repository.FeedRepositoryImpl
@@ -34,6 +36,7 @@ import com.contexts.cosmic.data.repository.ProfileRepositoryImpl
 import com.contexts.cosmic.db.Auth_state
 import com.contexts.cosmic.db.Database
 import com.contexts.cosmic.db.User
+import com.contexts.cosmic.domain.repository.ActorRepository
 import com.contexts.cosmic.domain.repository.AuthenticateRepository
 import com.contexts.cosmic.domain.repository.ChatRepository
 import com.contexts.cosmic.domain.repository.FeedRepository
@@ -41,6 +44,7 @@ import com.contexts.cosmic.domain.repository.NotificationsRepository
 import com.contexts.cosmic.domain.repository.PreferencesRepository
 import com.contexts.cosmic.domain.repository.ProfileRepository
 import com.contexts.cosmic.ui.components.SnackbarDelegate
+import com.contexts.cosmic.ui.screens.addpost.AddPostViewModel
 import com.contexts.cosmic.ui.screens.chat.ChatViewModel
 import com.contexts.cosmic.ui.screens.home.HomeViewModel
 import com.contexts.cosmic.ui.screens.login.LoginViewModel
@@ -86,6 +90,7 @@ val apiModule =
         single<FeedAPI> { FeedAPI(get<HttpClient>()) }
         single<AuthenticateAPI> { AuthenticateAPI(get<HttpClient>()) }
         single<ChatAPI> { ChatAPI(get<HttpClient>()) }
+        single<ActorAPI> { ActorAPI(get<HttpClient>()) }
     }
 
 val repositoryModule =
@@ -98,6 +103,7 @@ val repositoryModule =
         factory<FeedRepository> { FeedRepositoryImpl(get<FeedAPI>()) }
         factory<NotificationsRepository> { NotificationsRepositoryImpl(get<NotificationsAPI>()) }
         factory<ChatRepository> { ChatRepositoryImpl(get<ChatAPI>()) }
+        factory<ActorRepository> { ActorRepositoryImpl(get<ActorAPI>()) }
     }
 
 val viewModelModule =
@@ -109,6 +115,7 @@ val viewModelModule =
         viewModel { LoginViewModel(get<AuthenticateRepository>()) }
         viewModel { ProfileViewModel(get<ProfileRepository>(), get<AuthManager>()) }
         viewModel { ChatViewModel(get<AuthManager>(), get<ChatRepository>()) }
+        viewModel { AddPostViewModel(get<ActorRepository>()) }
     }
 
 expect val platformModule: Module

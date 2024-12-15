@@ -10,33 +10,18 @@
 package com.contexts.cosmic.ui.screens.addpost
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material.icons.filled.Gif
-import androidx.compose.material.icons.filled.Photo
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Button
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,32 +30,33 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
+import com.contexts.cosmic.ui.screens.addpost.composables.AddPostBottomBar
+import com.contexts.cosmic.ui.screens.addpost.composables.AddPostPermissionRationale
+import com.contexts.cosmic.ui.screens.addpost.composables.AddPostSuggestions
 import com.contexts.cosmic.util.PermissionCallback
 import com.contexts.cosmic.util.PermissionStatus
 import com.contexts.cosmic.util.PermissionType
 import com.contexts.cosmic.util.createPermissionsManager
 import com.contexts.cosmic.util.rememberCameraManager
 import com.contexts.cosmic.util.rememberGalleryManager
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun AddPostScreen() {
+    val viewModel: AddPostViewModel = koinViewModel()
+
+    val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-    var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
     var launchCamera by remember { mutableStateOf(value = false) }
     var launchGallery by remember { mutableStateOf(value = false) }
     var launchSetting by remember { mutableStateOf(value = false) }
     var permissionRationalDialog by remember { mutableStateOf(value = false) }
-    var postText by remember { mutableStateOf("") }
-    var charactersLeft by remember { mutableStateOf(300) }
+
     val permissionsManager =
         createPermissionsManager(
             object : PermissionCallback {
@@ -97,22 +83,14 @@ fun AddPostScreen() {
     val cameraManager =
         rememberCameraManager {
             coroutineScope.launch {
-                val bitmap =
-                    withContext(Dispatchers.Default) {
-                        it?.toImageBitmap()
-                    }
-                imageBitmap = bitmap
+                viewModel.onImageSelected(it?.toImageBitmap())
             }
         }
 
     val galleryManager =
         rememberGalleryManager {
             coroutineScope.launch {
-                val bitmap =
-                    withContext(Dispatchers.Default) {
-                        it?.toImageBitmap()
-                    }
-                imageBitmap = bitmap
+                viewModel.onImageSelected(it?.toImageBitmap())
             }
         }
 
@@ -140,63 +118,10 @@ fun AddPostScreen() {
     }
 
     if (permissionRationalDialog) {
-        Dialog(
-            onDismissRequest = { },
-            properties =
-                DialogProperties(
-                    dismissOnBackPress = false,
-                    dismissOnClickOutside = false,
-                ),
-        ) {
-            Surface(
-                modifier = Modifier.fillMaxWidth().wrapContentHeight(),
-                shape = RoundedCornerShape(size = 12.dp),
-            ) {
-                Column(
-                    modifier = Modifier.padding(all = 16.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Text(text = "Permissions required")
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text(
-                        text = "We need permissions to get media to post",
-                        textAlign = TextAlign.Center,
-                    )
-                    Spacer(modifier = Modifier.height(15.dp))
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth().padding(end = 16.dp, start = 16.dp),
-                    ) {
-                        Button(
-                            modifier = Modifier.weight(1f),
-                            onClick = {
-                                permissionRationalDialog = false
-                            },
-                        ) {
-                            Text(text = "Cancel", textAlign = TextAlign.Center, maxLines = 1)
-                        }
-
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Button(
-                            modifier = Modifier.weight(1f),
-                            onClick = {
-                                permissionRationalDialog = false
-                                launchSetting = true
-                            },
-                        ) {
-                            Text(
-                                text = "Launch settings",
-                                textAlign = TextAlign.Center,
-                                maxLines = 1,
-                            )
-                        }
-                    }
-                }
-            }
-        }
+        AddPostPermissionRationale(
+            onDismiss = { permissionRationalDialog = false },
+            launchSettings = { launchSetting = true },
+        )
     }
 
     Box(
@@ -211,28 +136,43 @@ fun AddPostScreen() {
                     .padding(16.dp),
         ) {
             OutlinedTextField(
-                value = postText,
+                value =
+                    TextFieldValue(
+                        text = uiState.text,
+                        selection = TextRange(uiState.cursorPosition),
+                    ),
                 minLines = 6,
                 onValueChange = {
-                    postText = it
-                    charactersLeft = 300 - it.length
+                    viewModel.handleTextChanged(
+                        newText = it.text,
+                        cursorPosition = it.selection.start,
+                    )
                 },
                 label = { Text("Add new post") },
                 modifier = Modifier.fillMaxWidth(),
+                visualTransformation = MentionVisualTransformation(),
             )
 
+            if (uiState.showSuggestions) {
+                AddPostSuggestions(
+                    suggestions = uiState.suggestions,
+                    isLoading = uiState.isLoading,
+                    onSelected = { viewModel.handleActorSelected(it) },
+                )
+            }
+
             Text(
-                text = charactersLeft.toString(),
+                text = uiState.charactersLeft.toString(),
                 modifier =
                     Modifier
                         .padding(8.dp)
                         .align(Alignment.End),
             )
 
-            if (imageBitmap != null) {
+            uiState.image?.let {
                 Spacer(modifier = Modifier.padding(8.dp))
                 Image(
-                    bitmap = imageBitmap!!,
+                    bitmap = it,
                     contentDescription = "Image",
                     modifier =
                         Modifier.size(140.dp)
@@ -242,30 +182,12 @@ fun AddPostScreen() {
             }
         }
 
-        BottomAppBar(
-            modifier =
-                Modifier
-                    .align(Alignment.BottomCenter),
-            actions = {
-                IconButton(onClick = { launchCamera = true }) {
-                    Icon(Icons.Default.Camera, "Camera")
-                }
-                IconButton(onClick = { launchGallery = true }) {
-                    Icon(Icons.Default.Photo, "Gallery")
-                }
-                IconButton(onClick = {}) {
-                    Icon(Icons.Default.Gif, "Gif")
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                FloatingActionButton(
-                    onClick = { },
-                    modifier =
-                        Modifier
-                            .padding(8.dp),
-                ) {
-                    Icon(Icons.AutoMirrored.Filled.Send, "Send")
-                }
-            },
+        AddPostBottomBar(
+            launchCamera = { launchCamera = true },
+            launchGallery = { launchGallery = true },
+            sendPost = {},
+            Modifier
+                .align(Alignment.BottomCenter),
         )
     }
 }

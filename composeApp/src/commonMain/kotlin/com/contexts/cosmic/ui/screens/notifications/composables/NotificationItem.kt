@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-package com.contexts.cosmic.ui.composables
+package com.contexts.cosmic.ui.screens.notifications.composables
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize

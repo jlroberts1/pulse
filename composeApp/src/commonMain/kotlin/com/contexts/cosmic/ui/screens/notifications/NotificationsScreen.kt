@@ -19,7 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.contexts.cosmic.extensions.RequestResult
-import com.contexts.cosmic.ui.composables.NotificationItem
+import com.contexts.cosmic.ui.screens.notifications.composables.NotificationItem
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
