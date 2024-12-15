@@ -78,6 +78,7 @@ class SqldelightDataSource(
                 accessJwt = authState.accessJwt,
                 refreshJwt = authState.refreshJwt,
                 lastRefreshed = authState.lastRefreshed,
+                didDocument = authState.didDocument,
             )
         }
 

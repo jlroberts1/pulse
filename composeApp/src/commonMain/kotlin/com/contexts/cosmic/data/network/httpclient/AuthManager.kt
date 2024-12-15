@@ -19,5 +19,7 @@ interface AuthManager {
 
     suspend fun putTokens(token: Token)
 
-    fun getAuthState(): Flow<AuthState?>
+    fun getAuthStateFlow(): Flow<AuthState?>
+
+    suspend fun getAuthState(): AuthState?
 }

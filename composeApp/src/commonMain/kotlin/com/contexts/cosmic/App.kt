@@ -255,7 +255,7 @@ private fun getIconForScreen(screen: NavigationRoutes): NavigationIcon {
     return when (screen) {
         NavigationRoutes.Authenticated.Home -> NavigationIcon(Icons.Default.Home, "Home")
         NavigationRoutes.Authenticated.Search -> NavigationIcon(Icons.Default.Search, "Search")
-        NavigationRoutes.Authenticated.Messages ->
+        NavigationRoutes.Authenticated.Chat ->
             NavigationIcon(
                 Icons.AutoMirrored.Filled.Message,
                 "Messages",
@@ -287,7 +287,7 @@ val topLevelDestinations =
     listOf(
         NavigationRoutes.Authenticated.Home,
         NavigationRoutes.Authenticated.Search,
-        NavigationRoutes.Authenticated.Messages,
+        NavigationRoutes.Authenticated.Chat,
         NavigationRoutes.Authenticated.Notifications,
         NavigationRoutes.Authenticated.Profile,
     )

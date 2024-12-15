@@ -30,7 +30,7 @@ class ProfileViewModel(
     authManager: AuthManager,
 ) : ViewModel() {
     private val authState =
-        authManager.getAuthState().stateIn(
+        authManager.getAuthStateFlow().stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000L),
             null,
@@ -38,7 +38,7 @@ class ProfileViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val profile =
-        authManager.getAuthState().mapNotNull { it }.flatMapLatest { authState ->
+        authManager.getAuthStateFlow().mapNotNull { it }.flatMapLatest { authState ->
             profileRepository.getMyProfile(authState.userDid)
         }
 

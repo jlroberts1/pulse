@@ -1,3 +1,5 @@
+import com.contexts.cosmic.domain.model.DidDocument;
+
 
 CREATE TABLE user (
     did TEXT NOT NULL PRIMARY KEY,
@@ -17,7 +19,8 @@ CREATE TABLE auth_state (
     userDid TEXT NOT NULL UNIQUE,
     accessJwt TEXT NOT NULL,
     refreshJwt TEXT NOT NULL,
-    lastRefreshed TEXT NOT NULL
+    lastRefreshed TEXT NOT NULL,
+    didDocument TEXT AS DidDocument
 );
 
 selectUser:
@@ -52,15 +55,16 @@ LIMIT 1;
 upsertAuthState:
 INSERT OR REPLACE INTO auth_state(
     userDid, accessJwt, refreshJwt,
-    lastRefreshed
-) VALUES ( ?, ?, ?, ?);
+    lastRefreshed, didDocument
+) VALUES ( ?, ?, ?, ?, ?);
 
 updateTokens:
 UPDATE auth_state
 SET
     accessJwt = ?,
     refreshJwt = ?,
-    lastRefreshed = ?
+    lastRefreshed = ?,
+    didDocument = ?
 WHERE userDid = ?;
 
 clearAuthState:

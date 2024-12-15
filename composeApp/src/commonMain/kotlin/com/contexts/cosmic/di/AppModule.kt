@@ -11,10 +11,13 @@ package com.contexts.cosmic.di
 
 import app.cash.sqldelight.db.SqlDriver
 import com.contexts.cosmic.MainViewModel
+import com.contexts.cosmic.data.datastore.PreferencesDataSource
+import com.contexts.cosmic.data.local.DidDocumentAdapter
 import com.contexts.cosmic.data.local.InstantAdapter
 import com.contexts.cosmic.data.local.LocalDataSource
 import com.contexts.cosmic.data.local.SqldelightDataSource
 import com.contexts.cosmic.data.network.api.AuthenticateAPI
+import com.contexts.cosmic.data.network.api.ChatAPI
 import com.contexts.cosmic.data.network.api.FeedAPI
 import com.contexts.cosmic.data.network.api.NotificationsAPI
 import com.contexts.cosmic.data.network.api.ProfileAPI
@@ -23,18 +26,22 @@ import com.contexts.cosmic.data.network.httpclient.AuthManagerImpl
 import com.contexts.cosmic.data.network.httpclient.KTorHttpClientImpl
 import com.contexts.cosmic.data.network.httpclient.TokenRefreshManager
 import com.contexts.cosmic.data.repository.AuthenticateRepositoryImpl
+import com.contexts.cosmic.data.repository.ChatRepositoryImpl
 import com.contexts.cosmic.data.repository.FeedRepositoryImpl
 import com.contexts.cosmic.data.repository.NotificationsRepositoryImpl
 import com.contexts.cosmic.data.repository.PreferencesRepositoryImpl
 import com.contexts.cosmic.data.repository.ProfileRepositoryImpl
+import com.contexts.cosmic.db.Auth_state
 import com.contexts.cosmic.db.Database
 import com.contexts.cosmic.db.User
 import com.contexts.cosmic.domain.repository.AuthenticateRepository
+import com.contexts.cosmic.domain.repository.ChatRepository
 import com.contexts.cosmic.domain.repository.FeedRepository
 import com.contexts.cosmic.domain.repository.NotificationsRepository
 import com.contexts.cosmic.domain.repository.PreferencesRepository
 import com.contexts.cosmic.domain.repository.ProfileRepository
 import com.contexts.cosmic.ui.components.SnackbarDelegate
+import com.contexts.cosmic.ui.screens.chat.ChatViewModel
 import com.contexts.cosmic.ui.screens.home.HomeViewModel
 import com.contexts.cosmic.ui.screens.login.LoginViewModel
 import com.contexts.cosmic.ui.screens.notifications.NotificationsViewModel
@@ -49,47 +56,59 @@ import org.koin.dsl.module
 val appModule =
     module {
         single<SnackbarDelegate> { SnackbarDelegate() }
-        single<PreferencesRepository> { PreferencesRepositoryImpl(get()) }
+    }
+
+val databaseModule =
+    module {
         single { User.Adapter(indexedAtAdapter = InstantAdapter) }
-        single<Database> { Database(get<SqlDriver>(), get()) }
+        single { Auth_state.Adapter(didDocumentAdapter = DidDocumentAdapter) }
+        single<Database> {
+            Database(
+                get<SqlDriver>(),
+                get<Auth_state.Adapter>(),
+                get<User.Adapter>(),
+            )
+        }
         single<LocalDataSource> { SqldelightDataSource(get<Database>()) }
+    }
+
+val networkModule =
+    module {
         single<AuthManager> { AuthManagerImpl(get<LocalDataSource>()) }
         single<TokenRefreshManager> { TokenRefreshManager() }
-        single<HttpClient> {
-            KTorHttpClientImpl(
-                get<AuthManager>(),
-                get<TokenRefreshManager>(),
-            ).client
-        }
+        single<HttpClient> { KTorHttpClientImpl(get<AuthManager>(), get<TokenRefreshManager>()).client }
+    }
 
+val apiModule =
+    module {
+        single<NotificationsAPI> { NotificationsAPI(get()) }
         single<ProfileAPI> { ProfileAPI(get<HttpClient>()) }
         single<FeedAPI> { FeedAPI(get<HttpClient>()) }
         single<AuthenticateAPI> { AuthenticateAPI(get<HttpClient>()) }
+        single<ChatAPI> { ChatAPI(get<HttpClient>()) }
+    }
 
-        single { NotificationsAPI(get()) }
-        single<ProfileRepository> {
-            ProfileRepositoryImpl(get<ProfileAPI>(), get<LocalDataSource>())
+val repositoryModule =
+    module {
+        single<PreferencesRepository> { PreferencesRepositoryImpl(get<PreferencesDataSource>()) }
+        factory<AuthenticateRepository> {
+            AuthenticateRepositoryImpl(get<AuthenticateAPI>(), get<ProfileAPI>(), get<LocalDataSource>())
         }
-        single<FeedRepository> {
-            FeedRepositoryImpl(get<FeedAPI>())
-        }
-        single<NotificationsRepository> {
-            NotificationsRepositoryImpl(get())
-        }
-        single<AuthenticateRepository> {
-            AuthenticateRepositoryImpl(
-                get<AuthenticateAPI>(),
-                get<ProfileAPI>(),
-                get<LocalDataSource>(),
-            )
-        }
+        factory<ProfileRepository> { ProfileRepositoryImpl(get<ProfileAPI>(), get<LocalDataSource>()) }
+        factory<FeedRepository> { FeedRepositoryImpl(get<FeedAPI>()) }
+        factory<NotificationsRepository> { NotificationsRepositoryImpl(get<NotificationsAPI>()) }
+        factory<ChatRepository> { ChatRepositoryImpl(get<ChatAPI>()) }
+    }
 
-        viewModel { MainViewModel(get(), get(), get()) }
-        viewModel { HomeViewModel(get()) }
-        viewModel { SettingsViewModel(get()) }
-        viewModel { NotificationsViewModel(get(), get()) }
+val viewModelModule =
+    module {
+        viewModel { MainViewModel(get<AuthManager>(), get<NotificationsRepository>(), get<PreferencesRepository>()) }
+        viewModel { HomeViewModel(get<FeedRepository>()) }
+        viewModel { SettingsViewModel(get<PreferencesRepository>()) }
+        viewModel { NotificationsViewModel(get<NotificationsRepository>(), get<PreferencesRepository>()) }
         viewModel { LoginViewModel(get<AuthenticateRepository>()) }
         viewModel { ProfileViewModel(get<ProfileRepository>(), get<AuthManager>()) }
+        viewModel { ChatViewModel(get<AuthManager>(), get<ChatRepository>()) }
     }
 
 expect val platformModule: Module
@@ -97,6 +116,11 @@ expect val sqlDriverModule: Module
 
 internal fun getBaseModules() =
     listOf(
+        databaseModule,
+        networkModule,
+        apiModule,
+        repositoryModule,
+        viewModelModule,
         platformModule,
         sqlDriverModule,
         appModule,

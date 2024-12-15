@@ -64,7 +64,7 @@ class MainViewModel(
 
     init {
         viewModelScope.launch {
-            authManager.getAuthState().collect { authState ->
+            authManager.getAuthStateFlow().collect { authState ->
                 _authState.value =
                     when (authState) {
                         null -> AuthenticationState.Unauthenticated

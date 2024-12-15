@@ -51,8 +51,14 @@ class AuthManagerImpl(private val localDataSource: LocalDataSource) : AuthManage
             } ?: Unit
         }
 
-    override fun getAuthState(): Flow<AuthState?> =
+    override fun getAuthStateFlow(): Flow<AuthState?> =
         localDataSource.getAuthState()
             .mapToOneOrNull(Dispatchers.IO)
             .map { it?.toAuthState() }
+
+    override suspend fun getAuthState() =
+        localDataSource.getAuthState()
+            .mapToOneOrNull(Dispatchers.IO)
+            .map { it?.toAuthState() }
+            .firstOrNull()
 }

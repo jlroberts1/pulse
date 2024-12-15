@@ -18,11 +18,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.contexts.cosmic.ui.screens.addpost.AddPostScreen
+import com.contexts.cosmic.ui.screens.chat.ChatScreen
 import com.contexts.cosmic.ui.screens.home.HomeOverflowMenu
 import com.contexts.cosmic.ui.screens.home.HomeOverflowMenuAction
 import com.contexts.cosmic.ui.screens.home.HomeScreen
 import com.contexts.cosmic.ui.screens.login.LoginScreen
-import com.contexts.cosmic.ui.screens.messages.MessageScreen
 import com.contexts.cosmic.ui.screens.notifications.NotificationsScreen
 import com.contexts.cosmic.ui.screens.profile.ProfileScreen
 import com.contexts.cosmic.ui.screens.search.SearchScreen
@@ -58,7 +58,7 @@ sealed class NavigationRoutes {
 
         data object Search : Authenticated("search")
 
-        data object Messages : Authenticated("messages")
+        data object Chat : Authenticated("chat")
 
         data object Notifications : Authenticated("notifications")
 
@@ -135,14 +135,14 @@ fun NavGraphBuilder.authenticatedGraph(
             )
             SearchScreen()
         }
-        composable(route = NavigationRoutes.Authenticated.Messages.route) {
+        composable(route = NavigationRoutes.Authenticated.Chat.route) {
             updateScaffoldViewState(
                 ScaffoldViewState(
                     showTopAppBar = true,
-                    showFab = true,
+                    showFab = false,
                 ),
             )
-            MessageScreen()
+            ChatScreen()
         }
         composable(route = NavigationRoutes.Authenticated.Notifications.route) {
             updateScaffoldViewState(
