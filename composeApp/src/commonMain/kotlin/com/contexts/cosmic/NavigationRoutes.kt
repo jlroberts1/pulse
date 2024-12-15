@@ -31,6 +31,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navigation
 import com.contexts.cosmic.ui.screens.addpost.AddPostScreen
 import com.contexts.cosmic.ui.screens.chat.ChatScreen
+import com.contexts.cosmic.ui.screens.chat.NewChatScreen
 import com.contexts.cosmic.ui.screens.home.HomeOverflowMenu
 import com.contexts.cosmic.ui.screens.home.HomeOverflowMenuAction
 import com.contexts.cosmic.ui.screens.home.HomeScreen
@@ -119,6 +120,8 @@ sealed class NavigationRoutes {
 
         data object Chat : Authenticated("chat")
 
+        data object NewChat : Authenticated("new_chat")
+
         data object Notifications : Authenticated("notifications")
 
         data object Profile : Authenticated("profile")
@@ -174,6 +177,9 @@ fun NavGraphBuilder.authenticatedGraph(
                 ScaffoldViewState(
                     showTopAppBar = true,
                     showFab = true,
+                    fabAction = {
+                        navController.navigate(NavigationRoutes.Authenticated.AddPost.route)
+                    },
                     topBarActions = {
                         HomeOverflowMenu {
                             when (it) {
@@ -203,16 +209,31 @@ fun NavGraphBuilder.authenticatedGraph(
             updateScaffoldViewState(
                 ScaffoldViewState(
                     showTopAppBar = true,
-                    showFab = false,
+                    showFab = true,
+                    fabAction = {
+                        navController.navigate(NavigationRoutes.Authenticated.NewChat.route)
+                    },
                 ),
             )
             ChatScreen()
+        }
+        composable(route = NavigationRoutes.Authenticated.NewChat.route) {
+            updateScaffoldViewState(
+                ScaffoldViewState(
+                    showTopAppBar = true,
+                    showFab = true,
+                ),
+            )
+            NewChatScreen()
         }
         composable(route = NavigationRoutes.Authenticated.Notifications.route) {
             updateScaffoldViewState(
                 ScaffoldViewState(
                     showTopAppBar = true,
                     showFab = true,
+                    fabAction = {
+                        navController.navigate(NavigationRoutes.Authenticated.AddPost.route)
+                    },
                 ),
             )
             NotificationsScreen()
@@ -221,7 +242,10 @@ fun NavGraphBuilder.authenticatedGraph(
             updateScaffoldViewState(
                 ScaffoldViewState(
                     showTopAppBar = false,
-                    showFab = false,
+                    showFab = true,
+                    fabAction = {
+                        navController.navigate(NavigationRoutes.Authenticated.AddPost.route)
+                    },
                 ),
             )
             ProfileScreen()

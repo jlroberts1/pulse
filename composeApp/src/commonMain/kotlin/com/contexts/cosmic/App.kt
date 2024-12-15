@@ -167,7 +167,7 @@ fun App(
                         ) {
                             FloatingActionButton(
                                 onClick = {
-                                    navController.navigate(NavigationRoutes.Authenticated.AddPost.route)
+                                    scaffoldViewState.fabAction()
                                 },
                                 containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
                                 elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
