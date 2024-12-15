@@ -9,7 +9,8 @@
 
 package com.contexts.cosmic.data.network.api
 
-import app.bsky.feed.GetTimelineResponse
+import app.bsky.feed.GetFeedResponse
+import com.contexts.cosmic.BuildKonfig
 import com.contexts.cosmic.data.network.httpclient.Response
 import com.contexts.cosmic.data.network.httpclient.safeRequest
 import com.contexts.cosmic.exceptions.NetworkError
@@ -18,18 +19,17 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.path
 
 class FeedAPI(private val client: HttpClient) {
-    suspend fun getTimeline(
+    suspend fun geDefaultFeed(
         limit: Int = 50,
         cursor: String? = null,
-        algorithm: String? = null,
-    ): Response<GetTimelineResponse, NetworkError> {
+    ): Response<GetFeedResponse, NetworkError> {
         return client.safeRequest {
             url {
                 method = HttpMethod.Get
-                path("xrpc/app.bsky.feed.getTimeline")
+                path("xrpc/app.bsky.feed.getFeed")
+                parameters.append("feed", BuildKonfig.DEFAULT_FEED)
                 parameters.append("limit", limit.toString())
                 cursor?.let { parameters.append("cursor", it) }
-                algorithm?.let { parameters.append("algorithm", it) }
             }
         }
     }

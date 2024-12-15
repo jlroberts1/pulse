@@ -153,5 +153,6 @@ buildkonfig {
     val tenorKey = getLocalProperty("TENOR_API_KEY")
     defaultConfigs {
         buildConfigField(STRING, "TENOR_API_KEY", tenorKey)
+        buildConfigField(STRING, "DEFAULT_FEED", "at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.generator/whats-hot")
     }
 }

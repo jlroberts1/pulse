@@ -38,7 +38,7 @@ class HomeViewModel(
     fun loadFeed() {
         viewModelScope.launch {
             _uiState.update { it.copy(loading = true, error = null) }
-            when (val response = feedRepository.getTimeline()) {
+            when (val response = feedRepository.getDefaultFeed()) {
                 is Response.Success -> {
                     _uiState.update {
                         it.copy(

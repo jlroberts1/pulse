@@ -9,13 +9,26 @@
 
 package com.contexts.cosmic
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navigation
 import com.contexts.cosmic.ui.screens.addpost.AddPostScreen
 import com.contexts.cosmic.ui.screens.chat.ChatScreen
@@ -28,19 +41,66 @@ import com.contexts.cosmic.ui.screens.profile.ProfileScreen
 import com.contexts.cosmic.ui.screens.search.SearchScreen
 import com.contexts.cosmic.ui.screens.settings.SettingsScreen
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun RootNav(
     navController: NavHostController,
     updateScaffoldViewState: (ScaffoldViewState) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    NavHost(
-        navController = navController,
-        startDestination = NavigationRoutes.Authenticated.NavigationRoute.route,
-        modifier = modifier,
+    var oldRoute by remember { mutableStateOf<String?>(null) }
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+    val routePair =
+        remember(currentRoute) {
+            val pair = oldRoute to currentRoute
+            oldRoute = currentRoute
+            pair
+        }
+    val routes = topLevelDestinations.map { it.route }
+    AnimatedContent(
+        targetState = routePair,
+        transitionSpec = {
+            val (previous, current) = targetState
+            if (previous in routes && current in routes) {
+                (
+                    fadeIn(animationSpec = tween(220)) +
+                        scaleIn(
+                            initialScale = 0.92f,
+                            animationSpec = tween(220),
+                        )
+                ).togetherWith(
+                    fadeOut(animationSpec = tween(220)) +
+                        scaleOut(
+                            targetScale = 1.08f,
+                            animationSpec = tween(220),
+                        ),
+                )
+            } else {
+                (
+                    fadeIn(
+                        animationSpec =
+                            tween(
+                                220,
+                                delayMillis = 90,
+                            ),
+                    ) +
+                        scaleIn(
+                            initialScale = 0.92f,
+                            animationSpec = tween(220, delayMillis = 90),
+                        )
+                ).togetherWith(fadeOut(animationSpec = tween(90)))
+            }
+        },
+        modifier = Modifier,
     ) {
-        authenticatedGraph(navController, updateScaffoldViewState)
-        unauthenticatedGraph(navController, updateScaffoldViewState)
+        NavHost(
+            navController = navController,
+            startDestination = NavigationRoutes.Authenticated.NavigationRoute.route,
+            modifier = modifier,
+        ) {
+            authenticatedGraph(navController, updateScaffoldViewState)
+            unauthenticatedGraph(navController, updateScaffoldViewState)
+        }
     }
 }
 
@@ -106,7 +166,9 @@ fun NavGraphBuilder.authenticatedGraph(
         route = NavigationRoutes.Authenticated.NavigationRoute.route,
         startDestination = NavigationRoutes.Authenticated.Home.route,
     ) {
-        composable(route = NavigationRoutes.Authenticated.Home.route) {
+        composable(
+            route = NavigationRoutes.Authenticated.Home.route,
+        ) {
             updateScaffoldViewState(
                 ScaffoldViewState(
                     showTopAppBar = true,
