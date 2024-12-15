@@ -246,6 +246,7 @@ fun App(
                 ) {
                     RootNav(
                         navController,
+                        controlsVisibility,
                         updateScaffoldViewState = {
                             viewModel.updateScaffoldViewState(it)
                         },

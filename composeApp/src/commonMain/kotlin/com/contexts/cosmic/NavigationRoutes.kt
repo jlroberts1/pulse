@@ -10,7 +10,6 @@
 package com.contexts.cosmic
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -41,10 +40,10 @@ import com.contexts.cosmic.ui.screens.profile.ProfileScreen
 import com.contexts.cosmic.ui.screens.search.SearchScreen
 import com.contexts.cosmic.ui.screens.settings.SettingsScreen
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun RootNav(
     navController: NavHostController,
+    controlsVisibility: Float,
     updateScaffoldViewState: (ScaffoldViewState) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -98,8 +97,8 @@ fun RootNav(
             startDestination = NavigationRoutes.Authenticated.NavigationRoute.route,
             modifier = modifier,
         ) {
-            authenticatedGraph(navController, updateScaffoldViewState)
-            unauthenticatedGraph(navController, updateScaffoldViewState)
+            authenticatedGraph(navController, controlsVisibility, updateScaffoldViewState)
+            unauthenticatedGraph(navController, controlsVisibility, updateScaffoldViewState)
         }
     }
 }
@@ -132,6 +131,7 @@ sealed class NavigationRoutes {
 
 fun NavGraphBuilder.unauthenticatedGraph(
     navController: NavController,
+    controlsVisibility: Float,
     updateScaffoldViewState: (ScaffoldViewState) -> Unit,
 ) {
     navigation(
@@ -160,6 +160,7 @@ fun NavGraphBuilder.unauthenticatedGraph(
 
 fun NavGraphBuilder.authenticatedGraph(
     navController: NavController,
+    controlsVisibility: Float,
     updateScaffoldViewState: (ScaffoldViewState) -> Unit,
 ) {
     navigation(
@@ -187,7 +188,7 @@ fun NavGraphBuilder.authenticatedGraph(
                     },
                 ),
             )
-            HomeScreen()
+            HomeScreen(controlsVisibility)
         }
         composable(route = NavigationRoutes.Authenticated.Search.route) {
             updateScaffoldViewState(

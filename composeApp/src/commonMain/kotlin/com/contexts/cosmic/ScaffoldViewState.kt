@@ -18,4 +18,5 @@ data class ScaffoldViewState(
     val showTopAppBar: Boolean = true,
     val showFab: Boolean = true,
     val isRefreshing: Boolean = false,
+    val controlsVisibility: Float = 1f,
 )
