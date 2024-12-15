@@ -9,12 +9,16 @@
 
 package com.contexts.cosmic
 
+import ViewMedia
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -38,12 +42,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
@@ -98,6 +100,7 @@ fun App(
     val authState by viewModel.authState.collectAsState()
     val unreadCount by viewModel.unreadCount.collectAsState()
     val unreadCountState by remember { derivedStateOf { unreadCount } }
+    val mediaState by viewModel.mediaState.collectAsState()
 
     val scaffoldViewState by viewModel.scaffoldViewState.collectAsState()
     snackbarDelegate.apply {
@@ -153,7 +156,7 @@ fun App(
             Scaffold(
                 modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                 topBar = {
-                    if (scaffoldViewState.showTopAppBar) {
+                    if (scaffoldViewState.showTopAppBar && mediaState.url == null) {
                         TopBar(scaffoldViewState, navController, scrollBehavior.topBarBehavior)
                     }
                 },
@@ -161,7 +164,7 @@ fun App(
                 floatingActionButton = {
                     if (scaffoldViewState.showFab) {
                         AnimatedVisibility(
-                            visible = controlsVisibility == 1f,
+                            visible = controlsVisibility == 1f && mediaState.url == null,
                             enter = scaleIn(),
                             exit = scaleOut(),
                         ) {
@@ -180,7 +183,7 @@ fun App(
                 bottomBar = {
                     if (showBottomBar) {
                         AnimatedVisibility(
-                            visible = controlsVisibility == 1f,
+                            visible = controlsVisibility == 1f && mediaState.url == null,
                             enter = slideInVertically { it },
                             exit = slideOutVertically { it },
                             modifier = Modifier.fillMaxWidth(),
@@ -240,9 +243,8 @@ fun App(
                         start = innerPadding.calculateStartPadding(LocalLayoutDirection.current),
                         end = innerPadding.calculateEndPadding(LocalLayoutDirection.current),
                     )
-                Surface(
+                Box(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background,
                 ) {
                     RootNav(
                         navController,
@@ -255,7 +257,21 @@ fun App(
                                 .imePadding()
                                 .navigationBarsPadding()
                                 .padding(newPadding),
+                        onMediaOpen = { viewModel.onMediaOpen(it) },
                     )
+
+                    AnimatedVisibility(
+                        visible = mediaState.url != null,
+                        enter = fadeIn(),
+                        exit = fadeOut(),
+                    ) {
+                        mediaState.url?.let { url ->
+                            ViewMedia(
+                                mediaUrl = url,
+                                onDismiss = { viewModel.onMediaDismissed() },
+                            )
+                        }
+                    }
                 }
             }
         }

@@ -39,7 +39,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun HomeScreen(
     controlsVisibility: Float,
     snackbarDelegate: SnackbarDelegate = koinInject(),
-    onMediaClick: (String) -> Unit,
+    onMediaOpen: (String) -> Unit,
 ) {
     val viewModel: HomeViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
@@ -69,7 +69,7 @@ fun HomeScreen(
                     onRepostClick = {},
                     onLikeClick = {},
                     onMenuClick = {},
-                    onMediaClick = { onMediaClick(it) },
+                    onMediaOpen = { onMediaOpen(it) },
                 )
             }
         }

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
@@ -25,13 +26,16 @@ import com.contexts.cosmic.ui.screens.profile.composables.ProfileInfo
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(onMediaOpen: (String) -> Unit) {
     val viewModel: ProfileViewModel = koinViewModel()
     val profile = viewModel.profile.collectAsState(null)
     val feed = viewModel.feed.collectAsState(RequestResult.Loading)
 
+    val listState = rememberLazyListState()
+
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
+            state = listState,
             modifier =
                 Modifier
                     .fillMaxSize(),
@@ -52,7 +56,7 @@ fun ProfileScreen() {
                             onRepostClick = {},
                             onLikeClick = {},
                             onMenuClick = {},
-                            onMediaClick = {},
+                            onMediaOpen = { onMediaOpen(it) },
                         )
                     }
                 }

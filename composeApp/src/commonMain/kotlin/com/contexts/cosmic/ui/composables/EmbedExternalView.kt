@@ -42,9 +42,16 @@ fun EmbedExternalView(
     title: String,
     description: String? = null,
     urlHandler: UrlHandler = koinInject(),
+    onMediaOpen: (String) -> Unit,
 ) {
     Surface(
-        onClick = { urlHandler.openUrl(uri.uri) },
+        onClick = {
+            if (uri.uri.isGifEmbed()) {
+                onMediaOpen(uri.uri)
+            } else {
+                urlHandler.openUrl(uri.uri)
+            }
+        },
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
         border =

@@ -9,7 +9,6 @@
 
 package com.contexts.cosmic
 
-import ViewMediaScreen
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -26,11 +25,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.contexts.cosmic.ui.screens.addpost.AddPostScreen
 import com.contexts.cosmic.ui.screens.chat.ChatScreen
@@ -43,12 +40,12 @@ import com.contexts.cosmic.ui.screens.notifications.NotificationsScreen
 import com.contexts.cosmic.ui.screens.profile.ProfileScreen
 import com.contexts.cosmic.ui.screens.search.SearchScreen
 import com.contexts.cosmic.ui.screens.settings.SettingsScreen
-import io.ktor.http.Url
 
 @Composable
 fun RootNav(
     navController: NavHostController,
     controlsVisibility: Float,
+    onMediaOpen: (String) -> Unit,
     updateScaffoldViewState: (ScaffoldViewState) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -102,7 +99,7 @@ fun RootNav(
             startDestination = NavigationRoutes.Authenticated.NavigationRoute.route,
             modifier = modifier,
         ) {
-            authenticatedGraph(navController, controlsVisibility, updateScaffoldViewState)
+            authenticatedGraph(navController, controlsVisibility, onMediaOpen, updateScaffoldViewState)
             unauthenticatedGraph(navController, controlsVisibility, updateScaffoldViewState)
         }
     }
@@ -119,8 +116,6 @@ sealed class NavigationRoutes {
         data object NavigationRoute : Authenticated("authenticated")
 
         data object Home : Authenticated("home")
-
-        data object ViewMedia : Authenticated("view_media")
 
         data object Search : Authenticated("search")
 
@@ -170,6 +165,7 @@ fun NavGraphBuilder.unauthenticatedGraph(
 fun NavGraphBuilder.authenticatedGraph(
     navController: NavController,
     controlsVisibility: Float,
+    onMediaOpen: (String) -> Unit,
     updateScaffoldViewState: (ScaffoldViewState) -> Unit,
 ) {
     navigation(
@@ -202,24 +198,8 @@ fun NavGraphBuilder.authenticatedGraph(
             )
             HomeScreen(
                 controlsVisibility,
-                onMediaClick = {
-                    val encodedUrl = Url(it)
-                    navController.navigate("view_media?mediaUrl=$encodedUrl")
-                },
+                onMediaOpen = { onMediaOpen(it) },
             )
-        }
-        composable(
-            route = "view_media?mediaUrl={mediaUrl}",
-            arguments = listOf(navArgument("mediaUrl") { type = NavType.StringType }),
-        ) { backStackEntry ->
-            updateScaffoldViewState(
-                ScaffoldViewState(
-                    showTopAppBar = false,
-                    showFab = false,
-                ),
-            )
-            val mediaUrl = backStackEntry.arguments?.getString("mediaUrl") ?: return@composable
-            ViewMediaScreen(mediaUrl = mediaUrl)
         }
         composable(route = NavigationRoutes.Authenticated.Search.route) {
             updateScaffoldViewState(
@@ -273,7 +253,9 @@ fun NavGraphBuilder.authenticatedGraph(
                     },
                 ),
             )
-            ProfileScreen()
+            ProfileScreen(
+                onMediaOpen = { onMediaOpen(it) },
+            )
         }
         composable(route = NavigationRoutes.Authenticated.Settings.route) {
             updateScaffoldViewState(

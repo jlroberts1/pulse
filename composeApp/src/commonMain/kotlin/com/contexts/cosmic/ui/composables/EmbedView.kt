@@ -15,7 +15,7 @@ import app.bsky.feed.PostViewEmbedUnion
 @Composable
 fun EmbedView(
     embed: PostViewEmbedUnion,
-    onClick: (String) -> Unit,
+    onMediaOpen: (String) -> Unit,
 ) {
     when (embed) {
         is PostViewEmbedUnion.RecordWithMediaView -> {
@@ -40,13 +40,14 @@ fun EmbedView(
                 thumb = embed.value.external.thumb,
                 title = embed.value.external.title,
                 description = embed.value.external.description,
+                onMediaOpen = { onMediaOpen(it) },
             )
         }
 
         is PostViewEmbedUnion.ImagesView -> {
             EmbedImageView(
                 embed.value.images,
-                onClick = { onClick(it) },
+                onClick = { onMediaOpen(it) },
             )
         }
 

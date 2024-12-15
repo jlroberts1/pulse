@@ -30,6 +30,10 @@ sealed interface AuthenticationState {
     data object Unauthenticated : AuthenticationState
 }
 
+data class MediaState(
+    val url: String? = null,
+)
+
 class MainViewModel(
     private val authManager: AuthManager,
     private val notificationsRepository: NotificationsRepository,
@@ -40,6 +44,9 @@ class MainViewModel(
 
     private val _scaffoldViewState = MutableStateFlow(ScaffoldViewState())
     val scaffoldViewState = _scaffoldViewState.asStateFlow()
+
+    private val _mediaState = MutableStateFlow(MediaState())
+    val mediaState = _mediaState.asStateFlow()
 
     private val _controlsVisibility = MutableStateFlow(1f)
     val controlsVisibility = _controlsVisibility.asStateFlow()
@@ -85,6 +92,18 @@ class MainViewModel(
                     Napier.e("Error getting unread count ${response.error}")
                 }
             }
+        }
+    }
+
+    fun onMediaOpen(url: String) {
+        _mediaState.update {
+            it.copy(url = url)
+        }
+    }
+
+    fun onMediaDismissed() {
+        _mediaState.update {
+            it.copy(url = null)
         }
     }
 

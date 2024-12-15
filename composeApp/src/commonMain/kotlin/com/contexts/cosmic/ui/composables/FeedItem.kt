@@ -26,7 +26,7 @@ fun FeedItem(
     onRepostClick: () -> Unit,
     onLikeClick: () -> Unit,
     onMenuClick: () -> Unit,
-    onMediaClick: (String) -> Unit,
+    onMediaOpen: (String) -> Unit,
 ) {
     ElevatedCard(
         modifier = Modifier.padding(top = 8.dp),
@@ -47,7 +47,7 @@ fun FeedItem(
             post.embed?.let {
                 EmbedView(
                     embed = it,
-                    onClick = { media -> onMediaClick(media) },
+                    onMediaOpen = { media -> onMediaOpen(media) },
                 )
             }
             FeedItemInteractions(
