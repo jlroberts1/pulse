@@ -1,3 +1,5 @@
+import java.util.Properties
+
 /*
  * Copyright (c) 2024. James Roberts
  *
@@ -35,6 +37,16 @@ dependencyResolutionManagement {
         }
         mavenCentral()
     }
+}
+
+fun getLocalProperty(key: String): String? {
+    val props = Properties()
+    props.load(File(rootDir.absolutePath + "/local.properties").inputStream())
+    val property = props.getProperty(key, "")
+    if (property.isNullOrEmpty()) {
+        throw GradleException("No value found for the key: $key")
+    }
+    return property
 }
 
 include(":composeApp")

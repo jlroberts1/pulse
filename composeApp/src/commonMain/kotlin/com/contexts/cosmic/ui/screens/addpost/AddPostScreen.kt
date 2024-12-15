@@ -34,9 +34,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.contexts.cosmic.ui.screens.addpost.composables.AddPostBottomBar
 import com.contexts.cosmic.ui.screens.addpost.composables.AddPostPermissionRationale
 import com.contexts.cosmic.ui.screens.addpost.composables.AddPostSuggestions
+import com.contexts.cosmic.ui.screens.addpost.composables.TenorSearch
+import com.contexts.cosmic.ui.screens.addpost.composables.getBestFormat
 import com.contexts.cosmic.util.PermissionCallback
 import com.contexts.cosmic.util.PermissionStatus
 import com.contexts.cosmic.util.PermissionType
@@ -55,6 +58,7 @@ fun AddPostScreen() {
     var launchCamera by remember { mutableStateOf(value = false) }
     var launchGallery by remember { mutableStateOf(value = false) }
     var launchSetting by remember { mutableStateOf(value = false) }
+    var launchGif by remember { mutableStateOf(value = false) }
     var permissionRationalDialog by remember { mutableStateOf(value = false) }
 
     val permissionsManager =
@@ -143,7 +147,7 @@ fun AddPostScreen() {
                     ),
                 minLines = 6,
                 onValueChange = {
-                    viewModel.handleTextChanged(
+                    viewModel.handleMentionQueryChanged(
                         newText = it.text,
                         cursorPosition = it.selection.start,
                     )
@@ -180,14 +184,46 @@ fun AddPostScreen() {
                     contentScale = ContentScale.Crop,
                 )
             }
+
+            uiState.selectedGif?.let {
+                Spacer(modifier = Modifier.padding(8.dp))
+                AsyncImage(
+                    model = it.getBestFormat(),
+                    contentDescription = "Image",
+                    modifier =
+                        Modifier.size(140.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop,
+                )
+            }
         }
 
         AddPostBottomBar(
             launchCamera = { launchCamera = true },
             launchGallery = { launchGallery = true },
+            launchGif = { launchGif = true },
             sendPost = {},
             Modifier
                 .align(Alignment.BottomCenter),
         )
+
+        if (launchGif) {
+            TenorSearch(
+                searchResults = uiState.gifSearchResults,
+                searchQuery = {
+                    coroutineScope.launch {
+                        viewModel.onGifSearchQueryChanged(it)
+                    }
+                },
+                onGifSelected = {
+                    viewModel.onGifSelected(it)
+                    launchGif = false
+                },
+                onDismiss = {
+                    viewModel.clearGifSearch()
+                    launchGif = false
+                },
+            )
+        }
     }
 }

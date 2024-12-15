@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 fun AddPostBottomBar(
     launchCamera: () -> Unit,
     launchGallery: () -> Unit,
+    launchGif: () -> Unit,
     sendPost: () -> Unit,
     modifier: Modifier,
 ) {
@@ -40,7 +41,7 @@ fun AddPostBottomBar(
             IconButton(onClick = { launchGallery() }) {
                 Icon(Icons.Default.Photo, "Gallery")
             }
-            IconButton(onClick = {}) {
+            IconButton(onClick = { launchGif() }) {
                 Icon(Icons.Default.Gif, "Gif")
             }
             Spacer(modifier = Modifier.weight(1f))

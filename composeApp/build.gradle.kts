@@ -7,6 +7,8 @@
  * (at your option) any later version.
  */
 
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
+import org.jetbrains.compose.internal.utils.getLocalProperty
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -18,6 +20,7 @@ plugins {
     alias(libs.plugins.sqldelight)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.ozoneGenerator)
+    alias(libs.plugins.buildKonfig)
 }
 
 kotlin {
@@ -143,4 +146,12 @@ lexicons {
     }
 
     outputDirectory.set(project.layout.buildDirectory.dir("out"))
+}
+
+buildkonfig {
+    packageName = "com.contexts.cosmic"
+    val tenorKey = getLocalProperty("TENOR_API_KEY")
+    defaultConfigs {
+        buildConfigField(STRING, "TENOR_API_KEY", tenorKey)
+    }
 }

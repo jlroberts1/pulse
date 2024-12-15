@@ -22,6 +22,7 @@ import com.contexts.cosmic.data.network.api.ChatAPI
 import com.contexts.cosmic.data.network.api.FeedAPI
 import com.contexts.cosmic.data.network.api.NotificationsAPI
 import com.contexts.cosmic.data.network.api.ProfileAPI
+import com.contexts.cosmic.data.network.api.TenorAPI
 import com.contexts.cosmic.data.network.httpclient.AuthManager
 import com.contexts.cosmic.data.network.httpclient.AuthManagerImpl
 import com.contexts.cosmic.data.network.httpclient.KTorHttpClientImpl
@@ -33,6 +34,7 @@ import com.contexts.cosmic.data.repository.FeedRepositoryImpl
 import com.contexts.cosmic.data.repository.NotificationsRepositoryImpl
 import com.contexts.cosmic.data.repository.PreferencesRepositoryImpl
 import com.contexts.cosmic.data.repository.ProfileRepositoryImpl
+import com.contexts.cosmic.data.repository.TenorRepositoryImpl
 import com.contexts.cosmic.db.Auth_state
 import com.contexts.cosmic.db.Database
 import com.contexts.cosmic.db.User
@@ -43,6 +45,7 @@ import com.contexts.cosmic.domain.repository.FeedRepository
 import com.contexts.cosmic.domain.repository.NotificationsRepository
 import com.contexts.cosmic.domain.repository.PreferencesRepository
 import com.contexts.cosmic.domain.repository.ProfileRepository
+import com.contexts.cosmic.domain.repository.TenorRepository
 import com.contexts.cosmic.ui.components.SnackbarDelegate
 import com.contexts.cosmic.ui.screens.addpost.AddPostViewModel
 import com.contexts.cosmic.ui.screens.chat.ChatViewModel
@@ -91,6 +94,7 @@ val apiModule =
         single<AuthenticateAPI> { AuthenticateAPI(get<HttpClient>()) }
         single<ChatAPI> { ChatAPI(get<HttpClient>()) }
         single<ActorAPI> { ActorAPI(get<HttpClient>()) }
+        single<TenorAPI> { TenorAPI() }
     }
 
 val repositoryModule =
@@ -104,6 +108,7 @@ val repositoryModule =
         factory<NotificationsRepository> { NotificationsRepositoryImpl(get<NotificationsAPI>()) }
         factory<ChatRepository> { ChatRepositoryImpl(get<ChatAPI>()) }
         factory<ActorRepository> { ActorRepositoryImpl(get<ActorAPI>()) }
+        factory<TenorRepository> { TenorRepositoryImpl(get<TenorAPI>()) }
     }
 
 val viewModelModule =
@@ -115,7 +120,7 @@ val viewModelModule =
         viewModel { LoginViewModel(get<AuthenticateRepository>()) }
         viewModel { ProfileViewModel(get<ProfileRepository>(), get<AuthManager>()) }
         viewModel { ChatViewModel(get<AuthManager>(), get<ChatRepository>()) }
-        viewModel { AddPostViewModel(get<ActorRepository>()) }
+        viewModel { AddPostViewModel(get<ActorRepository>(), get<TenorRepository>()) }
     }
 
 expect val platformModule: Module
