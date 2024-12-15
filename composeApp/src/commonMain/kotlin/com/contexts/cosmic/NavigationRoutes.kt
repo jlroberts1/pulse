@@ -118,6 +118,7 @@ fun NavGraphBuilder.authenticatedGraph(
                                     navController.navigate(
                                         NavigationRoutes.Authenticated.Settings.route,
                                     )
+
                                 is HomeOverflowMenuAction.Logout -> Unit
                             }
                         }

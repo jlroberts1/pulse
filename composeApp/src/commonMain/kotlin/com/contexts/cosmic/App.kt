@@ -10,11 +10,16 @@
 package com.contexts.cosmic
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -51,7 +56,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -154,73 +158,74 @@ fun App(
                 snackbarHost = { SnackbarHost(snackbarHostState, snackbarDelegate) },
                 floatingActionButton = {
                     if (scaffoldViewState.showFab) {
-                        FloatingActionButton(
-                            onClick = {
-                                navController.navigate(NavigationRoutes.Authenticated.AddPost.route)
-                            },
-                            containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
-                            elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
-                            modifier =
-                                Modifier.graphicsLayer {
-                                    alpha = controlsVisibility
-                                    translationY = 100f * (1f - controlsVisibility)
-                                },
+                        AnimatedVisibility(
+                            visible = controlsVisibility == 1f,
+                            enter = scaleIn(),
+                            exit = scaleOut(),
                         ) {
-                            Icon(Icons.Sharp.Add, "Add")
+                            FloatingActionButton(
+                                onClick = {
+                                    navController.navigate(NavigationRoutes.Authenticated.AddPost.route)
+                                },
+                                containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
+                                elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
+                            ) {
+                                Icon(Icons.Sharp.Add, "Add")
+                            }
                         }
                     }
                 },
                 bottomBar = {
-                    AnimatedVisibility(
-                        visible = showBottomBar,
-                        modifier =
-                            Modifier.graphicsLayer {
-                                alpha = controlsVisibility
-                                translationY = 100f * (1f - controlsVisibility)
-                            },
-                    ) {
-                        NavigationBar(
-                            modifier = Modifier.height(72.dp),
+                    if (showBottomBar) {
+                        AnimatedVisibility(
+                            visible = controlsVisibility == 1f,
+                            enter = slideInVertically { it },
+                            exit = slideOutVertically { it },
+                            modifier = Modifier.fillMaxWidth(),
                         ) {
-                            val currentRoute = navBackStackEntry?.destination?.route
-                            topLevelDestinations.forEach { screen ->
-                                val selected = currentRoute == screen.route
-                                NavigationBarItem(
-                                    selected = selected,
-                                    onClick = {
-                                        navController.navigate(screen.route) {
-                                            navController.graph.startDestinationRoute?.let {
-                                                popUpTo(it) { saveState = true }
+                            NavigationBar(
+                                modifier = Modifier.height(72.dp),
+                            ) {
+                                val currentRoute = navBackStackEntry?.destination?.route
+                                topLevelDestinations.forEach { screen ->
+                                    val selected = currentRoute == screen.route
+                                    NavigationBarItem(
+                                        selected = selected,
+                                        onClick = {
+                                            navController.navigate(screen.route) {
+                                                navController.graph.startDestinationRoute?.let {
+                                                    popUpTo(it) { saveState = true }
+                                                }
+                                                launchSingleTop = true
+                                                restoreState = true
                                             }
-                                            launchSingleTop = true
-                                            restoreState = true
-                                        }
-                                    },
-                                    icon = {
-                                        val icon = getIconForScreen(screen)
-                                        if (screen.route == NavigationRoutes.Authenticated.Notifications.route) {
-                                            BadgedBox(
-                                                badge = {
-                                                    if (unreadCountState != 0L) {
-                                                        Badge {
-                                                            Text(text = unreadCountState.toString())
+                                        },
+                                        icon = {
+                                            val icon = getIconForScreen(screen)
+                                            if (screen.route == NavigationRoutes.Authenticated.Notifications.route) {
+                                                BadgedBox(
+                                                    badge = {
+                                                        if (unreadCountState != 0L) {
+                                                            Badge {
+                                                                Text(text = unreadCountState.toString())
+                                                            }
                                                         }
-                                                    }
-                                                },
-                                            ) {
+                                                    },
+                                                ) {
+                                                    Icon(
+                                                        imageVector = icon.image,
+                                                        contentDescription = icon.contentDescription,
+                                                    )
+                                                }
+                                            } else {
                                                 Icon(
                                                     imageVector = icon.image,
                                                     contentDescription = icon.contentDescription,
                                                 )
                                             }
-                                        } else {
-                                            Icon(
-                                                imageVector = icon.image,
-                                                contentDescription = icon.contentDescription,
-                                            )
-                                        }
-                                    },
-                                )
+                                        },
+                                    )
+                                }
                             }
                         }
                     }
