@@ -12,12 +12,14 @@ package com.contexts.cosmic.modules
 import com.contexts.cosmic.ui.screens.home.HomeViewModel
 import com.contexts.cosmic.ui.screens.login.LoginViewModel
 import com.contexts.cosmic.ui.screens.main.AppViewModel
+import com.contexts.cosmic.ui.screens.notifications.NotificationViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val viewModelModule =
     module {
         viewModel { AppViewModel(get()) }
-        viewModel { LoginViewModel(get()) }
         viewModel { HomeViewModel(get()) }
+        viewModel { LoginViewModel(get()) }
+        viewModel { NotificationViewModel(get(), get()) }
     }

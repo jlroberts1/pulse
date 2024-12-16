@@ -12,7 +12,8 @@ package com.contexts.cosmic.ui.screens.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.bsky.feed.FeedViewPost
-import com.contexts.cosmic.data.network.client.Response
+import com.contexts.cosmic.data.network.client.onError
+import com.contexts.cosmic.data.network.client.onSuccess
 import com.contexts.cosmic.domain.repository.FeedRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,20 +39,10 @@ class HomeViewModel(
     fun loadFeed() {
         viewModelScope.launch {
             _uiState.update { it.copy(loading = true, error = null) }
-            when (val response = feedRepository.getDefaultFeed()) {
-                is Response.Success -> {
-                    _uiState.update {
-                        it.copy(
-                            feed = response.data.feed,
-                            loading = false,
-                            error = null,
-                        )
-                    }
-                }
-
-                is Response.Error -> {
-                    _uiState.update { it.copy(loading = false, error = response.error.message) }
-                }
+            feedRepository.getDefaultFeed().onSuccess { response ->
+                _uiState.update { it.copy(feed = response.feed, loading = false) }
+            }.onError { error ->
+                _uiState.update { it.copy(loading = false, error = error.message) }
             }
         }
     }

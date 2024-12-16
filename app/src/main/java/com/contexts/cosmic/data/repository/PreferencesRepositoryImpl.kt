@@ -14,7 +14,9 @@ import androidx.datastore.core.IOException
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.contexts.cosmic.domain.model.Theme
 import com.contexts.cosmic.domain.repository.PreferencesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -59,23 +61,29 @@ class PreferencesRepositoryImpl(
                 }
             }.map { preferences ->
                 Theme.fromString(preferences[THEME])
-            }
+            }.flowOn(Dispatchers.IO)
+
+    override suspend fun updateUnreadCount(count: Long) {
+        dataStore.edit { preferences ->
+            preferences[UNREAD_COUNT] = count
+        }
+    }
+
+    override fun getUnreadCount(): Flow<Long> =
+        dataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences ->
+                preferences[UNREAD_COUNT] ?: 0L
+            }.flowOn(Dispatchers.IO)
 
     companion object {
         val CURRENT_USER = stringPreferencesKey("current_user")
         val THEME = stringPreferencesKey("theme")
-    }
-}
-
-enum class Theme {
-    SYSTEM,
-    LIGHT,
-    DARK,
-    ;
-
-    companion object {
-        fun fromString(theme: String?): Theme {
-            return theme?.let { valueOf(theme) } ?: SYSTEM
-        }
+        val UNREAD_COUNT = longPreferencesKey("unread_count")
     }
 }
