@@ -9,24 +9,25 @@
 
 package com.contexts.cosmic.data.network.api
 
-import com.atproto.server.CreateSessionRequest
-import com.atproto.server.CreateSessionResponse
+import app.bsky.actor.SearchActorsTypeaheadQueryParams
+import app.bsky.actor.SearchActorsTypeaheadResponse
 import com.contexts.cosmic.data.network.client.Response
 import com.contexts.cosmic.data.network.client.safeRequest
 import com.contexts.cosmic.exceptions.NetworkError
 import io.ktor.client.HttpClient
-import io.ktor.client.request.setBody
 import io.ktor.http.HttpMethod
 import io.ktor.http.path
 
-class AuthenticateAPI(private val client: HttpClient) {
-    suspend fun createSession(createSessionRequest: CreateSessionRequest): Response<CreateSessionResponse, NetworkError> {
+class ActorAPI(private val client: HttpClient) {
+    suspend fun searchActorsTypeahead(
+        searchActorsTypeaheadQueryParams: SearchActorsTypeaheadQueryParams,
+    ): Response<SearchActorsTypeaheadResponse, NetworkError> {
         return client.safeRequest {
             url {
-                method = HttpMethod.Post
-                path("xrpc/com.atproto.server.createSession")
+                method = HttpMethod.Get
+                path("xrpc/app.bsky.actor.searchActorsTypeahead")
+                parameters.append("q", searchActorsTypeaheadQueryParams.q.toString())
             }
-            setBody(createSessionRequest)
         }
     }
 }

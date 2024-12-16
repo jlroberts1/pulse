@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.bsky.feed.FeedViewPost
 import com.contexts.cosmic.data.network.client.Response
-import com.contexts.cosmic.domain.FeedRepository
+import com.contexts.cosmic.domain.repository.FeedRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

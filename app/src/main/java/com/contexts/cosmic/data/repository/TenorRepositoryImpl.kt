@@ -9,12 +9,14 @@
 
 package com.contexts.cosmic.data.repository
 
-import app.bsky.feed.GetFeedResponse
-import com.contexts.cosmic.data.network.api.FeedAPI
+import com.contexts.cosmic.data.network.api.TenorAPI
 import com.contexts.cosmic.data.network.client.Response
-import com.contexts.cosmic.domain.repository.FeedRepository
+import com.contexts.cosmic.data.network.response.TenorResponse
+import com.contexts.cosmic.domain.repository.TenorRepository
 import com.contexts.cosmic.exceptions.NetworkError
 
-class FeedRepositoryImpl(private val feedAPI: FeedAPI) : FeedRepository {
-    override suspend fun getDefaultFeed(): Response<GetFeedResponse, NetworkError> = feedAPI.geDefaultFeed()
+class TenorRepositoryImpl(private val tenorAPI: TenorAPI) : TenorRepository {
+    override suspend fun searchTenor(query: String): Response<TenorResponse, NetworkError> {
+        return tenorAPI.searchTenor(query)
+    }
 }

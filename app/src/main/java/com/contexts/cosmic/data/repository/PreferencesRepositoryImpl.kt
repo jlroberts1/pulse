@@ -15,7 +15,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.contexts.cosmic.domain.PreferencesRepository
+import com.contexts.cosmic.domain.repository.PreferencesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -43,7 +43,39 @@ class PreferencesRepositoryImpl(
                 preferences[CURRENT_USER] ?: ""
             }.flowOn(Dispatchers.IO)
 
+    override suspend fun updateTheme(theme: Theme) {
+        dataStore.edit { preferences ->
+            preferences[THEME] = theme.name
+        }
+    }
+
+    override fun getTheme(): Flow<Theme> =
+        dataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences ->
+                Theme.fromString(preferences[THEME])
+            }
+
     companion object {
         val CURRENT_USER = stringPreferencesKey("current_user")
+        val THEME = stringPreferencesKey("theme")
+    }
+}
+
+enum class Theme {
+    SYSTEM,
+    LIGHT,
+    DARK,
+    ;
+
+    companion object {
+        fun fromString(theme: String?): Theme {
+            return theme?.let { valueOf(theme) } ?: SYSTEM
+        }
     }
 }

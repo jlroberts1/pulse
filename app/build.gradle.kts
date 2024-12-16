@@ -1,3 +1,5 @@
+import java.util.Properties
+
 /*
  * Copyright (c) 2024. James Roberts
  *
@@ -31,6 +33,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "DEFAULT_FEED", "\"at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.generator/whats-hot\"")
+        buildConfigField("String", "TENOR_API_KEY", getLocalProperty("TENOR_API_KEY") ?: "no_tenor_key")
     }
     packaging {
         resources {
@@ -114,4 +117,14 @@ tasks.withType<com.google.devtools.ksp.gradle.KspTaskJvm> {
 lexicons {
     namespace.set("com.contexts.cosmic")
     outputDirectory.set(project.layout.buildDirectory.dir("out"))
+}
+
+fun getLocalProperty(key: String): String? {
+    val props = Properties()
+    props.load(File(rootDir.absolutePath + "/local.properties").inputStream())
+    val property = props.getProperty(key, "")
+    if (property.isNullOrEmpty()) {
+        throw GradleException("No value found for the key: $key")
+    }
+    return property
 }

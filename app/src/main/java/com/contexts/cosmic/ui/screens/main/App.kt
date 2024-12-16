@@ -67,13 +67,13 @@ fun App(viewModel: AppViewModel = koinViewModel()) {
         isLoggedIn?.let {
             if (it) {
                 navController.navigate(NavigationRoutes.Authenticated.NavigationRoute.route) {
-                    popUpTo(NavigationRoutes.Authenticated.NavigationRoute.route) {
+                    popUpTo(NavigationRoutes.Unauthenticated.NavigationRoute.route) {
                         inclusive = true
                     }
                 }
             } else {
                 navController.navigate(NavigationRoutes.Unauthenticated.NavigationRoute.route) {
-                    popUpTo(NavigationRoutes.Unauthenticated.NavigationRoute.route) {
+                    popUpTo(NavigationRoutes.Authenticated.NavigationRoute.route) {
                         inclusive = true
                     }
                 }

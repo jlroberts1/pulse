@@ -13,7 +13,7 @@ import com.atproto.server.RefreshSessionResponse
 import com.contexts.cosmic.data.local.database.dao.UserDao
 import com.contexts.cosmic.data.local.database.entities.TokenPair
 import com.contexts.cosmic.data.network.requests.RefreshSessionRequest
-import com.contexts.cosmic.domain.PreferencesRepository
+import com.contexts.cosmic.domain.repository.PreferencesRepository
 import com.contexts.cosmic.exceptions.NetworkError
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp

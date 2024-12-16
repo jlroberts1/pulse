@@ -11,8 +11,8 @@ package com.contexts.cosmic.data.repository
 
 import com.contexts.cosmic.data.local.database.dao.UserDao
 import com.contexts.cosmic.data.local.database.entities.toUserEntity
-import com.contexts.cosmic.domain.UserRepository
 import com.contexts.cosmic.domain.model.User
+import com.contexts.cosmic.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 
 class UserRepositoryImpl(private val userDao: UserDao) : UserRepository {

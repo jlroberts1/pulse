@@ -14,10 +14,10 @@ import com.atproto.server.CreateSessionResponse
 import com.contexts.cosmic.data.network.api.AuthenticateAPI
 import com.contexts.cosmic.data.network.client.Response
 import com.contexts.cosmic.data.network.client.onSuccess
-import com.contexts.cosmic.domain.AuthenticateRepository
-import com.contexts.cosmic.domain.PreferencesRepository
-import com.contexts.cosmic.domain.UserRepository
 import com.contexts.cosmic.domain.model.toUser
+import com.contexts.cosmic.domain.repository.AuthenticateRepository
+import com.contexts.cosmic.domain.repository.PreferencesRepository
+import com.contexts.cosmic.domain.repository.UserRepository
 import com.contexts.cosmic.exceptions.NetworkError
 
 class AuthenticateRepositoryImpl(

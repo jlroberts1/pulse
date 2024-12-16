@@ -7,12 +7,15 @@
  * (at your option) any later version.
  */
 
-package com.contexts.cosmic.domain
+package com.contexts.cosmic.domain.repository
 
-import app.bsky.feed.GetFeedResponse
+import app.bsky.actor.SearchActorsTypeaheadQueryParams
+import app.bsky.actor.SearchActorsTypeaheadResponse
 import com.contexts.cosmic.data.network.client.Response
 import com.contexts.cosmic.exceptions.NetworkError
 
-interface FeedRepository {
-    suspend fun getDefaultFeed(): Response<GetFeedResponse, NetworkError>
+interface ActorRepository {
+    suspend fun searchActorsTypeahead(
+        searchActorsTypeaheadQueryParams: SearchActorsTypeaheadQueryParams,
+    ): Response<SearchActorsTypeaheadResponse, NetworkError>
 }

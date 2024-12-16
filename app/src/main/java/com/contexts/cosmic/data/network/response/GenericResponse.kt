@@ -7,12 +7,8 @@
  * (at your option) any later version.
  */
 
-package com.contexts.cosmic.domain
+package com.contexts.cosmic.data.network.response
 
-import kotlinx.coroutines.flow.Flow
-
-interface PreferencesRepository {
-    suspend fun updateCurrentUser(did: String)
-
-    fun getCurrentUserFlow(): Flow<String>
-}
+data class GenericResponse(
+    val status: String? = null,
+)

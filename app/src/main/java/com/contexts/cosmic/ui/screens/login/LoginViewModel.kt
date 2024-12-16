@@ -12,7 +12,7 @@ package com.contexts.cosmic.ui.screens.login
 import androidx.lifecycle.ViewModel
 import com.atproto.server.CreateSessionRequest
 import com.contexts.cosmic.data.network.client.Response
-import com.contexts.cosmic.domain.AuthenticateRepository
+import com.contexts.cosmic.domain.repository.AuthenticateRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

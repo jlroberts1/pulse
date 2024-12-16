@@ -20,12 +20,6 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
-@Immutable
-data class ExtendedColorScheme(
-    val bright: ColorFamily,
-    val accent: ColorFamily,
-)
-
 private val lightScheme =
     lightColorScheme(
         primary = primaryLight,
@@ -258,114 +252,6 @@ private val highContrastDarkColorScheme =
         surfaceContainer = surfaceContainerDarkHighContrast,
         surfaceContainerHigh = surfaceContainerHighDarkHighContrast,
         surfaceContainerHighest = surfaceContainerHighestDarkHighContrast,
-    )
-
-val extendedLight =
-    ExtendedColorScheme(
-        bright =
-            ColorFamily(
-                brightLight,
-                onBrightLight,
-                brightContainerLight,
-                onBrightContainerLight,
-            ),
-        accent =
-            ColorFamily(
-                accentLight,
-                onAccentLight,
-                accentContainerLight,
-                onAccentContainerLight,
-            ),
-    )
-
-val extendedDark =
-    ExtendedColorScheme(
-        bright =
-            ColorFamily(
-                brightDark,
-                onBrightDark,
-                brightContainerDark,
-                onBrightContainerDark,
-            ),
-        accent =
-            ColorFamily(
-                accentDark,
-                onAccentDark,
-                accentContainerDark,
-                onAccentContainerDark,
-            ),
-    )
-
-val extendedLightMediumContrast =
-    ExtendedColorScheme(
-        bright =
-            ColorFamily(
-                brightLightMediumContrast,
-                onBrightLightMediumContrast,
-                brightContainerLightMediumContrast,
-                onBrightContainerLightMediumContrast,
-            ),
-        accent =
-            ColorFamily(
-                accentLightMediumContrast,
-                onAccentLightMediumContrast,
-                accentContainerLightMediumContrast,
-                onAccentContainerLightMediumContrast,
-            ),
-    )
-
-val extendedLightHighContrast =
-    ExtendedColorScheme(
-        bright =
-            ColorFamily(
-                brightLightHighContrast,
-                onBrightLightHighContrast,
-                brightContainerLightHighContrast,
-                onBrightContainerLightHighContrast,
-            ),
-        accent =
-            ColorFamily(
-                accentLightHighContrast,
-                onAccentLightHighContrast,
-                accentContainerLightHighContrast,
-                onAccentContainerLightHighContrast,
-            ),
-    )
-
-val extendedDarkMediumContrast =
-    ExtendedColorScheme(
-        bright =
-            ColorFamily(
-                brightDarkMediumContrast,
-                onBrightDarkMediumContrast,
-                brightContainerDarkMediumContrast,
-                onBrightContainerDarkMediumContrast,
-            ),
-        accent =
-            ColorFamily(
-                accentDarkMediumContrast,
-                onAccentDarkMediumContrast,
-                accentContainerDarkMediumContrast,
-                onAccentContainerDarkMediumContrast,
-            ),
-    )
-
-val extendedDarkHighContrast =
-    ExtendedColorScheme(
-        bright =
-            ColorFamily(
-                brightDarkHighContrast,
-                onBrightDarkHighContrast,
-                brightContainerDarkHighContrast,
-                onBrightContainerDarkHighContrast,
-            ),
-        accent =
-            ColorFamily(
-                accentDarkHighContrast,
-                onAccentDarkHighContrast,
-                accentContainerDarkHighContrast,
-                onAccentContainerDarkHighContrast,
-            ),
     )
 
 @Immutable

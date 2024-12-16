@@ -18,7 +18,7 @@ import com.contexts.cosmic.data.network.client.AuthInterceptor
 import com.contexts.cosmic.data.network.client.AuthManager
 import com.contexts.cosmic.data.network.client.setupContentNegotiation
 import com.contexts.cosmic.data.network.client.setupDefaultRequest
-import com.contexts.cosmic.domain.PreferencesRepository
+import com.contexts.cosmic.domain.repository.PreferencesRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import okhttp3.OkHttpClient

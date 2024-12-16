@@ -7,13 +7,15 @@
  * (at your option) any later version.
  */
 
-package com.contexts.cosmic.domain
+package com.contexts.cosmic.domain.repository
 
-import com.atproto.server.CreateSessionRequest
-import com.atproto.server.CreateSessionResponse
+import app.bsky.actor.GetProfileResponse
+import app.bsky.feed.GetAuthorFeedResponse
 import com.contexts.cosmic.data.network.client.Response
 import com.contexts.cosmic.exceptions.NetworkError
 
-interface AuthenticateRepository {
-    suspend fun createSession(createSessionRequest: CreateSessionRequest): Response<CreateSessionResponse, NetworkError>
+interface ProfileRepository {
+    suspend fun getProfile(actor: String): Response<GetProfileResponse, NetworkError>
+
+    suspend fun getProfileFeed(myDid: String): Response<GetAuthorFeedResponse, NetworkError>
 }

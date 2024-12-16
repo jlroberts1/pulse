@@ -7,14 +7,12 @@
  * (at your option) any later version.
  */
 
-package com.contexts.cosmic.data.repository
+package com.contexts.cosmic.domain.repository
 
 import app.bsky.feed.GetFeedResponse
-import com.contexts.cosmic.data.network.api.FeedAPI
 import com.contexts.cosmic.data.network.client.Response
-import com.contexts.cosmic.domain.repository.FeedRepository
 import com.contexts.cosmic.exceptions.NetworkError
 
-class FeedRepositoryImpl(private val feedAPI: FeedAPI) : FeedRepository {
-    override suspend fun getDefaultFeed(): Response<GetFeedResponse, NetworkError> = feedAPI.geDefaultFeed()
+interface FeedRepository {
+    suspend fun getDefaultFeed(): Response<GetFeedResponse, NetworkError>
 }

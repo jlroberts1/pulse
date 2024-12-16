@@ -7,13 +7,17 @@
  * (at your option) any later version.
  */
 
-package com.contexts.cosmic.domain
+package com.contexts.cosmic.domain.repository
 
-import com.contexts.cosmic.domain.model.User
+import com.contexts.cosmic.data.repository.Theme
 import kotlinx.coroutines.flow.Flow
 
-interface UserRepository {
-    suspend fun insertUser(user: User)
+interface PreferencesRepository {
+    suspend fun updateCurrentUser(did: String)
 
-    fun isLoggedIn(): Flow<Boolean>
+    fun getCurrentUserFlow(): Flow<String>
+
+    suspend fun updateTheme(theme: Theme)
+
+    fun getTheme(): Flow<Theme>
 }

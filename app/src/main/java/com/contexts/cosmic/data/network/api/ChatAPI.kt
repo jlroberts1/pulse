@@ -9,24 +9,29 @@
 
 package com.contexts.cosmic.data.network.api
 
-import com.atproto.server.CreateSessionRequest
-import com.atproto.server.CreateSessionResponse
+import chat.bsky.convo.ListConvosQueryParams
+import chat.bsky.convo.ListConvosResponse
 import com.contexts.cosmic.data.network.client.Response
 import com.contexts.cosmic.data.network.client.safeRequest
 import com.contexts.cosmic.exceptions.NetworkError
 import io.ktor.client.HttpClient
-import io.ktor.client.request.setBody
+import io.ktor.client.request.header
 import io.ktor.http.HttpMethod
+import io.ktor.http.Url
 import io.ktor.http.path
 
-class AuthenticateAPI(private val client: HttpClient) {
-    suspend fun createSession(createSessionRequest: CreateSessionRequest): Response<CreateSessionResponse, NetworkError> {
+class ChatAPI(private val client: HttpClient) {
+    suspend fun listConvos(
+        pdsUrl: String,
+        listConvosQueryParams: ListConvosQueryParams,
+    ): Response<ListConvosResponse, NetworkError> {
         return client.safeRequest {
+            header("atproto-proxy", "did:web:api.bsky.chat#bsky_chat")
             url {
-                method = HttpMethod.Post
-                path("xrpc/com.atproto.server.createSession")
+                method = HttpMethod.Get
+                host = Url(pdsUrl).host
+                path("xrpc/chat.bsky.convo.listConvos")
             }
-            setBody(createSessionRequest)
         }
     }
 }

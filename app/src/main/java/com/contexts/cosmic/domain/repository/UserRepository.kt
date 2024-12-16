@@ -7,8 +7,13 @@
  * (at your option) any later version.
  */
 
-package com.contexts.cosmic.ui.theme
+package com.contexts.cosmic.domain.repository
 
-import androidx.compose.material3.Typography
+import com.contexts.cosmic.domain.model.User
+import kotlinx.coroutines.flow.Flow
 
-val AppTypography = Typography()
+interface UserRepository {
+    suspend fun insertUser(user: User)
+
+    fun isLoggedIn(): Flow<Boolean>
+}
