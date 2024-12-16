@@ -41,4 +41,7 @@ interface UserDao {
         newAccessJwt: String,
         newRefreshJwt: String,
     )
+
+    @Query("SELECT * FROM users WHERE did = :did")
+    suspend fun getUser(did: String): UserEntity
 }

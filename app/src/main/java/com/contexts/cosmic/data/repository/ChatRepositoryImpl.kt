@@ -11,18 +11,22 @@ package com.contexts.cosmic.data.repository
 
 import chat.bsky.convo.ListConvosQueryParams
 import chat.bsky.convo.ListConvosResponse
+import com.contexts.cosmic.data.local.database.dao.UserDao
 import com.contexts.cosmic.data.network.api.ChatAPI
 import com.contexts.cosmic.data.network.client.Response
 import com.contexts.cosmic.domain.repository.ChatRepository
+import com.contexts.cosmic.domain.repository.PreferencesRepository
 import com.contexts.cosmic.exceptions.NetworkError
+import kotlinx.coroutines.flow.first
 
 class ChatRepositoryImpl(
     private val chatAPI: ChatAPI,
+    private val userDao: UserDao,
+    private val preferencesRepository: PreferencesRepository,
 ) : ChatRepository {
-    override suspend fun listConvos(
-        serviceEndpoint: String,
-        listConvosQueryParams: ListConvosQueryParams,
-    ): Response<ListConvosResponse, NetworkError> {
+    override suspend fun listConvos(listConvosQueryParams: ListConvosQueryParams): Response<ListConvosResponse, NetworkError> {
+        val current = preferencesRepository.getCurrentUserFlow().first()
+        val serviceEndpoint = userDao.getUser(current).didDoc?.service?.first()?.serviceEndpoint
         return chatAPI.listConvos(serviceEndpoint, listConvosQueryParams)
     }
 }

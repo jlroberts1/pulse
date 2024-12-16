@@ -48,7 +48,7 @@ val appModule =
 
         single<ActorRepository> { ActorRepositoryImpl(get()) }
         single<AuthenticateRepository> { AuthenticateRepositoryImpl(get(), get(), get()) }
-        single<ChatRepository> { ChatRepositoryImpl(get()) }
+        single<ChatRepository> { ChatRepositoryImpl(get(), get(), get()) }
         single<FeedRepository> { FeedRepositoryImpl(get()) }
         single<NotificationsRepository> { NotificationsRepositoryImpl(get()) }
         single<PreferencesRepository> { PreferencesRepositoryImpl(get()) }

@@ -15,8 +15,5 @@ import com.contexts.cosmic.data.network.client.Response
 import com.contexts.cosmic.exceptions.NetworkError
 
 interface ChatRepository {
-    suspend fun listConvos(
-        serviceEndpoint: String,
-        listConvosQueryParams: ListConvosQueryParams,
-    ): Response<ListConvosResponse, NetworkError>
+    suspend fun listConvos(listConvosQueryParams: ListConvosQueryParams): Response<ListConvosResponse, NetworkError>
 }
