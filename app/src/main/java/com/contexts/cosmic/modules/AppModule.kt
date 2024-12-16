@@ -52,7 +52,7 @@ val appModule =
         single<FeedRepository> { FeedRepositoryImpl(get()) }
         single<NotificationsRepository> { NotificationsRepositoryImpl(get()) }
         single<PreferencesRepository> { PreferencesRepositoryImpl(get()) }
-        single<ProfileRepository> { ProfileRepositoryImpl(get()) }
+        single<ProfileRepository> { ProfileRepositoryImpl(get(), get()) }
         single<TenorRepository> { TenorRepositoryImpl(get()) }
         single<UserRepository> { UserRepositoryImpl(get()) }
     }

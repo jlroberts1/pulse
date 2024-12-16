@@ -9,6 +9,7 @@
 
 package com.contexts.cosmic.data.network.client
 
+import android.util.Log
 import com.contexts.cosmic.data.local.database.entities.TokenPair
 import io.ktor.http.HttpHeaders
 import kotlinx.coroutines.flow.firstOrNull
@@ -66,7 +67,7 @@ class AuthInterceptor(
                         response.data.accessJwt
                     }
                     is Response.Error -> {
-                        throw IllegalStateException("Failed to refresh token, ${response.error.message}")
+                        Log.e("AuthInterceptor", "Failed to refresh token, ${response.error.message}")
                     }
                 }
             }

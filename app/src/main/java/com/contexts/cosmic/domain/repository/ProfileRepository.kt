@@ -17,5 +17,7 @@ import com.contexts.cosmic.exceptions.NetworkError
 interface ProfileRepository {
     suspend fun getProfile(actor: String): Response<GetProfileResponse, NetworkError>
 
-    suspend fun getProfileFeed(myDid: String): Response<GetAuthorFeedResponse, NetworkError>
+    suspend fun getMyProfile(): Response<GetProfileResponse, NetworkError>
+
+    suspend fun getProfileFeed(): Response<GetAuthorFeedResponse, NetworkError>
 }

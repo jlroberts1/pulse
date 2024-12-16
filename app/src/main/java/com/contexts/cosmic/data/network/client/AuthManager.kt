@@ -12,12 +12,12 @@ package com.contexts.cosmic.data.network.client
 import com.atproto.server.RefreshSessionResponse
 import com.contexts.cosmic.data.local.database.dao.UserDao
 import com.contexts.cosmic.data.local.database.entities.TokenPair
-import com.contexts.cosmic.data.network.requests.RefreshSessionRequest
 import com.contexts.cosmic.domain.repository.PreferencesRepository
 import com.contexts.cosmic.exceptions.NetworkError
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.request.setBody
+import io.ktor.client.request.header
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.path
 import kotlinx.coroutines.flow.Flow
@@ -45,7 +45,7 @@ class AuthManager(
             url {
                 method = HttpMethod.Post
                 path("xrpc/com.atproto.server.refreshSession")
-                setBody(RefreshSessionRequest(refreshToken))
+                header(HttpHeaders.Authorization, "Bearer $refreshToken")
             }
         }
     }
