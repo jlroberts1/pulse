@@ -49,6 +49,7 @@ fun EmbedView(
                 thumbnail = embed.value.thumbnail,
                 playlist = embed.value.playlist,
                 onClick = { onMediaOpen(it) },
+                aspectRatio = embed.value.aspectRatio,
                 player = player,
                 playerState = playerPoolManager.noPlayersAvailable,
             )
