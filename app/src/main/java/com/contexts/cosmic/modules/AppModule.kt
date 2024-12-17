@@ -9,6 +9,7 @@
 
 package com.contexts.cosmic.modules
 
+import androidx.media3.exoplayer.ExoPlayer
 import com.contexts.cosmic.data.network.api.ActorAPI
 import com.contexts.cosmic.data.network.api.AuthenticateAPI
 import com.contexts.cosmic.data.network.api.ChatAPI
@@ -25,6 +26,7 @@ import com.contexts.cosmic.data.repository.PreferencesRepositoryImpl
 import com.contexts.cosmic.data.repository.ProfileRepositoryImpl
 import com.contexts.cosmic.data.repository.TenorRepositoryImpl
 import com.contexts.cosmic.data.repository.UserRepositoryImpl
+import com.contexts.cosmic.domain.media.PlayerPoolManager
 import com.contexts.cosmic.domain.repository.ActorRepository
 import com.contexts.cosmic.domain.repository.AuthenticateRepository
 import com.contexts.cosmic.domain.repository.ChatRepository
@@ -38,6 +40,8 @@ import org.koin.dsl.module
 
 val appModule =
     module {
+        single<ExoPlayer> { ExoPlayer.Builder(get()).build() }
+        single<PlayerPoolManager> { PlayerPoolManager(get()) }
         single { ActorAPI(get()) }
         single { AuthenticateAPI(get()) }
         single { ChatAPI(get()) }

@@ -9,6 +9,7 @@
 
 package com.contexts.cosmic.modules
 
+import com.contexts.cosmic.ui.components.PlayerViewModel
 import com.contexts.cosmic.ui.screens.addpost.AddPostViewModel
 import com.contexts.cosmic.ui.screens.chat.ChatViewModel
 import com.contexts.cosmic.ui.screens.home.HomeViewModel
@@ -30,4 +31,5 @@ val viewModelModule =
         viewModel { NotificationViewModel(get(), get()) }
         viewModel { ProfileViewModel(get()) }
         viewModel { SettingsViewModel(get()) }
+        viewModel { PlayerViewModel(get()) }
     }

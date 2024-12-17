@@ -92,6 +92,10 @@ dependencies {
     implementation(libs.bundles.koin.common)
     implementation(libs.bundles.room.common)
 
+    implementation(libs.media3.ui)
+    implementation(libs.exoplayer)
+    implementation(libs.exoplayer.hls)
+
     testImplementation(libs.koin.test)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

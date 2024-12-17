@@ -35,15 +35,16 @@ import coil3.compose.LocalPlatformContext
 import coil3.compose.SubcomposeAsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.contexts.cosmic.ui.components.Media3PlayerView
 
 @Composable
 fun ViewMedia(
     mediaUrl: String,
     onDismiss: () -> Unit,
 ) {
-    var scale by remember { mutableStateOf(1f) }
-    var offsetX by remember { mutableStateOf(0f) }
-    var offsetY by remember { mutableStateOf(0f) }
+    var scale by remember { mutableFloatStateOf(1f) }
+    var offsetX by remember { mutableFloatStateOf(0f) }
+    var offsetY by remember { mutableFloatStateOf(0f) }
     var imageFitsScreen by remember { mutableStateOf(true) }
 
     LaunchedEffect(imageFitsScreen, scale) {
@@ -73,7 +74,7 @@ fun ViewMedia(
                 },
     ) {
         when {
-            isVideoUrl(mediaUrl) -> VideoPlayer(mediaUrl)
+            isVideoUrl(mediaUrl) -> Media3PlayerView(mediaUrl)
             else ->
                 ZoomableImage(
                     imageUrl = mediaUrl,
@@ -176,11 +177,7 @@ private fun ZoomableImage(
     )
 }
 
-@Composable
-private fun VideoPlayer(videoUrl: String) {
-}
-
 private fun isVideoUrl(url: String): Boolean {
-    val videoExtensions = listOf(".mp4", ".mov", ".avi", ".wmv", ".flv", ".mkv", ".webm")
+    val videoExtensions = listOf(".mp4", ".mov", ".avi", ".wmv", ".flv", ".mkv", ".webm", ".m3u8")
     return videoExtensions.any { url.lowercase().endsWith(it) }
 }

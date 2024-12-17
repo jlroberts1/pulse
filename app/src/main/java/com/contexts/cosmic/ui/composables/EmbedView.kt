@@ -10,12 +10,18 @@
 package com.contexts.cosmic.ui.composables
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
+import androidx.media3.common.MediaItem
 import app.bsky.feed.PostViewEmbedUnion
+import com.contexts.cosmic.domain.media.PlayerPoolManager
+import org.koin.compose.koinInject
 
 @Composable
 fun EmbedView(
     embed: PostViewEmbedUnion,
     onMediaOpen: (String) -> Unit,
+    playerPoolManager: PlayerPoolManager = koinInject(),
 ) {
     when (embed) {
         is PostViewEmbedUnion.RecordWithMediaView -> {
@@ -28,9 +34,23 @@ fun EmbedView(
         }
 
         is PostViewEmbedUnion.VideoView -> {
+            val player =
+                remember(embed.value.playlist) { playerPoolManager.getPlayer() }?.apply {
+                    setMediaItem(MediaItem.fromUri(embed.value.playlist.uri))
+                    prepare()
+                    playWhenReady = true
+                }
+            DisposableEffect(player) {
+                onDispose {
+                    player?.let { playerPoolManager.releasePlayer(it) }
+                }
+            }
             EmbedVideoView(
                 thumbnail = embed.value.thumbnail,
                 playlist = embed.value.playlist,
+                onClick = { onMediaOpen(it) },
+                player = player,
+                playerState = playerPoolManager.noPlayersAvailable,
             )
         }
 
