@@ -9,6 +9,7 @@
 
 package com.contexts.cosmic.modules
 
+import com.contexts.cosmic.ui.screens.addpost.AddPostViewModel
 import com.contexts.cosmic.ui.screens.chat.ChatViewModel
 import com.contexts.cosmic.ui.screens.home.HomeViewModel
 import com.contexts.cosmic.ui.screens.login.LoginViewModel
@@ -21,6 +22,7 @@ import org.koin.dsl.module
 
 val viewModelModule =
     module {
+        viewModel { AddPostViewModel(get(), get()) }
         viewModel { AppViewModel(get(), get()) }
         viewModel { ChatViewModel(get()) }
         viewModel { HomeViewModel(get()) }
