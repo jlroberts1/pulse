@@ -16,8 +16,10 @@ import chat.bsky.convo.ListConvosQueryParams
 import com.contexts.cosmic.data.network.client.onError
 import com.contexts.cosmic.data.network.client.onSuccess
 import com.contexts.cosmic.domain.repository.ChatRepository
+import com.contexts.cosmic.domain.repository.PreferencesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -30,6 +32,7 @@ data class ChatUiState(
 
 class ChatViewModel(
     private val chatRepository: ChatRepository,
+    private val preferencesRepository: PreferencesRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ChatUiState())
     val uiState = _uiState.asStateFlow()
@@ -45,8 +48,9 @@ class ChatViewModel(
     private fun loadConvos() {
         viewModelScope.launch {
             _uiState.update { it.copy(loading = true, error = null) }
+            val current = preferencesRepository.getCurrentUserFlow().first()
             chatRepository.listConvos(listConvosQueryParams = ListConvosQueryParams()).onSuccess { response ->
-                _uiState.update { it.copy(chats = response.convos, loading = false) }
+                _uiState.update { it.copy(chats = response.convos, userDid = current, loading = false) }
             }.onError { error ->
                 _uiState.update { it.copy(loading = false, error = error.message) }
             }

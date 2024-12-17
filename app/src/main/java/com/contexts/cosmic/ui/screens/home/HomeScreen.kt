@@ -21,7 +21,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +44,11 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsState()
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
+    val showScrollToTop by remember {
+        derivedStateOf {
+            listState.firstVisibleItemIndex > 0
+        }
+    }
     PullToRefreshBox(
         isRefreshing = uiState.loading,
         onRefresh = { viewModel.loadFeed() },
@@ -53,7 +60,7 @@ fun HomeScreen(
                     .fillMaxSize(),
             state = listState,
         ) {
-            items(uiState.feed) { item ->
+            items(uiState.feed, key = { it.post.uri.atUri }) { item ->
                 FeedItem(
                     post = item.post,
                     onReplyClick = {},
@@ -64,8 +71,6 @@ fun HomeScreen(
                 )
             }
         }
-
-        val showScrollToTop = listState.firstVisibleItemIndex > 0
         if (showScrollToTop) {
             SmallFloatingActionButton(
                 onClick = {

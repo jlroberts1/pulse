@@ -78,7 +78,7 @@ fun ProfileScreen(onMediaOpen: (String) -> Unit) {
                     }
                 }
             }
-            items(uiState.feed) { item ->
+            items(uiState.feed, key = { it.post.uri.atUri }) { item ->
                 FeedItem(
                     item.post,
                     onReplyClick = {},

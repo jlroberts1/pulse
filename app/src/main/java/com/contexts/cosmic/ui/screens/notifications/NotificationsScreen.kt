@@ -39,7 +39,7 @@ fun NotificationsScreen() {
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            items(uiState.notifications) { notification ->
+            items(uiState.notifications, key = { it.uri.atUri }) { notification ->
                 NotificationItem(notification)
             }
         }

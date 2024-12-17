@@ -39,7 +39,7 @@ fun ChatScreen() {
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            items(uiState.chats) { chat ->
+            items(uiState.chats, key = { it.id }) { chat ->
                 ChatConvoItem(
                     conversation = chat,
                     userDid = uiState.userDid,
