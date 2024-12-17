@@ -15,15 +15,17 @@ import com.contexts.cosmic.ui.screens.login.LoginViewModel
 import com.contexts.cosmic.ui.screens.main.AppViewModel
 import com.contexts.cosmic.ui.screens.notifications.NotificationViewModel
 import com.contexts.cosmic.ui.screens.profile.ProfileViewModel
+import com.contexts.cosmic.ui.screens.settings.SettingsViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val viewModelModule =
     module {
-        viewModel { AppViewModel(get()) }
+        viewModel { AppViewModel(get(), get()) }
         viewModel { ChatViewModel(get()) }
         viewModel { HomeViewModel(get()) }
         viewModel { LoginViewModel(get()) }
         viewModel { NotificationViewModel(get(), get()) }
         viewModel { ProfileViewModel(get()) }
+        viewModel { SettingsViewModel(get()) }
     }

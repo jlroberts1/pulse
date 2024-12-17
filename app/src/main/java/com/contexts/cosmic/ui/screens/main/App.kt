@@ -50,7 +50,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun App(viewModel: AppViewModel = koinViewModel()) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-
+    val theme by viewModel.theme.collectAsStateWithLifecycle()
     val scaffoldViewState by viewModel.scaffoldViewState.collectAsStateWithLifecycle()
     val showBottomBar =
         remember(navBackStackEntry) {
@@ -80,7 +80,7 @@ fun App(viewModel: AppViewModel = koinViewModel()) {
             }
         }
     }
-    AppTheme {
+    AppTheme(theme = theme) {
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {

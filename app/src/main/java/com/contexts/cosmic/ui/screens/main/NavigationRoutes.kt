@@ -25,6 +25,7 @@ import com.contexts.cosmic.ui.screens.login.LoginScreen
 import com.contexts.cosmic.ui.screens.notifications.NotificationsScreen
 import com.contexts.cosmic.ui.screens.profile.ProfileScreen
 import com.contexts.cosmic.ui.screens.search.SearchScreen
+import com.contexts.cosmic.ui.screens.settings.SettingsScreen
 
 @Composable
 fun RootNav(
@@ -167,6 +168,7 @@ fun NavGraphBuilder.authenticatedGraph(
                     showTopAppBar = true,
                 ),
             )
+            SettingsScreen()
         }
     }
 }

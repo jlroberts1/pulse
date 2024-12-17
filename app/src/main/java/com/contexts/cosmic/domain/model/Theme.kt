@@ -17,7 +17,7 @@ enum class Theme {
 
     companion object {
         fun fromString(theme: String?): Theme {
-            return theme?.let { valueOf(theme) } ?: SYSTEM
+            return theme?.uppercase()?.let { valueOf(it) } ?: SYSTEM
         }
     }
 }

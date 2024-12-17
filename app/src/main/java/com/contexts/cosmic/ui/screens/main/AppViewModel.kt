@@ -11,6 +11,8 @@ package com.contexts.cosmic.ui.screens.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.contexts.cosmic.domain.model.Theme
+import com.contexts.cosmic.domain.repository.PreferencesRepository
 import com.contexts.cosmic.domain.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,10 +20,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
-class AppViewModel(private val userRepository: UserRepository) : ViewModel() {
+class AppViewModel(
+    preferencesRepository: PreferencesRepository,
+    userRepository: UserRepository,
+) : ViewModel() {
     val isLoggedIn =
         userRepository.isLoggedIn()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), null)
+
+    val theme =
+        preferencesRepository.getTheme()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), Theme.SYSTEM)
 
     private val _scaffoldViewState = MutableStateFlow(ScaffoldViewState())
     val scaffoldViewState = _scaffoldViewState.asStateFlow()
