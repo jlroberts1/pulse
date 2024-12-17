@@ -31,6 +31,7 @@ import com.contexts.cosmic.ui.screens.settings.SettingsScreen
 fun RootNav(
     navController: NavHostController,
     controlsVisibility: Float,
+    onMediaOpen: (String) -> Unit,
     updateScaffoldViewState: (ScaffoldViewState) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -39,7 +40,7 @@ fun RootNav(
         startDestination = NavigationRoutes.Authenticated.NavigationRoute.route,
         modifier = modifier,
     ) {
-        authenticatedGraph(navController, controlsVisibility, updateScaffoldViewState)
+        authenticatedGraph(navController, controlsVisibility, onMediaOpen, updateScaffoldViewState)
         unauthenticatedGraph(navController, updateScaffoldViewState)
     }
 }
@@ -98,6 +99,7 @@ fun NavGraphBuilder.unauthenticatedGraph(
 fun NavGraphBuilder.authenticatedGraph(
     navController: NavController,
     controlsVisibility: Float,
+    onMediaOpen: (String) -> Unit,
     updateScaffoldViewState: (ScaffoldViewState) -> Unit,
 ) {
     navigation(
@@ -123,7 +125,10 @@ fun NavGraphBuilder.authenticatedGraph(
                     },
                 ),
             )
-            HomeScreen(controlsVisibility = controlsVisibility)
+            HomeScreen(
+                controlsVisibility = controlsVisibility,
+                onMediaOpen = { onMediaOpen(it) },
+            )
         }
         composable(route = NavigationRoutes.Authenticated.Search.route) {
             updateScaffoldViewState(
@@ -159,7 +164,9 @@ fun NavGraphBuilder.authenticatedGraph(
                     showTopAppBar = false,
                 ),
             )
-            ProfileScreen()
+            ProfileScreen(
+                onMediaOpen = { onMediaOpen(it) },
+            )
         }
         composable(route = NavigationRoutes.Authenticated.Settings.route) {
             updateScaffoldViewState(

@@ -10,6 +10,8 @@
 package com.contexts.cosmic.ui.screens.main
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
@@ -42,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.contexts.cosmic.ui.composables.ViewMedia
 import com.contexts.cosmic.ui.theme.AppTheme
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -62,6 +65,7 @@ fun App(viewModel: AppViewModel = koinViewModel()) {
         rememberFabScrollBehavior(
             onScroll = { delta -> viewModel.updateControlsVisibility(delta) },
         )
+    val mediaState by viewModel.mediaState.collectAsStateWithLifecycle()
     val isLoggedIn by viewModel.isLoggedIn.collectAsStateWithLifecycle()
     LaunchedEffect(isLoggedIn) {
         isLoggedIn?.let {
@@ -84,7 +88,7 @@ fun App(viewModel: AppViewModel = koinViewModel()) {
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                if (scaffoldViewState.showTopAppBar) {
+                if (scaffoldViewState.showTopAppBar && mediaState.url == null) {
                     TopBar(
                         scaffoldViewState,
                         navController,
@@ -95,7 +99,7 @@ fun App(viewModel: AppViewModel = koinViewModel()) {
             floatingActionButton = {
                 if (scaffoldViewState.showFab) {
                     AnimatedVisibility(
-                        visible = controlsVisibility == 1f,
+                        visible = controlsVisibility == 1f && mediaState.url == null,
                         enter = scaleIn(),
                         exit = scaleOut(),
                     ) {
@@ -114,7 +118,7 @@ fun App(viewModel: AppViewModel = koinViewModel()) {
             bottomBar = {
                 if (showBottomBar) {
                     AnimatedVisibility(
-                        visible = controlsVisibility == 1f,
+                        visible = controlsVisibility == 1f && mediaState.url == null,
                         enter = slideInVertically { it },
                         exit = slideOutVertically { it },
                         modifier = Modifier.fillMaxWidth(),
@@ -141,12 +145,26 @@ fun App(viewModel: AppViewModel = koinViewModel()) {
                     navController,
                     updateScaffoldViewState = { viewModel.updateScaffoldViewState(it) },
                     controlsVisibility = controlsVisibility,
+                    onMediaOpen = { viewModel.onMediaOpen(it) },
                     modifier =
                         Modifier
                             .imePadding()
                             .navigationBarsPadding()
                             .padding(newPadding),
                 )
+
+                AnimatedVisibility(
+                    visible = mediaState.url != null,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                ) {
+                    mediaState.url?.let { url ->
+                        ViewMedia(
+                            mediaUrl = url,
+                            onDismiss = { viewModel.onMediaDismissed() },
+                        )
+                    }
+                }
             }
         }
     }

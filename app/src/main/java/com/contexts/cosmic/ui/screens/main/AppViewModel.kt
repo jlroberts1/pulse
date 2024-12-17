@@ -20,6 +20,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
+data class MediaState(
+    val url: String? = null,
+)
+
 class AppViewModel(
     preferencesRepository: PreferencesRepository,
     userRepository: UserRepository,
@@ -31,6 +35,9 @@ class AppViewModel(
     val theme =
         preferencesRepository.getTheme()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), Theme.SYSTEM)
+
+    private val _mediaState = MutableStateFlow(MediaState())
+    val mediaState = _mediaState.asStateFlow()
 
     private val _scaffoldViewState = MutableStateFlow(ScaffoldViewState())
     val scaffoldViewState = _scaffoldViewState.asStateFlow()
@@ -46,6 +53,14 @@ class AppViewModel(
                 (currentVisibility + (scrollDelta / 100f)).coerceIn(0f, 1f)
             }
         }
+    }
+
+    fun onMediaOpen(url: String) {
+        _mediaState.update { it.copy(url = url) }
+    }
+
+    fun onMediaDismissed() {
+        _mediaState.update { it.copy(url = null) }
     }
 
     fun updateScaffoldViewState(newState: ScaffoldViewState) {

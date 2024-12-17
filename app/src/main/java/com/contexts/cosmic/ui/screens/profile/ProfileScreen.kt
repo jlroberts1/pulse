@@ -33,7 +33,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(onMediaOpen: (String) -> Unit) {
     val viewModel: ProfileViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
@@ -85,7 +85,7 @@ fun ProfileScreen() {
                     onRepostClick = {},
                     onLikeClick = {},
                     onMenuClick = {},
-                    onMediaOpen = {},
+                    onMediaOpen = { onMediaOpen(it) },
                 )
             }
         }

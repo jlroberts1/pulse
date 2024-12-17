@@ -34,7 +34,10 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(controlsVisibility: Float) {
+fun HomeScreen(
+    controlsVisibility: Float,
+    onMediaOpen: (String) -> Unit,
+) {
     val viewModel: HomeViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
     val listState = rememberLazyListState()
@@ -57,8 +60,7 @@ fun HomeScreen(controlsVisibility: Float) {
                     onRepostClick = {},
                     onLikeClick = {},
                     onMenuClick = {},
-                    onMediaOpen = {},
-                    // onMediaOpen = { onMediaOpen(it) },
+                    onMediaOpen = { onMediaOpen(it) },
                 )
             }
         }
