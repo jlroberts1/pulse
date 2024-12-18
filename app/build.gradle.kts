@@ -74,6 +74,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.compose.nav.suite)
     implementation(libs.androidx.navigation)
     implementation(libs.datastore.preferences)
     implementation(libs.accompanist.permissions)

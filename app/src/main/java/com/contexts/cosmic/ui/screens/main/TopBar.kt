@@ -35,7 +35,7 @@ fun TopBar(
         title = { Text(scaffoldViewState.topAppBarTitle) },
         actions = { scaffoldViewState.topBarActions() },
         navigationIcon = {
-            val topLevelRoutes = topLevelDestinations.map { it.route }
+            val topLevelRoutes = TopDestinations.entries.map { it.route }
             if (navController.previousBackStackEntry != null &&
                 !topLevelRoutes.contains(navController.currentDestination?.route)
             ) {

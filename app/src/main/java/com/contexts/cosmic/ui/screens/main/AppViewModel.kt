@@ -14,11 +14,14 @@ import androidx.lifecycle.viewModelScope
 import com.contexts.cosmic.domain.model.Theme
 import com.contexts.cosmic.domain.repository.PreferencesRepository
 import com.contexts.cosmic.domain.repository.UserRepository
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 data class MediaState(
     val url: String? = null,
@@ -28,10 +31,6 @@ class AppViewModel(
     preferencesRepository: PreferencesRepository,
     userRepository: UserRepository,
 ) : ViewModel() {
-    val isLoggedIn =
-        userRepository.isLoggedIn()
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), null)
-
     val theme =
         preferencesRepository.getTheme()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), Theme.SYSTEM)
@@ -44,6 +43,29 @@ class AppViewModel(
 
     private val _controlsVisibility = MutableStateFlow(1f)
     val controlsVisibility = _controlsVisibility.asStateFlow()
+
+    private val _navigationEvent = MutableSharedFlow<String>()
+    val navigationEvent = _navigationEvent.asSharedFlow()
+
+    private val isLoggedIn =
+        userRepository.isLoggedIn()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), null)
+
+    init {
+        viewModelScope.launch {
+            isLoggedIn.collect { isLoggedInState ->
+                isLoggedInState?.let { loggedIn ->
+                    _navigationEvent.emit(
+                        if (loggedIn) {
+                            NavigationRoutes.Authenticated.NavigationRoute.route
+                        } else {
+                            NavigationRoutes.Unauthenticated.NavigationRoute.route
+                        },
+                    )
+                }
+            }
+        }
+    }
 
     fun updateControlsVisibility(scrollDelta: Float) {
         _controlsVisibility.update { currentVisibility ->

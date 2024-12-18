@@ -29,7 +29,10 @@ fun FeedItem(
     onMediaOpen: (String) -> Unit,
 ) {
     ElevatedCard(
-        modifier = Modifier.padding(top = 8.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
     ) {
         Column(
             modifier =

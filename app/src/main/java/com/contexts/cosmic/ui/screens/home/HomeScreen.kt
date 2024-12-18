@@ -16,9 +16,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -29,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowWidthSizeClass
 import com.contexts.cosmic.ui.composables.FeedItem
 import com.contexts.cosmic.ui.composables.PullToRefreshBox
 import kotlinx.coroutines.launch
@@ -49,6 +52,9 @@ fun HomeScreen(
             listState.firstVisibleItemIndex > 0
         }
     }
+    val adaptiveInfo = currentWindowAdaptiveInfo()
+    val isExpandedScreen =
+        adaptiveInfo.windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED
     PullToRefreshBox(
         isRefreshing = uiState.loading,
         onRefresh = { viewModel.loadFeed() },
@@ -78,12 +84,13 @@ fun HomeScreen(
                         listState.animateScrollToItem(0)
                     }
                 },
+                containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
                 modifier =
                     Modifier
                         .align(Alignment.BottomStart)
-                        .padding(bottom = 72.dp, start = 16.dp)
+                        .padding(bottom = if (isExpandedScreen) 16.dp else 104.dp, start = 16.dp)
                         .graphicsLayer {
-                            translationY = 100f * (1f - controlsVisibility)
+                            if (!isExpandedScreen) translationY = 200f * (1f - controlsVisibility)
                         },
             ) {
                 Icon(
