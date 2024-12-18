@@ -10,6 +10,7 @@
 package com.contexts.cosmic.data.network.api
 
 import app.bsky.feed.GetFeedResponse
+import app.bsky.feed.GetTimelineResponse
 import com.contexts.cosmic.BuildConfig
 import com.contexts.cosmic.data.network.client.Response
 import com.contexts.cosmic.data.network.client.safeRequest
@@ -28,6 +29,20 @@ class FeedAPI(private val client: HttpClient) {
                 method = HttpMethod.Get
                 path("xrpc/app.bsky.feed.getFeed")
                 parameters.append("feed", BuildConfig.DEFAULT_FEED)
+                parameters.append("limit", limit.toString())
+                cursor?.let { parameters.append("cursor", it) }
+            }
+        }
+    }
+
+    suspend fun getTimeline(
+        limit: Int = 50,
+        cursor: String? = null,
+    ): Response<GetTimelineResponse, NetworkError> {
+        return client.safeRequest {
+            url {
+                method = HttpMethod.Get
+                path("xrpc/app.bsky.feed.getTimeline")
                 parameters.append("limit", limit.toString())
                 cursor?.let { parameters.append("cursor", it) }
             }

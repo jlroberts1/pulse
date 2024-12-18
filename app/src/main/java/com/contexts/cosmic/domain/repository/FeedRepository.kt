@@ -10,9 +10,12 @@
 package com.contexts.cosmic.domain.repository
 
 import app.bsky.feed.GetFeedResponse
+import app.bsky.feed.GetTimelineResponse
 import com.contexts.cosmic.data.network.client.Response
 import com.contexts.cosmic.exceptions.NetworkError
 
 interface FeedRepository {
     suspend fun getDefaultFeed(): Response<GetFeedResponse, NetworkError>
+
+    suspend fun getTimeline(): Response<GetTimelineResponse, NetworkError>
 }

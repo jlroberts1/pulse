@@ -20,29 +20,63 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class HomeUiState(
+data class FeedState(
     val feed: List<FeedViewPost> = emptyList(),
     val loading: Boolean = false,
     val error: String? = null,
 )
 
+sealed class FeedType(val title: String) {
+    data object Discover : FeedType("Discover")
+
+    data object Following : FeedType("Following")
+
+    companion object {
+        val entries = listOf(Discover, Following)
+    }
+}
+
 class HomeViewModel(
     private val feedRepository: FeedRepository,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(HomeUiState())
-    val uiState = _uiState.asStateFlow()
+    private val _visibleFeeds = MutableStateFlow(listOf(FeedType.Discover, FeedType.Following))
+    val visibleFeeds = _visibleFeeds.asStateFlow()
+
+    private val _availableFeeds = MutableStateFlow(FeedType.entries)
+    val availableFeeds = _availableFeeds.asStateFlow()
+    private val _followingFeed = MutableStateFlow(FeedState())
+    val followingFeed = _followingFeed.asStateFlow()
+
+    private val _discoverFeed = MutableStateFlow(FeedState())
+    val discoverFeed = _discoverFeed.asStateFlow()
 
     init {
-        loadFeed()
+        loadFeeds()
     }
 
-    fun loadFeed() {
+    fun loadFeeds() {
+        loadDiscover()
+        loadFollowing()
+    }
+
+    private fun loadDiscover() {
         viewModelScope.launch {
-            _uiState.update { it.copy(loading = true, error = null) }
+            _discoverFeed.update { it.copy(loading = true, error = null) }
             feedRepository.getDefaultFeed().onSuccess { response ->
-                _uiState.update { it.copy(feed = response.feed, loading = false) }
+                _discoverFeed.update { it.copy(feed = response.feed, loading = false) }
             }.onError { error ->
-                _uiState.update { it.copy(loading = false, error = error.message) }
+                _discoverFeed.update { it.copy(loading = false, error = error.message) }
+            }
+        }
+    }
+
+    private fun loadFollowing() {
+        viewModelScope.launch {
+            _followingFeed.update { it.copy(loading = true, error = null) }
+            feedRepository.getTimeline().onSuccess { response ->
+                _followingFeed.update { it.copy(feed = response.feed, loading = false) }
+            }.onError { error ->
+                _followingFeed.update { it.copy(loading = false, error = error.message) }
             }
         }
     }
