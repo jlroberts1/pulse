@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.core.layout.WindowWidthSizeClass
+import com.contexts.cosmic.ui.composables.FeedItem
 import com.contexts.cosmic.ui.composables.PullToRefreshBox
 import com.contexts.cosmic.ui.screens.profile.composables.Header
 import com.contexts.cosmic.ui.screens.profile.composables.ProfileInfo
@@ -40,6 +41,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ProfileScreen(onMediaOpen: (String) -> Unit) {
     val viewModel: ProfileViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val profile by viewModel.profile.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val isExpandedScreen =
@@ -66,7 +68,7 @@ fun ProfileScreen(onMediaOpen: (String) -> Unit) {
                             .padding(end = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    uiState.profile?.let { profile ->
+                    profile?.let { profile ->
                         Header(
                             profile.banner,
                             profile.avatar,
@@ -92,7 +94,15 @@ fun ProfileScreen(onMediaOpen: (String) -> Unit) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    items(uiState.feed, key = { it.post.uri.atUri }) { item ->
+                    items(uiState.feed, key = { it.postUri }) { item ->
+                        FeedItem(
+                            post = item,
+                            onMediaOpen = { onMediaOpen(it) },
+                            onRepostClick = {},
+                            onReplyClick = {},
+                            onMenuClick = {},
+                            onLikeClick = {},
+                        )
                     }
                 }
             }
@@ -110,7 +120,7 @@ fun ProfileScreen(onMediaOpen: (String) -> Unit) {
                             .weight(1f, fill = false),
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    uiState.profile?.let {
+                    profile?.let {
                         item {
                             Header(
                                 it.banner,
@@ -129,7 +139,15 @@ fun ProfileScreen(onMediaOpen: (String) -> Unit) {
                         }
                     }
 
-                    items(uiState.feed, key = { it.post.uri.atUri }) { item ->
+                    items(uiState.feed, key = { it.postUri }) { item ->
+                        FeedItem(
+                            post = item,
+                            onRepostClick = {},
+                            onReplyClick = {},
+                            onMenuClick = {},
+                            onLikeClick = {},
+                            onMediaOpen = { onMediaOpen(it) },
+                        )
                     }
                 }
             }

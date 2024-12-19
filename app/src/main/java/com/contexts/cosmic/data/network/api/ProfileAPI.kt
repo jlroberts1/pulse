@@ -34,10 +34,6 @@ class ProfileAPI(private val client: HttpClient) {
         }
     }
 
-    suspend fun getMyProfile(myDid: String): Response<GetProfileResponse, NetworkError> {
-        return getProfile(myDid)
-    }
-
     suspend fun getPreferences(): Response<GetPreferencesResponse, NetworkError> {
         return client.safeRequest {
             url {

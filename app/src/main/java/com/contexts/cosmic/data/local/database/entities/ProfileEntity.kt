@@ -13,6 +13,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import app.bsky.actor.GetProfileResponse
 
 @Entity(
     tableName = "profiles",
@@ -41,3 +42,16 @@ data class ProfileEntity(
     val followsCount: Long?,
     val postsCount: Long?,
 )
+
+fun GetProfileResponse.toProfileEntity() =
+    ProfileEntity(
+        userDid = did.did,
+        handle = handle.handle,
+        displayName = displayName,
+        banner = banner?.uri,
+        avatar = avatar?.uri,
+        description = description,
+        followersCount = followersCount,
+        followsCount = followsCount,
+        postsCount = postsCount,
+    )

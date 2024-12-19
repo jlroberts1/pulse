@@ -14,8 +14,10 @@ import app.bsky.feed.GetAuthorFeedResponse
 import com.contexts.cosmic.data.local.database.dao.ProfileDao
 import com.contexts.cosmic.data.local.database.entities.FeedEntity
 import com.contexts.cosmic.data.local.database.entities.ProfileEntity
+import com.contexts.cosmic.data.local.database.entities.toProfileEntity
 import com.contexts.cosmic.data.network.api.ProfileAPI
 import com.contexts.cosmic.data.network.client.Response
+import com.contexts.cosmic.data.network.client.onSuccess
 import com.contexts.cosmic.domain.repository.PreferencesRepository
 import com.contexts.cosmic.domain.repository.ProfileRepository
 import com.contexts.cosmic.exceptions.NetworkError
@@ -32,11 +34,13 @@ class ProfileRepositoryImpl(
     override suspend fun getProfile(actor: String): Response<GetProfileResponse, NetworkError> = profileAPI.getProfile(actor)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun getMyProfile(): Flow<ProfileEntity?> {
-        return preferencesRepository.getCurrentUserFlow().flatMapLatest {
+    override fun getMyProfile(): Flow<ProfileEntity?> =
+        preferencesRepository.getCurrentUserFlow().flatMapLatest {
+            profileAPI.getProfile(it).onSuccess { response ->
+                profileDao.insertProfile(response.toProfileEntity())
+            }
             profileDao.getProfileByDid(it)
         }
-    }
 
     override suspend fun getProfileFeed(): Response<GetAuthorFeedResponse, NetworkError> {
         val current = preferencesRepository.getCurrentUserFlow().first()
