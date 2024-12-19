@@ -20,6 +20,7 @@ import com.contexts.cosmic.data.network.api.TenorAPI
 import com.contexts.cosmic.data.repository.ActorRepositoryImpl
 import com.contexts.cosmic.data.repository.AuthenticateRepositoryImpl
 import com.contexts.cosmic.data.repository.ChatRepositoryImpl
+import com.contexts.cosmic.data.repository.FeedManager
 import com.contexts.cosmic.data.repository.FeedRepositoryImpl
 import com.contexts.cosmic.data.repository.NotificationsRepositoryImpl
 import com.contexts.cosmic.data.repository.PreferencesRepositoryImpl
@@ -49,6 +50,7 @@ val appModule =
         single { NotificationsAPI(get()) }
         single { ProfileAPI(get()) }
         single { TenorAPI() }
+        single { FeedManager(get(), get(), get(), get(), get(), get()) }
 
         single<ActorRepository> { ActorRepositoryImpl(get()) }
         single<AuthenticateRepository> { AuthenticateRepositoryImpl(get(), get(), get()) }

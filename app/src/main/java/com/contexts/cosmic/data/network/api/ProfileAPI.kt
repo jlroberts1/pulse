@@ -9,8 +9,13 @@
 
 package com.contexts.cosmic.data.network.api
 
+import app.bsky.actor.GetPreferencesResponse
 import app.bsky.actor.GetProfileResponse
+import app.bsky.actor.PreferencesUnion
+import app.bsky.actor.Type
 import app.bsky.feed.GetAuthorFeedResponse
+import app.bsky.feed.GetFeedGeneratorResponse
+import com.contexts.cosmic.data.local.database.entities.FeedEntity
 import com.contexts.cosmic.data.network.client.Response
 import com.contexts.cosmic.data.network.client.safeRequest
 import com.contexts.cosmic.exceptions.NetworkError
@@ -31,6 +36,69 @@ class ProfileAPI(private val client: HttpClient) {
 
     suspend fun getMyProfile(myDid: String): Response<GetProfileResponse, NetworkError> {
         return getProfile(myDid)
+    }
+
+    suspend fun getPreferences(): Response<GetPreferencesResponse, NetworkError> {
+        return client.safeRequest {
+            url {
+                method = HttpMethod.Get
+                path("xrpc/app.bsky.actor.getPreferences")
+            }
+        }
+    }
+
+    suspend fun getSavedFeeds(): Response<List<FeedEntity>, NetworkError> {
+        try {
+            val prefsResponse =
+                client.safeRequest<GetPreferencesResponse> {
+                    url {
+                        method = HttpMethod.Get
+                        path("xrpc/app.bsky.actor.getPreferences")
+                    }
+                }
+
+            return when (prefsResponse) {
+                is Response.Success -> {
+                    val feedEntities = mutableListOf<FeedEntity>()
+                    val savedFeeds =
+                        prefsResponse.data.preferences
+                            .filterIsInstance<PreferencesUnion.SavedFeedsPrefV2>()
+                            .map { it.value.items.filter { item -> item.type is Type.Feed } }
+                            .firstOrNull()
+
+                    savedFeeds?.forEach { savedFeed ->
+                        val detailsResponse =
+                            client.safeRequest<GetFeedGeneratorResponse> {
+                                url {
+                                    method = HttpMethod.Get
+                                    path("xrpc/app.bsky.feed.getFeedGenerator")
+                                    parameters.append("feed", savedFeed.value)
+                                }
+                            }
+
+                        when (detailsResponse) {
+                            is Response.Success -> {
+                                feedEntities.add(
+                                    FeedEntity(
+                                        id = savedFeed.id,
+                                        type = savedFeed.type.value,
+                                        uri = savedFeed.value,
+                                        pinned = savedFeed.pinned,
+                                        displayName = detailsResponse.data.view.displayName,
+                                    ),
+                                )
+                            }
+                            is Response.Error -> return Response.Error(detailsResponse.error)
+                        }
+                    }
+                    Response.Success(feedEntities)
+                }
+
+                is Response.Error -> Response.Error(prefsResponse.error)
+            }
+        } catch (e: Exception) {
+            return Response.Error(NetworkError.Unknown("Unable to get saved feeds"))
+        }
     }
 
     suspend fun getAuthorFeed(

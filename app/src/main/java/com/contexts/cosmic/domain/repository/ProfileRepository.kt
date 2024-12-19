@@ -11,6 +11,7 @@ package com.contexts.cosmic.domain.repository
 
 import app.bsky.actor.GetProfileResponse
 import app.bsky.feed.GetAuthorFeedResponse
+import com.contexts.cosmic.data.local.database.entities.FeedEntity
 import com.contexts.cosmic.data.network.client.Response
 import com.contexts.cosmic.exceptions.NetworkError
 
@@ -20,4 +21,6 @@ interface ProfileRepository {
     suspend fun getMyProfile(): Response<GetProfileResponse, NetworkError>
 
     suspend fun getProfileFeed(): Response<GetAuthorFeedResponse, NetworkError>
+
+    suspend fun getSavedFeeds(): Response<List<FeedEntity>, NetworkError>
 }

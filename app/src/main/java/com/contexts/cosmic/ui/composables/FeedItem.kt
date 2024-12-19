@@ -14,18 +14,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import app.bsky.feed.PostView
-import com.contexts.cosmic.extensions.getPostText
+import androidx.media3.common.MediaItem
+import com.contexts.cosmic.data.local.database.entities.FeedPostEntity
+import com.contexts.cosmic.domain.media.PlayerPoolManager
+import org.koin.compose.koinInject
 
 @Composable
 fun FeedItem(
-    post: PostView,
+    post: FeedPostEntity,
     onReplyClick: () -> Unit,
     onRepostClick: () -> Unit,
     onLikeClick: () -> Unit,
     onMenuClick: () -> Unit,
+    playerPoolManager: PlayerPoolManager = koinInject(),
     onMediaOpen: (String) -> Unit,
 ) {
     ElevatedCard(
@@ -41,18 +46,55 @@ fun FeedItem(
                     .padding(top = 8.dp, start = 8.dp, end = 8.dp),
         ) {
             PostHeader(
-                avatar = post.author.avatar,
-                displayName = post.author.displayName,
-                handle = post.author.handle.handle,
+                avatar = post.authorAvatar,
+                displayName = post.authorDisplayName,
+                handle = post.authorHandle,
                 indexedAt = post.indexedAt,
             )
-            PostMessageText(post.getPostText())
-            post.embed?.let {
-                EmbedView(
-                    embed = it,
+            PostMessageText(post.content)
+            post.embedExternal?.let {
+                EmbedExternalView(
+                    uri = it.external.uri,
+                    thumb = it.external.thumb,
+                    title = it.external.title,
+                    description = it.external.description,
                     onMediaOpen = { media -> onMediaOpen(media) },
                 )
             }
+
+            post.embedVideo?.let {
+                val player =
+                    remember(it.playlist) { playerPoolManager.getPlayer() }?.apply {
+                        setMediaItem(MediaItem.fromUri(it.playlist.uri))
+                        prepare()
+                        playWhenReady = true
+                    }
+                DisposableEffect(player) {
+                    onDispose {
+                        player?.let { playerPoolManager.releasePlayer(it) }
+                    }
+                }
+                EmbedVideoView(
+                    thumbnail = it.thumbnail,
+                    playlist = it.playlist,
+                    aspectRatio = it.aspectRatio,
+                    onClick = { media -> onMediaOpen(media) },
+                    player = player,
+                    playerState = playerPoolManager.noPlayersAvailable,
+                )
+            }
+
+            post.embedImages?.let {
+                EmbedImageView(images = it, onClick = { media -> onMediaOpen(media) })
+            }
+
+            post.embedRecord?.let {
+                EmbedRecordView(record = it.record)
+            }
+
+            post.embedRecordWithMedia?.let {
+            }
+
             FeedItemInteractions(
                 replyCount = post.replyCount,
                 repostCount = post.replyCount,

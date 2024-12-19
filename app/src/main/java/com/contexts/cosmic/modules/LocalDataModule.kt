@@ -11,6 +11,9 @@ package com.contexts.cosmic.modules
 
 import androidx.room.Room
 import com.contexts.cosmic.data.local.database.CosmicDatabase
+import com.contexts.cosmic.data.local.database.dao.FeedDao
+import com.contexts.cosmic.data.local.database.dao.FeedPostDao
+import com.contexts.cosmic.data.local.database.dao.RemoteKeysDao
 import com.contexts.cosmic.data.local.database.dao.UserDao
 import com.contexts.cosmic.data.local.datastore.PreferencesDataStore
 import org.koin.dsl.module
@@ -23,5 +26,8 @@ val localDataModule =
                 .fallbackToDestructiveMigration()
                 .build()
         }
+        single<RemoteKeysDao> { get<CosmicDatabase>().remoteKeysDao() }
+        single<FeedDao> { get<CosmicDatabase>().feedDao() }
+        single<FeedPostDao> { get<CosmicDatabase>().feedPostDao() }
         single<UserDao> { get<CosmicDatabase>().userDao() }
     }

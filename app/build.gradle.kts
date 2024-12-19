@@ -80,6 +80,8 @@ dependencies {
     implementation(libs.accompanist.permissions)
     implementation(libs.splashscreen.android)
     implementation(libs.okhttp.logging)
+    implementation(libs.paging.runtime)
+    implementation(libs.paging.compose)
 
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)

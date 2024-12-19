@@ -25,12 +25,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.contexts.cosmic.extensions.toRelativeTime
-import sh.christian.ozone.api.Uri
 import sh.christian.ozone.api.model.Timestamp
 
 @Composable
 fun PostHeader(
-    avatar: Uri? = null,
+    avatar: String? = null,
     displayName: String? = null,
     handle: String? = null,
     indexedAt: Timestamp? = null,
@@ -39,7 +38,7 @@ fun PostHeader(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        BorderedCircularAvatar(avatar?.uri, modifier = Modifier.padding(4.dp))
+        BorderedCircularAvatar(avatar, modifier = Modifier.padding(4.dp))
         Row(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.weight(1f),

@@ -11,6 +11,7 @@ package com.contexts.cosmic.data.repository
 
 import app.bsky.actor.GetProfileResponse
 import app.bsky.feed.GetAuthorFeedResponse
+import com.contexts.cosmic.data.local.database.entities.FeedEntity
 import com.contexts.cosmic.data.network.api.ProfileAPI
 import com.contexts.cosmic.data.network.client.Response
 import com.contexts.cosmic.domain.repository.PreferencesRepository
@@ -32,5 +33,9 @@ class ProfileRepositoryImpl(
     override suspend fun getProfileFeed(): Response<GetAuthorFeedResponse, NetworkError> {
         val current = preferencesRepository.getCurrentUserFlow().first()
         return profileAPI.getAuthorFeed(current)
+    }
+
+    override suspend fun getSavedFeeds(): Response<List<FeedEntity>, NetworkError> {
+        return profileAPI.getSavedFeeds()
     }
 }

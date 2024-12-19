@@ -29,18 +29,16 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -50,9 +48,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.PagingData
+import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.window.core.layout.WindowWidthSizeClass
+import com.contexts.cosmic.data.local.database.entities.FeedEntity
+import com.contexts.cosmic.data.local.database.entities.FeedPostEntity
 import com.contexts.cosmic.ui.composables.FeedItem
-import com.contexts.cosmic.ui.composables.PullToRefreshBox
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -63,46 +65,41 @@ fun HomeScreen(
 ) {
     val viewModel: HomeViewModel = koinViewModel()
     val visibleFeeds by viewModel.visibleFeeds.collectAsStateWithLifecycle()
-    val availableFeeds by viewModel.availableFeeds.collectAsStateWithLifecycle()
-    val discoverFeed by viewModel.discoverFeed.collectAsStateWithLifecycle()
-    val followingFeed by viewModel.followingFeed.collectAsStateWithLifecycle()
+    val allFeeds by viewModel.allFeeds.collectAsStateWithLifecycle()
+    val feedStates by viewModel.feedStates.collectAsStateWithLifecycle()
     val adaptiveInfo = currentWindowAdaptiveInfo()
-    var selectedFeedIndex by remember { mutableIntStateOf(0) }
     val isExpandedScreen =
         adaptiveInfo.windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED
     Column(
         modifier = Modifier.fillMaxSize(),
     ) {
         if (isExpandedScreen) {
-            TabRow(
+            if (feedStates.isEmpty()) return
+            ScrollableTabRow(
                 selectedTabIndex = -1,
                 modifier = Modifier.fillMaxWidth(),
                 indicator = @Composable { _ -> },
                 divider = @Composable { },
             ) {
-                visibleFeeds.take(4).forEachIndexed { index, feedType ->
+                visibleFeeds.forEachIndexed { index, feedType ->
                     Tab(
                         selected = true,
-                        onClick = { selectedFeedIndex = index },
-                        text = { Text(text = feedType.title) },
+                        onClick = { },
+                        text = { Text(feedType.displayName) },
                         modifier = Modifier.weight(1f),
                     )
                 }
             }
             TabletRow(
-                feeds = availableFeeds,
-                discoverFeed = discoverFeed,
-                followingFeed = followingFeed,
-                onRefresh = { viewModel.loadFeeds() },
+                feeds = visibleFeeds,
+                feedStates = feedStates,
                 onMediaOpen = { onMediaOpen(it) },
                 controlsVisibility,
             )
         } else {
             TabPagerFeeds(
                 feeds = visibleFeeds,
-                discoverFeed = discoverFeed,
-                followingFeed = followingFeed,
-                onRefresh = { viewModel.loadFeeds() },
+                feedStates = feedStates,
                 onMediaOpen = { onMediaOpen(it) },
                 controlsVisibility = controlsVisibility,
             )
@@ -123,10 +120,10 @@ fun HomeScreen(
 
 @Composable
 fun FeedConfigurationDialog(
-    visibleFeeds: List<FeedType>,
-    availableFeeds: List<FeedType>,
+    visibleFeeds: List<FeedEntity>,
+    availableFeeds: List<FeedEntity>,
     onDismiss: () -> Unit,
-    onSaveConfiguration: (List<FeedType>) -> Unit,
+    onSaveConfiguration: (List<FeedEntity>) -> Unit,
 ) {
     var selectedFeeds by remember { mutableStateOf(visibleFeeds) }
 
@@ -154,7 +151,7 @@ fun FeedConfigurationDialog(
                                     }
                             },
                         )
-                        Text(feed.title)
+                        Text(feed.displayName)
                         Icon(
                             Icons.Default.DragIndicator,
                             contentDescription = "Drag to reorder",
@@ -182,10 +179,8 @@ fun FeedConfigurationDialog(
 
 @Composable
 fun TabletRow(
-    feeds: List<FeedType>,
-    discoverFeed: FeedState,
-    followingFeed: FeedState,
-    onRefresh: () -> Unit,
+    feeds: List<FeedEntity>,
+    feedStates: Map<String, Flow<PagingData<FeedPostEntity>>>,
     onMediaOpen: (String) -> Unit,
     controlsVisibility: Float,
 ) {
@@ -196,29 +191,19 @@ fun TabletRow(
                 .padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        feeds.take(4).forEach { feedType ->
+        feeds.forEach { feed ->
             Box(
                 modifier =
                     Modifier
                         .weight(1f)
                         .fillMaxHeight(),
             ) {
-                when (feedType) {
-                    is FeedType.Discover ->
-                        FeedContent(
-                            discoverFeed,
-                            onRefresh = { onRefresh() },
-                            onMediaOpen = { onMediaOpen(it) },
-                            controlsVisibility = controlsVisibility,
-                        )
-
-                    is FeedType.Following ->
-                        FeedContent(
-                            followingFeed,
-                            onRefresh = { onRefresh() },
-                            onMediaOpen = { onMediaOpen(it) },
-                            controlsVisibility = controlsVisibility,
-                        )
+                feedStates[feed.id]?.let { pagingFlow ->
+                    FeedContent(
+                        pagingFlow = pagingFlow,
+                        onMediaOpen = onMediaOpen,
+                        controlsVisibility = controlsVisibility,
+                    )
                 }
             }
         }
@@ -227,28 +212,27 @@ fun TabletRow(
 
 @Composable
 fun TabPagerFeeds(
-    feeds: List<FeedType>,
-    discoverFeed: FeedState,
-    followingFeed: FeedState,
-    onRefresh: () -> Unit,
+    feeds: List<FeedEntity>,
+    feedStates: Map<String, Flow<PagingData<FeedPostEntity>>>,
     onMediaOpen: (String) -> Unit,
     controlsVisibility: Float,
 ) {
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState { feeds.size }
-    TabRow(
+    if (feeds.isEmpty()) return
+    ScrollableTabRow(
         selectedTabIndex = pagerState.currentPage,
-        modifier =
-            Modifier
-                .fillMaxWidth(),
+        edgePadding = 16.dp,
     ) {
-        feeds.forEachIndexed { index, feedType ->
+        feeds.forEachIndexed { index, feed ->
             Tab(
                 selected = pagerState.currentPage == index,
                 onClick = {
                     scope.launch { pagerState.animateScrollToPage(index) }
                 },
-                text = { Text(feedType.title) },
+                text = {
+                    Text(feed.displayName)
+                },
             )
         }
     }
@@ -263,32 +247,21 @@ fun TabPagerFeeds(
                     .widthIn(max = 840.dp)
                     .fillMaxSize(),
         ) { page ->
-            when (feeds[page]) {
-                FeedType.Discover ->
-                    FeedContent(
-                        feedState = discoverFeed,
-                        onRefresh = { onRefresh() },
-                        onMediaOpen = { onMediaOpen(it) },
-                        controlsVisibility = controlsVisibility,
-                    )
-
-                FeedType.Following ->
-                    FeedContent(
-                        feedState = followingFeed,
-                        onRefresh = { onRefresh() },
-                        onMediaOpen = { onMediaOpen(it) },
-                        controlsVisibility = controlsVisibility,
-                    )
+            val feed = feeds[page]
+            feedStates[feed.id]?.let { pagingFlow ->
+                FeedContent(
+                    pagingFlow = pagingFlow,
+                    onMediaOpen = { onMediaOpen(it) },
+                    controlsVisibility = controlsVisibility,
+                )
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FeedContent(
-    feedState: FeedState,
-    onRefresh: () -> Unit,
+    pagingFlow: Flow<PagingData<FeedPostEntity>>,
     onMediaOpen: (String) -> Unit,
     controlsVisibility: Float,
 ) {
@@ -302,10 +275,9 @@ private fun FeedContent(
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val isExpandedScreen =
         adaptiveInfo.windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED
-    PullToRefreshBox(
-        isRefreshing = feedState.loading,
-        onRefresh = onRefresh,
-    ) {
+
+    val posts = pagingFlow.collectAsLazyPagingItems()
+    Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             modifier =
                 Modifier
@@ -313,15 +285,20 @@ private fun FeedContent(
                     .fillMaxSize(),
             state = listState,
         ) {
-            items(feedState.feed, key = { it.post.uri.atUri }) { item ->
-                FeedItem(
-                    post = item.post,
-                    onReplyClick = {},
-                    onRepostClick = {},
-                    onLikeClick = {},
-                    onMenuClick = {},
-                    onMediaOpen = { onMediaOpen(it) },
-                )
+            items(
+                count = posts.itemCount,
+                key = { index -> posts[index]?.postUri ?: index },
+            ) { item ->
+                posts[item]?.let {
+                    FeedItem(
+                        post = it,
+                        onReplyClick = {},
+                        onRepostClick = {},
+                        onLikeClick = {},
+                        onMenuClick = {},
+                        onMediaOpen = { onMediaOpen(it) },
+                    )
+                }
             }
         }
         if (showScrollToTop) {

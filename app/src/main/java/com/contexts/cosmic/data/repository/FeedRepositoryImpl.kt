@@ -10,14 +10,14 @@
 package com.contexts.cosmic.data.repository
 
 import app.bsky.feed.GetFeedResponse
-import app.bsky.feed.GetTimelineResponse
 import com.contexts.cosmic.data.network.api.FeedAPI
 import com.contexts.cosmic.data.network.client.Response
 import com.contexts.cosmic.domain.repository.FeedRepository
 import com.contexts.cosmic.exceptions.NetworkError
 
 class FeedRepositoryImpl(private val feedAPI: FeedAPI) : FeedRepository {
-    override suspend fun getDefaultFeed(): Response<GetFeedResponse, NetworkError> = feedAPI.geDefaultFeed()
-
-    override suspend fun getTimeline(): Response<GetTimelineResponse, NetworkError> = feedAPI.getTimeline()
+    override suspend fun getFeed(
+        feedUri: String,
+        cursor: String?,
+    ): Response<GetFeedResponse, NetworkError> = feedAPI.getFeed(feedUri = feedUri, cursor = cursor)
 }

@@ -48,4 +48,20 @@ class FeedAPI(private val client: HttpClient) {
             }
         }
     }
+
+    suspend fun getFeed(
+        feedUri: String,
+        limit: Int = 15,
+        cursor: String? = null,
+    ): Response<GetFeedResponse, NetworkError> {
+        return client.safeRequest {
+            url {
+                method = HttpMethod.Get
+                path("xrpc/app.bsky.feed.getFeed")
+                parameters.append("feed", feedUri)
+                parameters.append("limit", limit.toString())
+                cursor?.let { parameters.append("cursor", it) }
+            }
+        }
+    }
 }

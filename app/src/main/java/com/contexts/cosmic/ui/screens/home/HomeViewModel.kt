@@ -11,72 +11,48 @@ package com.contexts.cosmic.ui.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import app.bsky.feed.FeedViewPost
-import com.contexts.cosmic.data.network.client.onError
-import com.contexts.cosmic.data.network.client.onSuccess
-import com.contexts.cosmic.domain.repository.FeedRepository
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import com.contexts.cosmic.data.local.database.entities.FeedPostEntity
+import com.contexts.cosmic.data.repository.FeedManager
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class FeedState(
-    val feed: List<FeedViewPost> = emptyList(),
-    val loading: Boolean = false,
-    val error: String? = null,
-)
-
-sealed class FeedType(val title: String) {
-    data object Discover : FeedType("Discover")
-
-    data object Following : FeedType("Following")
-
-    companion object {
-        val entries = listOf(Discover, Following)
-    }
-}
-
 class HomeViewModel(
-    private val feedRepository: FeedRepository,
+    private val feedManager: FeedManager,
 ) : ViewModel() {
-    private val _visibleFeeds = MutableStateFlow(listOf(FeedType.Discover, FeedType.Following))
-    val visibleFeeds = _visibleFeeds.asStateFlow()
+    val visibleFeeds =
+        feedManager.availableFeeds
+            .map { feeds -> feeds.filter { it.pinned } }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
 
-    private val _availableFeeds = MutableStateFlow(FeedType.entries)
-    val availableFeeds = _availableFeeds.asStateFlow()
-    private val _followingFeed = MutableStateFlow(FeedState())
-    val followingFeed = _followingFeed.asStateFlow()
+    val allFeeds =
+        feedManager.availableFeeds
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
 
-    private val _discoverFeed = MutableStateFlow(FeedState())
-    val discoverFeed = _discoverFeed.asStateFlow()
+    private val _feedStates =
+        MutableStateFlow<Map<String, Flow<PagingData<FeedPostEntity>>>>(emptyMap())
+    val feedStates = _feedStates.asStateFlow()
 
     init {
-        loadFeeds()
-    }
-
-    fun loadFeeds() {
-        loadDiscover()
-        loadFollowing()
-    }
-
-    private fun loadDiscover() {
         viewModelScope.launch {
-            _discoverFeed.update { it.copy(loading = true, error = null) }
-            feedRepository.getDefaultFeed().onSuccess { response ->
-                _discoverFeed.update { it.copy(feed = response.feed, loading = false) }
-            }.onError { error ->
-                _discoverFeed.update { it.copy(loading = false, error = error.message) }
-            }
-        }
-    }
-
-    private fun loadFollowing() {
-        viewModelScope.launch {
-            _followingFeed.update { it.copy(loading = true, error = null) }
-            feedRepository.getTimeline().onSuccess { response ->
-                _followingFeed.update { it.copy(feed = response.feed, loading = false) }
-            }.onError { error ->
-                _followingFeed.update { it.copy(loading = false, error = error.message) }
+            visibleFeeds.collect { feeds ->
+                _feedStates.update { current ->
+                    feeds.associate { feed ->
+                        feed.id to (
+                            current[feed.id] ?: feedManager.getFeedPagingFlow(
+                                feed.id,
+                                feed.uri,
+                            ).cachedIn(viewModelScope)
+                        )
+                    }
+                }
             }
         }
     }

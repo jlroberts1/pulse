@@ -30,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.core.layout.WindowWidthSizeClass
-import com.contexts.cosmic.ui.composables.FeedItem
 import com.contexts.cosmic.ui.composables.PullToRefreshBox
 import com.contexts.cosmic.ui.screens.profile.composables.Header
 import com.contexts.cosmic.ui.screens.profile.composables.ProfileInfo
@@ -94,14 +93,6 @@ fun ProfileScreen(onMediaOpen: (String) -> Unit) {
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     items(uiState.feed, key = { it.post.uri.atUri }) { item ->
-                        FeedItem(
-                            item.post,
-                            onReplyClick = {},
-                            onRepostClick = {},
-                            onLikeClick = {},
-                            onMenuClick = {},
-                            onMediaOpen = { onMediaOpen(it) },
-                        )
                     }
                 }
             }
@@ -139,14 +130,6 @@ fun ProfileScreen(onMediaOpen: (String) -> Unit) {
                     }
 
                     items(uiState.feed, key = { it.post.uri.atUri }) { item ->
-                        FeedItem(
-                            item.post,
-                            onReplyClick = {},
-                            onRepostClick = {},
-                            onLikeClick = {},
-                            onMenuClick = {},
-                            onMediaOpen = { onMediaOpen(it) },
-                        )
                     }
                 }
             }
