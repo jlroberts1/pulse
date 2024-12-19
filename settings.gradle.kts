@@ -32,5 +32,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Cosmic"
+rootProject.name = "Pulse"
 include(":app")

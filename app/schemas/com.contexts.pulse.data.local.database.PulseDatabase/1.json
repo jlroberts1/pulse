@@ -1,0 +1,470 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "377ad295bc0b167546450e371aa2308f",
+    "entities": [
+      {
+        "tableName": "users",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`did` TEXT NOT NULL, `handle` TEXT NOT NULL, `email` TEXT, `accessJwt` TEXT NOT NULL, `refreshJwt` TEXT NOT NULL, `context` TEXT, `id` TEXT, `alsoKnownAs` TEXT, `verificationMethod` TEXT, `service` TEXT, PRIMARY KEY(`did`))",
+        "fields": [
+          {
+            "fieldPath": "did",
+            "columnName": "did",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "handle",
+            "columnName": "handle",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "email",
+            "columnName": "email",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "accessJwt",
+            "columnName": "accessJwt",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "refreshJwt",
+            "columnName": "refreshJwt",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "didDoc.context",
+            "columnName": "context",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "didDoc.id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "didDoc.alsoKnownAs",
+            "columnName": "alsoKnownAs",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "didDoc.verificationMethod",
+            "columnName": "verificationMethod",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "didDoc.service",
+            "columnName": "service",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "did"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_users_did",
+            "unique": true,
+            "columnNames": [
+              "did"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_users_did` ON `${TABLE_NAME}` (`did`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "feeds",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `userDid` TEXT NOT NULL, `uri` TEXT NOT NULL, `type` TEXT NOT NULL, `pinned` INTEGER NOT NULL, `displayName` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`userDid`) REFERENCES `users`(`did`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userDid",
+            "columnName": "userDid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uri",
+            "columnName": "uri",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pinned",
+            "columnName": "pinned",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayName",
+            "columnName": "displayName",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_feeds_userDid",
+            "unique": true,
+            "columnNames": [
+              "userDid"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_feeds_userDid` ON `${TABLE_NAME}` (`userDid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "users",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "userDid"
+            ],
+            "referencedColumns": [
+              "did"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "feed_posts",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`postUri` TEXT NOT NULL, `feedId` TEXT NOT NULL, `authorDid` TEXT NOT NULL, `authorHandle` TEXT NOT NULL, `authorDisplayName` TEXT, `authorAvatar` TEXT, `content` TEXT NOT NULL, `indexedAt` INTEGER NOT NULL, `embedType` TEXT, `embedImages` TEXT, `embedExternal` TEXT, `embedVideo` TEXT, `embedRecord` TEXT, `embedRecordWithMedia` TEXT, `isLiked` INTEGER NOT NULL, `isReposted` INTEGER NOT NULL, `replyCount` INTEGER NOT NULL, `repostCount` INTEGER NOT NULL, `likeCount` INTEGER NOT NULL, `replyParentUri` TEXT, `replyRootUri` TEXT, `reasonType` TEXT, `reasonActorDid` TEXT, PRIMARY KEY(`postUri`))",
+        "fields": [
+          {
+            "fieldPath": "postUri",
+            "columnName": "postUri",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "feedId",
+            "columnName": "feedId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "authorDid",
+            "columnName": "authorDid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "authorHandle",
+            "columnName": "authorHandle",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "authorDisplayName",
+            "columnName": "authorDisplayName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "authorAvatar",
+            "columnName": "authorAvatar",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "content",
+            "columnName": "content",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "indexedAt",
+            "columnName": "indexedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "embedType",
+            "columnName": "embedType",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "embedImages",
+            "columnName": "embedImages",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "embedExternal",
+            "columnName": "embedExternal",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "embedVideo",
+            "columnName": "embedVideo",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "embedRecord",
+            "columnName": "embedRecord",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "embedRecordWithMedia",
+            "columnName": "embedRecordWithMedia",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isLiked",
+            "columnName": "isLiked",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isReposted",
+            "columnName": "isReposted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "replyCount",
+            "columnName": "replyCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "repostCount",
+            "columnName": "repostCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "likeCount",
+            "columnName": "likeCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "replyParentUri",
+            "columnName": "replyParentUri",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "replyRootUri",
+            "columnName": "replyRootUri",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "reasonType",
+            "columnName": "reasonType",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "reasonActorDid",
+            "columnName": "reasonActorDid",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "postUri"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_feed_posts_feedId",
+            "unique": false,
+            "columnNames": [
+              "feedId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_feed_posts_feedId` ON `${TABLE_NAME}` (`feedId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "remote_keys",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`feedId` TEXT NOT NULL, `prevKey` TEXT, `nextKey` TEXT, PRIMARY KEY(`feedId`))",
+        "fields": [
+          {
+            "fieldPath": "feedId",
+            "columnName": "feedId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "prevKey",
+            "columnName": "prevKey",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "nextKey",
+            "columnName": "nextKey",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "feedId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_remote_keys_feedId",
+            "unique": false,
+            "columnNames": [
+              "feedId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_remote_keys_feedId` ON `${TABLE_NAME}` (`feedId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "profiles",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userDid` TEXT NOT NULL, `handle` TEXT NOT NULL, `displayName` TEXT, `banner` TEXT, `avatar` TEXT, `description` TEXT, `followersCount` INTEGER, `followsCount` INTEGER, `postsCount` INTEGER, FOREIGN KEY(`userDid`) REFERENCES `users`(`did`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userDid",
+            "columnName": "userDid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "handle",
+            "columnName": "handle",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayName",
+            "columnName": "displayName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "banner",
+            "columnName": "banner",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "avatar",
+            "columnName": "avatar",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "followersCount",
+            "columnName": "followersCount",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "followsCount",
+            "columnName": "followsCount",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "postsCount",
+            "columnName": "postsCount",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_profiles_userDid",
+            "unique": true,
+            "columnNames": [
+              "userDid"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_profiles_userDid` ON `${TABLE_NAME}` (`userDid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "users",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "userDid"
+            ],
+            "referencedColumns": [
+              "did"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '377ad295bc0b167546450e371aa2308f')"
+    ]
+  }
+}

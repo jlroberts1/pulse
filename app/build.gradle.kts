@@ -20,19 +20,17 @@ plugins {
 }
 
 android {
-    namespace = "com.contexts.cosmic"
+    namespace = "com.contexts.pulse"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.contexts.cosmic"
+        applicationId = "com.contexts.pulse"
         minSdk = 31
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        buildConfigField("String", "DEFAULT_FEED", "\"at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.generator/whats-hot\"")
         buildConfigField("String", "TENOR_API_KEY", getLocalProperty("TENOR_API_KEY") ?: "no_tenor_key")
     }
     packaging {
@@ -82,6 +80,7 @@ dependencies {
     implementation(libs.okhttp.logging)
     implementation(libs.paging.runtime)
     implementation(libs.paging.compose)
+    implementation(libs.autofill)
 
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
@@ -126,7 +125,7 @@ tasks.withType<com.google.devtools.ksp.gradle.KspTaskJvm> {
 }
 
 lexicons {
-    namespace.set("com.contexts.cosmic")
+    namespace.set("com.contexts.pulse")
     outputDirectory.set(project.layout.buildDirectory.dir("out"))
 }
 

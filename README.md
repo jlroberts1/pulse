@@ -1,9 +1,9 @@
-# Cosmic
+# Pulse
 
 ![play_store_feature_graphic](https://github.com/user-attachments/assets/dbba0a69-383b-4e44-921f-35e418a7fe2e)
 
 
-Cosmic is an open-source Android client for Bluesky, built with modern Android development practices and a focus on user experience.
+Pulse is an open-source Android client for Bluesky, built with modern Android development practices and a focus on user experience.
 
 ## Features
 
@@ -43,7 +43,7 @@ Cosmic is an open-source Android client for Bluesky, built with modern Android d
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/cosmic.git
+git clone https://github.com/yourusername/pulse.git
 ```
 
 2. Open the project in Android Studio
@@ -85,7 +85,7 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 
 ## Contact
 
-Project Link: [https://github.com/jlroberts1/Cosmic](https://github.com/jlroberts1/Cosmic)
+Project Link: [https://github.com/jlroberts1/pulse](https://github.com/jlroberts1/pulse)
 
 ## Disclaimer
 
