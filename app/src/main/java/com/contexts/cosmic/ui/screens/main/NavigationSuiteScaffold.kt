@@ -131,7 +131,12 @@ fun NavigationScaffold(
                             NavigationBarItem(
                                 icon = {
                                     Icon(
-                                        it.icon,
+                                        imageVector =
+                                            if (currentRoute == it.route) {
+                                                it.selectedIcon
+                                            } else {
+                                                it.unselectedIcon
+                                            },
                                         contentDescription = it.contentDescription,
                                     )
                                 },
@@ -167,7 +172,12 @@ fun NavigationScaffold(
                             NavigationRailItem(
                                 icon = {
                                     Icon(
-                                        it.icon,
+                                        imageVector =
+                                            if (currentRoute == it.route) {
+                                                it.selectedIcon
+                                            } else {
+                                                it.unselectedIcon
+                                            },
                                         contentDescription = it.contentDescription,
                                     )
                                 },
