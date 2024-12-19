@@ -43,19 +43,19 @@ class FeedManager(
         feedDao.insertFeed(feed)
     }
 
-    private suspend fun fetchAndRegisterAvailableFeeds(): Response<List<FeedEntity>, NetworkError> {
-        return profileRepository.getSavedFeeds().onSuccess { response ->
+    private suspend fun fetchAndRegisterAvailableFeeds(did: String): Response<List<FeedEntity>, NetworkError> {
+        return profileRepository.getSavedFeeds(did).onSuccess { response ->
             response.forEach { feed ->
                 registerFeed(feed)
             }
         }
     }
 
-    val availableFeeds: Flow<List<FeedEntity>> =
+    fun getAvailableFeeds(did: String): Flow<List<FeedEntity>> =
         flow {
-            emit(feedDao.getAllFeeds())
+            emit(feedDao.getFeedsForUser(did))
 
-            fetchAndRegisterAvailableFeeds().onSuccess { feeds ->
+            fetchAndRegisterAvailableFeeds(did).onSuccess { feeds ->
                 emit(feeds)
             }
         }.distinctUntilChanged()

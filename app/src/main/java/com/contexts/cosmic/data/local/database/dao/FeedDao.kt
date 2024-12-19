@@ -20,6 +20,6 @@ interface FeedDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFeed(feedEntity: FeedEntity)
 
-    @Query("SELECT * FROM feeds ORDER BY id ASC")
-    suspend fun getAllFeeds(): List<FeedEntity>
+    @Query("SELECT * FROM feeds WHERE userDid = :did ORDER BY id ASC")
+    suspend fun getFeedsForUser(did: String): List<FeedEntity>
 }

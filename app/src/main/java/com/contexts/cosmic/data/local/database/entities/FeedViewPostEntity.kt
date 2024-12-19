@@ -62,10 +62,6 @@ data class FeedPostEntity(
             feedId: String,
         ): FeedPostEntity {
             val embed = feedViewPost.post.embed
-
-            Log.d("FeedEntity", "Mapping post for feed: $feedId")
-            Log.d("FeedEntity", "Post: ${feedViewPost.post.uri}")
-
             try {
                 return FeedPostEntity(
                     postUri = feedViewPost.post.uri.atUri,

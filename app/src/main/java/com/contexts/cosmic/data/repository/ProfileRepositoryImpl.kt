@@ -43,8 +43,8 @@ class ProfileRepositoryImpl(
         return profileAPI.getAuthorFeed(current)
     }
 
-    override suspend fun getSavedFeeds(): Response<List<FeedEntity>, NetworkError> {
-        return profileAPI.getSavedFeeds()
+    override suspend fun getSavedFeeds(did: String): Response<List<FeedEntity>, NetworkError> {
+        return profileAPI.getSavedFeeds(did)
     }
 
     override suspend fun insertProfile(profile: ProfileEntity) {

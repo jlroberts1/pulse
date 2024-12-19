@@ -24,7 +24,7 @@ interface ProfileRepository {
 
     suspend fun getProfileFeed(): Response<GetAuthorFeedResponse, NetworkError>
 
-    suspend fun getSavedFeeds(): Response<List<FeedEntity>, NetworkError>
+    suspend fun getSavedFeeds(did: String): Response<List<FeedEntity>, NetworkError>
 
     suspend fun insertProfile(profile: ProfileEntity)
 }

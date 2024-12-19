@@ -26,7 +26,7 @@ val viewModelModule =
         viewModel { AddPostViewModel(get(), get()) }
         viewModel { AppViewModel(get(), get(), get()) }
         viewModel { ChatViewModel(get(), get()) }
-        viewModel { HomeViewModel(get()) }
+        viewModel { HomeViewModel(get(), get()) }
         viewModel { LoginViewModel(get()) }
         viewModel { NotificationViewModel(get(), get()) }
         viewModel { ProfileViewModel(get()) }

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "4b10e4ca9f16796697a5b41f476d3650",
+    "identityHash": "377ad295bc0b167546450e371aa2308f",
     "entities": [
       {
         "tableName": "users",
@@ -90,11 +90,17 @@
       },
       {
         "tableName": "feeds",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `uri` TEXT NOT NULL, `type` TEXT NOT NULL, `pinned` INTEGER NOT NULL, `displayName` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `userDid` TEXT NOT NULL, `uri` TEXT NOT NULL, `type` TEXT NOT NULL, `pinned` INTEGER NOT NULL, `displayName` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`userDid`) REFERENCES `users`(`did`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userDid",
+            "columnName": "userDid",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -129,8 +135,30 @@
             "id"
           ]
         },
-        "indices": [],
-        "foreignKeys": []
+        "indices": [
+          {
+            "name": "index_feeds_userDid",
+            "unique": true,
+            "columnNames": [
+              "userDid"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_feeds_userDid` ON `${TABLE_NAME}` (`userDid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "users",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "userDid"
+            ],
+            "referencedColumns": [
+              "did"
+            ]
+          }
+        ]
       },
       {
         "tableName": "feed_posts",
@@ -436,7 +464,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4b10e4ca9f16796697a5b41f476d3650')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '377ad295bc0b167546450e371aa2308f')"
     ]
   }
 }

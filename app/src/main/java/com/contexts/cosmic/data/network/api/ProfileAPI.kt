@@ -47,7 +47,7 @@ class ProfileAPI(private val client: HttpClient) {
         }
     }
 
-    suspend fun getSavedFeeds(): Response<List<FeedEntity>, NetworkError> {
+    suspend fun getSavedFeeds(did: String): Response<List<FeedEntity>, NetworkError> {
         try {
             val prefsResponse =
                 client.safeRequest<GetPreferencesResponse> {
@@ -81,6 +81,7 @@ class ProfileAPI(private val client: HttpClient) {
                                 feedEntities.add(
                                     FeedEntity(
                                         id = savedFeed.id,
+                                        userDid = did,
                                         type = savedFeed.type.value,
                                         uri = savedFeed.value,
                                         pinned = savedFeed.pinned,

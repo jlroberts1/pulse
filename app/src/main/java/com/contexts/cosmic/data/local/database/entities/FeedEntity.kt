@@ -10,12 +10,28 @@
 package com.contexts.cosmic.data.local.database.entities
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "feeds")
+@Entity(
+    tableName = "feeds",
+    foreignKeys = [
+        ForeignKey(
+            entity = UserEntity::class,
+            parentColumns = ["did"],
+            childColumns = ["userDid"],
+            onDelete = ForeignKey.CASCADE,
+        ),
+    ],
+    indices = [
+        Index(value = ["userDid"], unique = true),
+    ],
+)
 data class FeedEntity(
     @PrimaryKey
     val id: String,
+    val userDid: String,
     val uri: String,
     val type: String,
     val pinned: Boolean,
