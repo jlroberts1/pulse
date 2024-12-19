@@ -71,7 +71,7 @@ fun ProfileScreen(onMediaOpen: (String) -> Unit) {
                             profile.banner,
                             profile.avatar,
                             profile.displayName,
-                            profile.handle.handle,
+                            profile.handle,
                         )
                         ProfileInfo(
                             profile.description,
@@ -116,7 +116,7 @@ fun ProfileScreen(onMediaOpen: (String) -> Unit) {
                                 it.banner,
                                 it.avatar,
                                 it.displayName,
-                                it.handle.handle,
+                                it.handle,
                             )
                         }
                         item {

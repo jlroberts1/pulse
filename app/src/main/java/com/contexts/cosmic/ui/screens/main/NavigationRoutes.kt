@@ -19,8 +19,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.contexts.cosmic.ui.screens.addpost.AddPostScreen
 import com.contexts.cosmic.ui.screens.chat.ChatScreen
-import com.contexts.cosmic.ui.screens.home.HomeOverflowMenu
-import com.contexts.cosmic.ui.screens.home.HomeOverflowMenuAction
 import com.contexts.cosmic.ui.screens.home.HomeScreen
 import com.contexts.cosmic.ui.screens.login.LoginScreen
 import com.contexts.cosmic.ui.screens.notifications.NotificationsScreen
@@ -116,17 +114,6 @@ fun NavGraphBuilder.authenticatedGraph(
                     showTopAppBar = true,
                     fabAction = {
                         navController.navigate(NavigationRoutes.Authenticated.AddPost.route)
-                    },
-                    topBarActions = {
-                        HomeOverflowMenu {
-                            when (it) {
-                                is HomeOverflowMenuAction.Settings ->
-                                    navController.navigate(
-                                        NavigationRoutes.Authenticated.Settings.route,
-                                    )
-                                is HomeOverflowMenuAction.Logout -> Unit
-                            }
-                        }
                     },
                 ),
             )

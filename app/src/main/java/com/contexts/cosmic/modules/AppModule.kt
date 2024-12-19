@@ -53,12 +53,12 @@ val appModule =
         single { FeedManager(get(), get(), get(), get(), get(), get()) }
 
         single<ActorRepository> { ActorRepositoryImpl(get()) }
-        single<AuthenticateRepository> { AuthenticateRepositoryImpl(get(), get(), get()) }
+        single<AuthenticateRepository> { AuthenticateRepositoryImpl(get(), get(), get(), get()) }
         single<ChatRepository> { ChatRepositoryImpl(get(), get(), get()) }
         single<FeedRepository> { FeedRepositoryImpl(get()) }
         single<NotificationsRepository> { NotificationsRepositoryImpl(get()) }
         single<PreferencesRepository> { PreferencesRepositoryImpl(get()) }
-        single<ProfileRepository> { ProfileRepositoryImpl(get(), get()) }
+        single<ProfileRepository> { ProfileRepositoryImpl(get(), get(), get()) }
         single<TenorRepository> { TenorRepositoryImpl(get()) }
         single<UserRepository> { UserRepositoryImpl(get()) }
     }

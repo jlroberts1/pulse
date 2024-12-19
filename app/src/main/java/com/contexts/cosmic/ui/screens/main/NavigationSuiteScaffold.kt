@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Add
 import androidx.compose.material3.BottomAppBarDefaults
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -60,6 +61,7 @@ fun NavigationScaffold(
     viewModel: AppViewModel,
     navController: NavHostController,
     mediaState: MediaState,
+    drawerState: DrawerState,
 ) {
     val scrollBehavior =
         rememberFabScrollBehavior(
@@ -95,6 +97,7 @@ fun NavigationScaffold(
                     scaffoldViewState,
                     navController,
                     scrollBehavior.topBarBehavior,
+                    drawerState,
                 )
             }
         },

@@ -19,10 +19,12 @@ import com.contexts.cosmic.data.local.database.converters.StringListConverter
 import com.contexts.cosmic.data.local.database.converters.VerificationMethodConverter
 import com.contexts.cosmic.data.local.database.dao.FeedDao
 import com.contexts.cosmic.data.local.database.dao.FeedPostDao
+import com.contexts.cosmic.data.local.database.dao.ProfileDao
 import com.contexts.cosmic.data.local.database.dao.RemoteKeysDao
 import com.contexts.cosmic.data.local.database.dao.UserDao
 import com.contexts.cosmic.data.local.database.entities.FeedEntity
 import com.contexts.cosmic.data.local.database.entities.FeedPostEntity
+import com.contexts.cosmic.data.local.database.entities.ProfileEntity
 import com.contexts.cosmic.data.local.database.entities.RemoteKeys
 import com.contexts.cosmic.data.local.database.entities.UserEntity
 
@@ -32,6 +34,7 @@ import com.contexts.cosmic.data.local.database.entities.UserEntity
         FeedEntity::class,
         FeedPostEntity::class,
         RemoteKeys::class,
+        ProfileEntity::class,
     ],
     version = 1,
 )
@@ -50,4 +53,6 @@ abstract class CosmicDatabase : RoomDatabase() {
     abstract fun feedPostDao(): FeedPostDao
 
     abstract fun remoteKeysDao(): RemoteKeysDao
+
+    abstract fun profileDao(): ProfileDao
 }

@@ -13,6 +13,7 @@ import androidx.room.Room
 import com.contexts.cosmic.data.local.database.CosmicDatabase
 import com.contexts.cosmic.data.local.database.dao.FeedDao
 import com.contexts.cosmic.data.local.database.dao.FeedPostDao
+import com.contexts.cosmic.data.local.database.dao.ProfileDao
 import com.contexts.cosmic.data.local.database.dao.RemoteKeysDao
 import com.contexts.cosmic.data.local.database.dao.UserDao
 import com.contexts.cosmic.data.local.datastore.PreferencesDataStore
@@ -29,5 +30,6 @@ val localDataModule =
         single<RemoteKeysDao> { get<CosmicDatabase>().remoteKeysDao() }
         single<FeedDao> { get<CosmicDatabase>().feedDao() }
         single<FeedPostDao> { get<CosmicDatabase>().feedPostDao() }
+        single<ProfileDao> { get<CosmicDatabase>().profileDao() }
         single<UserDao> { get<CosmicDatabase>().userDao() }
     }

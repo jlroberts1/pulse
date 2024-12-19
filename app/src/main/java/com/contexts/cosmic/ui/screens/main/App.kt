@@ -9,6 +9,8 @@
 
 package com.contexts.cosmic.ui.screens.main
 
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,6 +24,8 @@ fun App(viewModel: AppViewModel = koinViewModel()) {
     val navController = rememberNavController()
     val theme by viewModel.theme.collectAsStateWithLifecycle()
     val mediaState by viewModel.mediaState.collectAsStateWithLifecycle()
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val profile by viewModel.profile.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.navigationEvent.collect { route ->
@@ -39,10 +43,17 @@ fun App(viewModel: AppViewModel = koinViewModel()) {
         }
     }
     AppTheme(theme = theme) {
-        NavigationScaffold(
-            viewModel = viewModel,
+        NavigationDrawer(
+            profile = profile,
             navController = navController,
-            mediaState = mediaState,
-        )
+            drawerState = drawerState,
+        ) {
+            NavigationScaffold(
+                viewModel = viewModel,
+                navController = navController,
+                mediaState = mediaState,
+                drawerState = drawerState,
+            )
+        }
     }
 }

@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.contexts.cosmic.domain.model.Theme
 import com.contexts.cosmic.domain.repository.PreferencesRepository
+import com.contexts.cosmic.domain.repository.ProfileRepository
 import com.contexts.cosmic.domain.repository.UserRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +29,7 @@ data class MediaState(
 )
 
 class AppViewModel(
+    profileRepository: ProfileRepository,
     preferencesRepository: PreferencesRepository,
     userRepository: UserRepository,
 ) : ViewModel() {
@@ -49,6 +51,10 @@ class AppViewModel(
 
     private val isLoggedIn =
         userRepository.isLoggedIn()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), null)
+
+    val profile =
+        profileRepository.getMyProfile()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), null)
 
     init {

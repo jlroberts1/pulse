@@ -11,8 +11,8 @@ package com.contexts.cosmic.ui.screens.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import app.bsky.actor.GetProfileResponse
 import app.bsky.feed.FeedViewPost
+import com.contexts.cosmic.data.local.database.entities.ProfileEntity
 import com.contexts.cosmic.data.network.client.onError
 import com.contexts.cosmic.data.network.client.onSuccess
 import com.contexts.cosmic.domain.repository.ProfileRepository
@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class ProfileUiState(
-    val profile: GetProfileResponse? = null,
+    val profile: ProfileEntity? = null,
     val feed: List<FeedViewPost> = emptyList(),
     val feedLoading: Boolean = false,
     val loading: Boolean = false,
@@ -48,11 +48,6 @@ class ProfileViewModel(
     private fun getProfile() {
         viewModelScope.launch {
             _uiState.update { it.copy(loading = true) }
-            profileRepository.getMyProfile().onSuccess { response ->
-                _uiState.update { it.copy(profile = response, loading = false) }
-            }.onError { error ->
-                _uiState.update { it.copy(loading = false, error = error.message) }
-            }
         }
     }
 

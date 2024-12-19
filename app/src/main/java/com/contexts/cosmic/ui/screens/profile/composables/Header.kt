@@ -33,12 +33,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import sh.christian.ozone.api.Uri
 
 @Composable
 fun Header(
-    banner: Uri?,
-    avatar: Uri?,
+    banner: String?,
+    avatar: String?,
     displayName: String?,
     handle: String,
 ) {
@@ -51,7 +50,7 @@ fun Header(
     ) {
         banner?.let { bannerUrl ->
             AsyncImage(
-                model = bannerUrl.uri,
+                model = bannerUrl,
                 contentDescription = "Profile banner",
                 contentScale = ContentScale.FillHeight,
                 modifier = Modifier.fillMaxSize(),
@@ -83,7 +82,7 @@ fun Header(
             Spacer(modifier = Modifier.padding(18.dp))
             avatar?.let { avatarUrl ->
                 AsyncImage(
-                    model = avatarUrl.uri,
+                    model = avatarUrl,
                     contentDescription = "Profile avatar",
                     modifier =
                         Modifier
