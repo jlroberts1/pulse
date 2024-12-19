@@ -1,6 +1,6 @@
 # Pulse
 
-![play_store_feature_graphic](https://github.com/user-attachments/assets/dbba0a69-383b-4e44-921f-35e418a7fe2e)
+![play_store_feature_graphic](https://github.com/user-attachments/assets/b35b0dec-7689-4c20-82c0-9512bb3b5ce0)
 
 
 Pulse is an open-source Android client for Bluesky, built with modern Android development practices and a focus on user experience.
