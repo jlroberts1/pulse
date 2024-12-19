@@ -10,6 +10,8 @@
 package com.contexts.cosmic.domain.repository
 
 import app.bsky.feed.GetFeedResponse
+import app.bsky.feed.GetSuggestedFeedsQueryParams
+import app.bsky.feed.GetSuggestedFeedsResponse
 import com.contexts.cosmic.data.network.client.Response
 import com.contexts.cosmic.exceptions.NetworkError
 
@@ -18,4 +20,8 @@ interface FeedRepository {
         feedUri: String,
         cursor: String?,
     ): Response<GetFeedResponse, NetworkError>
+
+    suspend fun getSuggestions(
+        getFeedSuggestionsQueryParams: GetSuggestedFeedsQueryParams,
+    ): Response<GetSuggestedFeedsResponse, NetworkError>
 }

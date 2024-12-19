@@ -9,6 +9,8 @@
 
 package com.contexts.cosmic.data.network.api
 
+import app.bsky.actor.GetSuggestionsQueryParams
+import app.bsky.actor.GetSuggestionsResponse
 import app.bsky.actor.SearchActorsTypeaheadQueryParams
 import app.bsky.actor.SearchActorsTypeaheadResponse
 import com.contexts.cosmic.data.network.client.Response
@@ -27,6 +29,17 @@ class ActorAPI(private val client: HttpClient) {
                 method = HttpMethod.Get
                 path("xrpc/app.bsky.actor.searchActorsTypeahead")
                 parameters.append("q", searchActorsTypeaheadQueryParams.q.toString())
+            }
+        }
+    }
+
+    suspend fun getSuggestions(getSuggestionsQueryParams: GetSuggestionsQueryParams): Response<GetSuggestionsResponse, NetworkError> {
+        return client.safeRequest {
+            url {
+                method = HttpMethod.Get
+                path("xrpc/app.bsky.actor.getSuggestions")
+                getSuggestionsQueryParams.limit?.let { parameters.append("limit", it.toString()) }
+                getSuggestionsQueryParams.cursor?.let { parameters.append("cursor", it) }
             }
         }
     }

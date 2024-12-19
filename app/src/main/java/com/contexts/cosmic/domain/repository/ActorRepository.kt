@@ -9,6 +9,8 @@
 
 package com.contexts.cosmic.domain.repository
 
+import app.bsky.actor.GetSuggestionsQueryParams
+import app.bsky.actor.GetSuggestionsResponse
 import app.bsky.actor.SearchActorsTypeaheadQueryParams
 import app.bsky.actor.SearchActorsTypeaheadResponse
 import com.contexts.cosmic.data.network.client.Response
@@ -18,4 +20,6 @@ interface ActorRepository {
     suspend fun searchActorsTypeahead(
         searchActorsTypeaheadQueryParams: SearchActorsTypeaheadQueryParams,
     ): Response<SearchActorsTypeaheadResponse, NetworkError>
+
+    suspend fun getSuggestions(getSuggestionsQueryParams: GetSuggestionsQueryParams): Response<GetSuggestionsResponse, NetworkError>
 }

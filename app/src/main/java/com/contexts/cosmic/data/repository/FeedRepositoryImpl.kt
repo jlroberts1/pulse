@@ -10,6 +10,8 @@
 package com.contexts.cosmic.data.repository
 
 import app.bsky.feed.GetFeedResponse
+import app.bsky.feed.GetSuggestedFeedsQueryParams
+import app.bsky.feed.GetSuggestedFeedsResponse
 import com.contexts.cosmic.data.network.api.FeedAPI
 import com.contexts.cosmic.data.network.client.Response
 import com.contexts.cosmic.domain.repository.FeedRepository
@@ -20,4 +22,10 @@ class FeedRepositoryImpl(private val feedAPI: FeedAPI) : FeedRepository {
         feedUri: String,
         cursor: String?,
     ): Response<GetFeedResponse, NetworkError> = feedAPI.getFeed(feedUri = feedUri, cursor = cursor)
+
+    override suspend fun getSuggestions(
+        getFeedSuggestionsQueryParams: GetSuggestedFeedsQueryParams,
+    ): Response<GetSuggestedFeedsResponse, NetworkError> {
+        return feedAPI.getSuggestions(getFeedSuggestionsQueryParams)
+    }
 }

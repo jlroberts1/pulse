@@ -10,6 +10,8 @@
 package com.contexts.cosmic.data.network.api
 
 import app.bsky.feed.GetFeedResponse
+import app.bsky.feed.GetSuggestedFeedsQueryParams
+import app.bsky.feed.GetSuggestedFeedsResponse
 import app.bsky.feed.GetTimelineResponse
 import com.contexts.cosmic.BuildConfig
 import com.contexts.cosmic.data.network.client.Response
@@ -61,6 +63,17 @@ class FeedAPI(private val client: HttpClient) {
                 parameters.append("feed", feedUri)
                 parameters.append("limit", limit.toString())
                 cursor?.let { parameters.append("cursor", it) }
+            }
+        }
+    }
+
+    suspend fun getSuggestions(getFeedSuggestionsParams: GetSuggestedFeedsQueryParams): Response<GetSuggestedFeedsResponse, NetworkError> {
+        return client.safeRequest {
+            url {
+                method = HttpMethod.Get
+                path("xrpc/app.bsky.feed.getSuggestedFeeds")
+                getFeedSuggestionsParams.limit?.let { parameters.append("limit", it.toString()) }
+                getFeedSuggestionsParams.cursor?.let { parameters.append("cursor", it) }
             }
         }
     }

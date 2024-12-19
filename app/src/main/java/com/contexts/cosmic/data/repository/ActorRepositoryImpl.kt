@@ -9,6 +9,8 @@
 
 package com.contexts.cosmic.data.repository
 
+import app.bsky.actor.GetSuggestionsQueryParams
+import app.bsky.actor.GetSuggestionsResponse
 import app.bsky.actor.SearchActorsTypeaheadQueryParams
 import app.bsky.actor.SearchActorsTypeaheadResponse
 import com.contexts.cosmic.data.network.api.ActorAPI
@@ -21,5 +23,11 @@ class ActorRepositoryImpl(private val actorAPI: ActorAPI) : ActorRepository {
         searchActorsTypeaheadQueryParams: SearchActorsTypeaheadQueryParams,
     ): Response<SearchActorsTypeaheadResponse, NetworkError> {
         return actorAPI.searchActorsTypeahead(searchActorsTypeaheadQueryParams)
+    }
+
+    override suspend fun getSuggestions(
+        getSuggestionsQueryParams: GetSuggestionsQueryParams,
+    ): Response<GetSuggestionsResponse, NetworkError> {
+        return actorAPI.getSuggestions(getSuggestionsQueryParams)
     }
 }
