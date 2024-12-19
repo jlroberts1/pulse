@@ -55,8 +55,7 @@ import com.contexts.pulse.ui.composables.BorderedCircularAvatar
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun SearchScreen() {
-    val viewModel: SearchViewModel = koinViewModel()
+fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     Column(modifier = Modifier.fillMaxSize()) {
         SearchBox(

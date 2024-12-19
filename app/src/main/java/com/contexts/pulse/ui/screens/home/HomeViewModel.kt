@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -32,15 +33,19 @@ class HomeViewModel(
     private val feedManager: FeedManager,
     private val preferencesRepository: PreferencesRepository,
 ) : ViewModel() {
-    val visibleFeeds =
-        preferencesRepository.getCurrentUserFlow().flatMapLatest { user ->
-            feedManager.getAvailableFeeds(user).map { feeds -> feeds.filter { it.pinned } }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
+    private val currentUser = preferencesRepository.getCurrentUserFlow()
+    private val allFeedsFlow =
+        currentUser
+            .mapNotNull { it }
+            .flatMapLatest { user ->
+                feedManager.getAvailableFeeds(user)
+            }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
 
-    val allFeeds =
-        preferencesRepository.getCurrentUserFlow().flatMapLatest { user ->
-            feedManager.getAvailableFeeds(user)
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
+    val visibleFeeds =
+        allFeedsFlow
+            .map { feeds -> feeds.filter { it.pinned } }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
 
     private val _feedStates =
         MutableStateFlow<Map<String, Flow<PagingData<FeedPostEntity>>>>(emptyMap())
@@ -48,18 +53,19 @@ class HomeViewModel(
 
     init {
         viewModelScope.launch {
-            visibleFeeds.collect { feeds ->
-                _feedStates.update { current ->
-                    feeds.associate { feed ->
-                        feed.id to (
-                            current[feed.id] ?: feedManager.getFeedPagingFlow(
-                                feed.id,
-                                feed.uri,
-                            ).cachedIn(viewModelScope)
-                        )
+            visibleFeeds
+                .collect { feeds ->
+                    _feedStates.update { current ->
+                        feeds.associate { feed ->
+                            feed.id to (
+                                current[feed.id] ?: feedManager.getFeedPagingFlow(
+                                    feed.id,
+                                    feed.uri,
+                                ).cachedIn(viewModelScope)
+                            )
+                        }
                     }
                 }
-            }
         }
     }
 }

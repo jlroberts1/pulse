@@ -14,6 +14,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -24,8 +26,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.sharp.Add
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,15 +39,21 @@ import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -63,22 +69,32 @@ fun NavigationScaffold(
     mediaState: MediaState,
     drawerState: DrawerState,
 ) {
-    val scrollBehavior =
-        rememberFabScrollBehavior(
-            onScroll = { delta -> viewModel.updateControlsVisibility(delta) },
-        )
-    val scaffoldViewState by viewModel.scaffoldViewState.collectAsStateWithLifecycle()
-    val controlsVisibility by viewModel.controlsVisibility.collectAsStateWithLifecycle()
+    val topAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    var controlsVisible by remember { mutableStateOf(true) }
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val isExpandedScreen =
         adaptiveInfo.windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route ?: TopDestinations.HOME.route
-    val showBottomBar =
-        remember(navBackStackEntry) {
-            navBackStackEntry?.destination?.route in TopDestinations.entries.map { it.route }
+    val currentRoute =
+        rememberUpdatedState(
+            navController.currentBackStackEntryAsState().value?.destination?.route
+                ?: TopDestinations.HOME.route,
+        )
+    val nestedScrollConnection =
+        remember {
+            object : NestedScrollConnection {
+                override fun onPreScroll(
+                    available: Offset,
+                    source: NestedScrollSource,
+                ): Offset {
+                    if (available.y < -10) {
+                        controlsVisible = false
+                    } else if (available.y > 10) {
+                        controlsVisible = true
+                    }
+                    return Offset.Zero
+                }
+            }
         }
-
     val onNavigate = { destination: TopDestinations ->
         navController.navigate(destination.route) {
             popUpTo(navController.graph.findStartDestination().id) {
@@ -89,42 +105,48 @@ fun NavigationScaffold(
         }
     }
 
+    val routeUiState =
+        remember(currentRoute.value) {
+            getRouteUiState(currentRoute.value, navController)
+        }
+
     Scaffold(
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier =
+            modifier.nestedScroll(nestedScrollConnection)
+                .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
         topBar = {
-            if (scaffoldViewState.showTopAppBar && mediaState.url == null) {
+            if (routeUiState.showTopAppBar && mediaState.url == null) {
                 TopBar(
-                    scaffoldViewState,
-                    navController,
-                    scrollBehavior.topBarBehavior,
-                    drawerState,
+                    navController = navController,
+                    title = routeUiState.topAppBarTitle,
+                    scrollBehavior = topAppBarScrollBehavior,
+                    actions = routeUiState.topBarActions,
+                    drawerState = drawerState,
                 )
             }
         },
         floatingActionButton = {
-            if (scaffoldViewState.showFab) {
-                AnimatedVisibility(
-                    visible = controlsVisibility == 1f && mediaState.url == null,
-                    enter = scaleIn(),
-                    exit = scaleOut(),
+            AnimatedVisibility(
+                visible = routeUiState.showFab && controlsVisible && mediaState.url == null,
+                enter = scaleIn(),
+                exit = scaleOut(),
+            ) {
+                FloatingActionButton(
+                    onClick = { routeUiState.fabAction() },
+                    containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
+                    elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
                 ) {
-                    FloatingActionButton(
-                        onClick = {
-                            scaffoldViewState.fabAction()
-                        },
-                        containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
-                        elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
-                    ) {
-                        Icon(Icons.Sharp.Add, "Add")
-                    }
+                    Icon(routeUiState.fabIcon, routeUiState.fabDesc)
                 }
             }
         },
         bottomBar = {
-            if (!isExpandedScreen && showBottomBar) {
+            if (!isExpandedScreen) {
                 AnimatedVisibility(
-                    visible = controlsVisibility == 1f && mediaState.url == null,
+                    visible = routeUiState.showBottomBar && controlsVisible && mediaState.url == null,
                     modifier = Modifier.fillMaxWidth(),
+                    enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
+                    exit = slideOutVertically(targetOffsetY = { it }) + fadeOut(),
                 ) {
                     NavigationBar {
                         TopDestinations.entries.forEach {
@@ -132,7 +154,7 @@ fun NavigationScaffold(
                                 icon = {
                                     Icon(
                                         imageVector =
-                                            if (currentRoute == it.route) {
+                                            if (currentRoute.value == it.route) {
                                                 it.selectedIcon
                                             } else {
                                                 it.unselectedIcon
@@ -140,7 +162,7 @@ fun NavigationScaffold(
                                         contentDescription = it.contentDescription,
                                     )
                                 },
-                                selected = currentRoute == it.route,
+                                selected = currentRoute.value == it.route,
                                 onClick = { onNavigate(it) },
                                 colors = NavigationBarItemDefaults.colors(),
                             )
@@ -173,7 +195,7 @@ fun NavigationScaffold(
                                 icon = {
                                     Icon(
                                         imageVector =
-                                            if (currentRoute == it.route) {
+                                            if (currentRoute.value == it.route) {
                                                 it.selectedIcon
                                             } else {
                                                 it.unselectedIcon
@@ -181,7 +203,7 @@ fun NavigationScaffold(
                                         contentDescription = it.contentDescription,
                                     )
                                 },
-                                selected = currentRoute == it.route,
+                                selected = currentRoute.value == it.route,
                                 onClick = { onNavigate(it) },
                                 colors = NavigationRailItemDefaults.colors(),
                             )
@@ -196,8 +218,6 @@ fun NavigationScaffold(
                 ) {
                     RootNav(
                         navController,
-                        updateScaffoldViewState = { viewModel.updateScaffoldViewState(it) },
-                        controlsVisibility = controlsVisibility,
                         onMediaOpen = { viewModel.onMediaOpen(it) },
                     )
                 }

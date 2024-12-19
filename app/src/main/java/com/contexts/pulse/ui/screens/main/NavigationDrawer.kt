@@ -43,7 +43,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -84,42 +86,47 @@ fun NavigationDrawer(
         }
     }
 
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route ?: TopDestinations.HOME.route
+    val currentRoute =
+        rememberUpdatedState(
+            navController.currentBackStackEntryAsState().value?.destination?.route
+                ?: TopDestinations.HOME.route,
+        )
 
     val items =
-        listOf(
-            NavigationItems(
-                title = "Home",
-                route = NavigationRoutes.Authenticated.Home.route,
-                selectedIcon = Icons.Filled.Home,
-                unselectedIcon = Icons.Outlined.Home,
-            ),
-            NavigationItems(
-                title = "Search",
-                route = NavigationRoutes.Authenticated.Search.route,
-                selectedIcon = Icons.Filled.Search,
-                unselectedIcon = Icons.Outlined.Search,
-            ),
-            NavigationItems(
-                title = "Chat",
-                route = NavigationRoutes.Authenticated.Chat.route,
-                selectedIcon = Icons.Filled.ChatBubble,
-                unselectedIcon = Icons.Outlined.ChatBubble,
-            ),
-            NavigationItems(
-                title = "Notifications",
-                route = NavigationRoutes.Authenticated.Notifications.route,
-                selectedIcon = Icons.Filled.Notifications,
-                unselectedIcon = Icons.Outlined.Notifications,
-            ),
-            NavigationItems(
-                title = "Profile",
-                route = NavigationRoutes.Authenticated.Profile.route,
-                selectedIcon = Icons.Filled.Person,
-                unselectedIcon = Icons.Outlined.Person,
-            ),
-        )
+        remember {
+            listOf(
+                NavigationItems(
+                    title = "Home",
+                    route = NavigationRoutes.Authenticated.Home.route,
+                    selectedIcon = Icons.Filled.Home,
+                    unselectedIcon = Icons.Outlined.Home,
+                ),
+                NavigationItems(
+                    title = "Search",
+                    route = NavigationRoutes.Authenticated.Search.route,
+                    selectedIcon = Icons.Filled.Search,
+                    unselectedIcon = Icons.Outlined.Search,
+                ),
+                NavigationItems(
+                    title = "Chat",
+                    route = NavigationRoutes.Authenticated.Chat.route,
+                    selectedIcon = Icons.Filled.ChatBubble,
+                    unselectedIcon = Icons.Outlined.ChatBubble,
+                ),
+                NavigationItems(
+                    title = "Notifications",
+                    route = NavigationRoutes.Authenticated.Notifications.route,
+                    selectedIcon = Icons.Filled.Notifications,
+                    unselectedIcon = Icons.Outlined.Notifications,
+                ),
+                NavigationItems(
+                    title = "Profile",
+                    route = NavigationRoutes.Authenticated.Profile.route,
+                    selectedIcon = Icons.Filled.Person,
+                    unselectedIcon = Icons.Outlined.Person,
+                ),
+            )
+        }
     var selectedItemIndex by rememberSaveable {
         mutableIntStateOf(0)
     }
@@ -201,7 +208,7 @@ fun NavigationDrawer(
                         items.forEachIndexed { index, item ->
                             NavigationDrawerItem(
                                 label = { Text(item.title) },
-                                selected = currentRoute == item.route,
+                                selected = currentRoute.value == item.route,
                                 onClick = {
                                     selectedItemIndex = index
                                     scope.launch {

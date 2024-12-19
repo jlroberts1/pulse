@@ -15,7 +15,9 @@ import kotlinx.coroutines.flow.Flow
 interface PreferencesRepository {
     suspend fun updateCurrentUser(did: String)
 
-    fun getCurrentUserFlow(): Flow<String>
+    fun getCurrentUserFlow(): Flow<String?>
+
+    suspend fun getCurrentUser(): String?
 
     suspend fun updateTheme(theme: Theme)
 

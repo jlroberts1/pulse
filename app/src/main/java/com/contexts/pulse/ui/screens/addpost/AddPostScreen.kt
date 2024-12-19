@@ -44,9 +44,7 @@ import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun AddPostScreen() {
-    val viewModel: AddPostViewModel = koinViewModel()
-
+fun AddPostScreen(viewModel: AddPostViewModel = koinViewModel()) {
     val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     var launchGallery by remember { mutableStateOf(value = false) }

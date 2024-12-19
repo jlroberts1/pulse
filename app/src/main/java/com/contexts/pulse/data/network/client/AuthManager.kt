@@ -26,7 +26,7 @@ class AuthManager(
     private val preferencesRepository: PreferencesRepository,
     private val userDao: UserDao,
 ) {
-    fun getCurrentUserFlow(): Flow<String> {
+    fun getCurrentUserFlow(): Flow<String?> {
         return preferencesRepository.getCurrentUserFlow()
     }
 

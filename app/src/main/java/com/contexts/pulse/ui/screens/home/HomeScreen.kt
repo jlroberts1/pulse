@@ -9,6 +9,9 @@
 
 package com.contexts.pulse.ui.screens.home
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,7 +48,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.PagingData
@@ -60,16 +62,15 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun HomeScreen(
-    controlsVisibility: Float,
+    viewModel: HomeViewModel = koinViewModel(),
     onMediaOpen: (String) -> Unit,
 ) {
-    val viewModel: HomeViewModel = koinViewModel()
     val visibleFeeds by viewModel.visibleFeeds.collectAsStateWithLifecycle()
-    val allFeeds by viewModel.allFeeds.collectAsStateWithLifecycle()
     val feedStates by viewModel.feedStates.collectAsStateWithLifecycle()
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val isExpandedScreen =
         adaptiveInfo.windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED
+
     Column(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -81,7 +82,7 @@ fun HomeScreen(
                 indicator = @Composable { _ -> },
                 divider = @Composable { },
             ) {
-                visibleFeeds.forEachIndexed { index, feedType ->
+                visibleFeeds.forEach { feedType ->
                     Tab(
                         selected = true,
                         onClick = { },
@@ -94,14 +95,12 @@ fun HomeScreen(
                 feeds = visibleFeeds,
                 feedStates = feedStates,
                 onMediaOpen = { onMediaOpen(it) },
-                controlsVisibility,
             )
         } else {
             TabPagerFeeds(
                 feeds = visibleFeeds,
                 feedStates = feedStates,
                 onMediaOpen = { onMediaOpen(it) },
-                controlsVisibility = controlsVisibility,
             )
         }
 //        if (showFeedConfig) {
@@ -182,7 +181,6 @@ fun TabletRow(
     feeds: List<FeedEntity>,
     feedStates: Map<String, Flow<PagingData<FeedPostEntity>>>,
     onMediaOpen: (String) -> Unit,
-    controlsVisibility: Float,
 ) {
     Row(
         modifier =
@@ -202,7 +200,6 @@ fun TabletRow(
                     FeedContent(
                         pagingFlow = pagingFlow,
                         onMediaOpen = onMediaOpen,
-                        controlsVisibility = controlsVisibility,
                     )
                 }
             }
@@ -215,7 +212,6 @@ fun TabPagerFeeds(
     feeds: List<FeedEntity>,
     feedStates: Map<String, Flow<PagingData<FeedPostEntity>>>,
     onMediaOpen: (String) -> Unit,
-    controlsVisibility: Float,
 ) {
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState { feeds.size }
@@ -252,7 +248,6 @@ fun TabPagerFeeds(
                 FeedContent(
                     pagingFlow = pagingFlow,
                     onMediaOpen = { onMediaOpen(it) },
-                    controlsVisibility = controlsVisibility,
                 )
             }
         }
@@ -263,7 +258,6 @@ fun TabPagerFeeds(
 private fun FeedContent(
     pagingFlow: Flow<PagingData<FeedPostEntity>>,
     onMediaOpen: (String) -> Unit,
-    controlsVisibility: Float,
 ) {
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
@@ -301,7 +295,15 @@ private fun FeedContent(
                 }
             }
         }
-        if (showScrollToTop) {
+        AnimatedVisibility(
+            modifier =
+                Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(bottom = if (isExpandedScreen) 16.dp else 104.dp, start = 16.dp),
+            visible = showScrollToTop,
+            enter = scaleIn(),
+            exit = scaleOut(),
+        ) {
             SmallFloatingActionButton(
                 onClick = {
                     scope.launch {
@@ -309,13 +311,6 @@ private fun FeedContent(
                     }
                 },
                 containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
-                modifier =
-                    Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(bottom = if (isExpandedScreen) 16.dp else 104.dp, start = 16.dp)
-                        .graphicsLayer {
-                            if (!isExpandedScreen) translationY = 200f * (1f - controlsVisibility)
-                        },
             ) {
                 Icon(
                     Icons.Default.KeyboardArrowUp,

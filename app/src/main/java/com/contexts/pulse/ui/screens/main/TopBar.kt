@@ -28,8 +28,9 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(
-    scaffoldViewState: ScaffoldViewState,
     navController: NavController,
+    title: String,
+    actions: @Composable () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
     drawerState: DrawerState,
 ) {
@@ -38,8 +39,8 @@ fun TopBar(
         colors =
             TopAppBarDefaults.topAppBarColors(),
         scrollBehavior = scrollBehavior,
-        title = { Text(scaffoldViewState.topAppBarTitle) },
-        actions = { scaffoldViewState.topBarActions() },
+        title = { Text(title) },
+        actions = { actions() },
         navigationIcon = {
             val topLevelRoutes = TopDestinations.entries.map { it.route }
             if (navController.previousBackStackEntry != null &&

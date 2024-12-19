@@ -40,9 +40,6 @@ class AppViewModel(
     private val _mediaState = MutableStateFlow(MediaState())
     val mediaState = _mediaState.asStateFlow()
 
-    private val _scaffoldViewState = MutableStateFlow(ScaffoldViewState())
-    val scaffoldViewState = _scaffoldViewState.asStateFlow()
-
     private val _controlsVisibility = MutableStateFlow(1f)
     val controlsVisibility = _controlsVisibility.asStateFlow()
 
@@ -73,25 +70,11 @@ class AppViewModel(
         }
     }
 
-    fun updateControlsVisibility(scrollDelta: Float) {
-        _controlsVisibility.update { currentVisibility ->
-            if (scrollDelta < 0) {
-                (currentVisibility - (-scrollDelta / 100f)).coerceIn(0f, 1f)
-            } else {
-                (currentVisibility + (scrollDelta / 100f)).coerceIn(0f, 1f)
-            }
-        }
-    }
-
     fun onMediaOpen(url: String) {
         _mediaState.update { it.copy(url = url) }
     }
 
     fun onMediaDismissed() {
         _mediaState.update { it.copy(url = null) }
-    }
-
-    fun updateScaffoldViewState(newState: ScaffoldViewState) {
-        _scaffoldViewState.value = newState
     }
 }

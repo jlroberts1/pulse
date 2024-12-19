@@ -9,15 +9,18 @@
 
 package com.contexts.pulse.ui.screens.main
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.sharp.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.vector.ImageVector
 
-data class ScaffoldViewState(
+data class RouteUiState(
     val topAppBarTitle: String = "Pulse",
     val topBarActions: @Composable () -> Unit = {},
-    val fabIcon: @Composable () -> Unit = {},
+    val fabIcon: ImageVector = Icons.Sharp.Add,
+    val fabDesc: String? = "Add new post",
     val fabAction: () -> Unit = {},
     val showTopAppBar: Boolean = true,
-    val showFab: Boolean = true,
-    val isRefreshing: Boolean = false,
-    val controlsVisibility: Float = 1f,
+    val showFab: Boolean = false,
+    val showBottomBar: Boolean = false,
 )

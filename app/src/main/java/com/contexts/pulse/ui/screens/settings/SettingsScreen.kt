@@ -29,8 +29,7 @@ import com.contexts.pulse.ui.screens.settings.composables.SelectionItem
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun SettingsScreen() {
-    val viewModel: SettingsViewModel = koinViewModel()
+fun SettingsScreen(viewModel: SettingsViewModel = koinViewModel()) {
     val scrollState = rememberScrollState()
     var showThemeDialog by remember { mutableStateOf(false) }
     val theme = viewModel.theme.collectAsStateWithLifecycle()

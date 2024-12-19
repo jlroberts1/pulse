@@ -29,8 +29,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationsScreen() {
-    val viewModel: NotificationViewModel = koinViewModel()
+fun NotificationsScreen(viewModel: NotificationViewModel = koinViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     PullToRefreshBox(

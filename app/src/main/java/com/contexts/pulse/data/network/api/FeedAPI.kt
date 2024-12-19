@@ -37,7 +37,7 @@ class FeedAPI(private val client: HttpClient) {
 
     suspend fun getFeed(
         feedUri: String,
-        limit: Int = 15,
+        limit: Int = 20,
         cursor: String? = null,
     ): Response<GetFeedResponse, NetworkError> {
         return client.safeRequest {

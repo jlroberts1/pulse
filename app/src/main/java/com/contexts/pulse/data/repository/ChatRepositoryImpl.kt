@@ -25,8 +25,8 @@ class ChatRepositoryImpl(
     private val preferencesRepository: PreferencesRepository,
 ) : ChatRepository {
     override suspend fun listConvos(listConvosQueryParams: ListConvosQueryParams): Response<ListConvosResponse, NetworkError> {
-        val current = preferencesRepository.getCurrentUserFlow().first()
-        val serviceEndpoint = userDao.getUser(current).didDoc?.service?.first()?.serviceEndpoint
+        val current = preferencesRepository.getCurrentUser()
+        val serviceEndpoint = userDao.getUser(current ?: "").didDoc?.service?.first()?.serviceEndpoint
         return chatAPI.listConvos(serviceEndpoint, listConvosQueryParams)
     }
 }

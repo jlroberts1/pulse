@@ -54,8 +54,10 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun LoginScreen(onNavigateToHome: () -> Unit) {
-    val viewModel: LoginViewModel = koinViewModel()
+fun LoginScreen(
+    viewModel: LoginViewModel = koinViewModel(),
+    onNavigateToHome: () -> Unit,
+) {
     var identifier by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }

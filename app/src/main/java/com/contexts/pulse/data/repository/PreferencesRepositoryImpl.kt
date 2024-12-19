@@ -21,8 +21,10 @@ import com.contexts.pulse.domain.repository.PreferencesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 
 class PreferencesRepositoryImpl(
     private val dataStore: DataStore<Preferences>,
@@ -33,7 +35,18 @@ class PreferencesRepositoryImpl(
         }
     }
 
-    override fun getCurrentUserFlow(): Flow<String> =
+    override suspend fun getCurrentUser(): String? {
+        return try {
+            dataStore.data
+                .map { preferences -> preferences[CURRENT_USER] }
+                .mapNotNull { it }
+                .first()
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    override fun getCurrentUserFlow(): Flow<String?> =
         dataStore.data
             .catch { exception ->
                 if (exception is IOException) {
@@ -42,8 +55,9 @@ class PreferencesRepositoryImpl(
                     throw exception
                 }
             }.map { preferences ->
-                preferences[CURRENT_USER] ?: ""
-            }.flowOn(Dispatchers.IO)
+                preferences[CURRENT_USER]
+            }
+            .flowOn(Dispatchers.IO)
 
     override suspend fun updateTheme(theme: Theme) {
         dataStore.edit { preferences ->

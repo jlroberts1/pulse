@@ -27,17 +27,19 @@ fun App(viewModel: AppViewModel = koinViewModel()) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val profile by viewModel.profile.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(viewModel.navigationEvent) {
         viewModel.navigationEvent.collect { route ->
-            navController.navigate(route) {
-                popUpTo(
-                    if (route == NavigationRoutes.Authenticated.NavigationRoute.route) {
-                        NavigationRoutes.Unauthenticated.NavigationRoute.route
-                    } else {
-                        NavigationRoutes.Authenticated.NavigationRoute.route
-                    },
-                ) {
-                    inclusive = true
+            if (navController.currentBackStackEntry?.destination?.parent?.route != route) {
+                navController.navigate(route) {
+                    popUpTo(
+                        if (route == NavigationRoutes.Authenticated.NavigationRoute.route) {
+                            NavigationRoutes.Unauthenticated.NavigationRoute.route
+                        } else {
+                            NavigationRoutes.Authenticated.NavigationRoute.route
+                        },
+                    ) {
+                        inclusive = true
+                    }
                 }
             }
         }

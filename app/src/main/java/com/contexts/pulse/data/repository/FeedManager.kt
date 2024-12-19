@@ -53,8 +53,6 @@ class FeedManager(
 
     fun getAvailableFeeds(did: String): Flow<List<FeedEntity>> =
         flow {
-            emit(feedDao.getFeedsForUser(did))
-
             fetchAndRegisterAvailableFeeds(did).onSuccess { feeds ->
                 emit(feeds)
             }
@@ -84,9 +82,7 @@ class FeedManager(
         return Pager(
             config =
                 PagingConfig(
-                    pageSize = 15,
-                    prefetchDistance = 5,
-                    enablePlaceholders = false,
+                    pageSize = 20,
                 ),
             remoteMediator = getOrCreateMediator(feedId, feedUri),
         ) {

@@ -23,8 +23,8 @@ import com.contexts.pulse.domain.repository.ProfileRepository
 import com.contexts.pulse.exceptions.NetworkError
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapNotNull
 
 class ProfileRepositoryImpl(
     private val profileAPI: ProfileAPI,
@@ -35,7 +35,7 @@ class ProfileRepositoryImpl(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getMyProfile(): Flow<ProfileEntity?> =
-        preferencesRepository.getCurrentUserFlow().flatMapLatest {
+        preferencesRepository.getCurrentUserFlow().mapNotNull { it }.flatMapLatest {
             profileAPI.getProfile(it).onSuccess { response ->
                 profileDao.insertProfile(response.toProfileEntity())
             }
@@ -43,8 +43,8 @@ class ProfileRepositoryImpl(
         }
 
     override suspend fun getProfileFeed(): Response<GetAuthorFeedResponse, NetworkError> {
-        val current = preferencesRepository.getCurrentUserFlow().first()
-        return profileAPI.getAuthorFeed(current)
+        val current = preferencesRepository.getCurrentUser()
+        return profileAPI.getAuthorFeed(current ?: "")
     }
 
     override suspend fun getSavedFeeds(did: String): Response<List<FeedEntity>, NetworkError> {

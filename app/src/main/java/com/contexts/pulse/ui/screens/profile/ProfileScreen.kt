@@ -38,8 +38,10 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(onMediaOpen: (String) -> Unit) {
-    val viewModel: ProfileViewModel = koinViewModel()
+fun ProfileScreen(
+    viewModel: ProfileViewModel = koinViewModel(),
+    onMediaOpen: (String) -> Unit,
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val profile by viewModel.profile.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
