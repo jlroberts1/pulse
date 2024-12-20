@@ -52,6 +52,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.contexts.pulse.data.local.database.entities.FeedEntity
 import com.contexts.pulse.data.local.database.entities.FeedPostEntity
@@ -281,7 +283,8 @@ private fun FeedContent(
         ) {
             items(
                 count = posts.itemCount,
-                key = { index -> posts[index]?.postUri ?: index },
+                key = posts.itemKey { it.postUri },
+                contentType = posts.itemContentType(),
             ) { item ->
                 posts[item]?.let {
                     FeedItem(

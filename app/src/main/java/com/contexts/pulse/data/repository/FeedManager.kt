@@ -24,9 +24,11 @@ import com.contexts.pulse.data.network.client.onSuccess
 import com.contexts.pulse.domain.repository.FeedRepository
 import com.contexts.pulse.domain.repository.ProfileRepository
 import com.contexts.pulse.exceptions.NetworkError
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import java.util.concurrent.ConcurrentHashMap
 
 class FeedManager(
@@ -87,6 +89,6 @@ class FeedManager(
             remoteMediator = getOrCreateMediator(feedId, feedUri),
         ) {
             feedPostDao.getPostsForFeed(feedId)
-        }.flow
+        }.flow.flowOn(Dispatchers.IO)
     }
 }
