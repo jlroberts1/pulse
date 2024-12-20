@@ -11,10 +11,12 @@ package com.contexts.pulse.ui.screens.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.map
 import com.contexts.pulse.data.local.database.entities.FeedPostEntity
-import com.contexts.pulse.data.network.client.onError
-import com.contexts.pulse.data.network.client.onSuccess
 import com.contexts.pulse.domain.repository.ProfileRepository
+import com.contexts.pulse.domain.repository.RequestResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,8 +25,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class ProfileUiState(
-    val feed: List<FeedPostEntity> = emptyList(),
-    val feedLoading: Boolean = false,
     val loading: Boolean = false,
     val error: String? = null,
 )
@@ -32,6 +32,9 @@ data class ProfileUiState(
 class ProfileViewModel(
     private val profileRepository: ProfileRepository,
 ) : ViewModel() {
+    private val _feedState = MutableStateFlow<PagingData<FeedPostEntity>>(PagingData.empty())
+    val feedState = _feedState.asStateFlow()
+
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -40,21 +43,18 @@ class ProfileViewModel(
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), null)
 
     init {
-        getFeed()
-    }
-
-    fun refreshProfile() {
-        getFeed()
-    }
-
-    private fun getFeed() {
         viewModelScope.launch {
-            _uiState.update { it.copy(feedLoading = true) }
-            profileRepository.getProfileFeed().onSuccess { response ->
-                val feed = response.feed.map { FeedPostEntity.from(it, "") }
-                _uiState.update { it.copy(feed = feed, feedLoading = false) }
-            }.onError { error ->
-                _uiState.update { it.copy(feedLoading = false, error = error.message) }
+            when (val result = profileRepository.getProfileFeed()) {
+                is RequestResult.Success -> {
+                    result.data
+                        .cachedIn(viewModelScope)
+                        .collect { pagingData ->
+                            _feedState.update { pagingData.map { FeedPostEntity.from(it, "") } }
+                        }
+                }
+                is RequestResult.NoCurrentUser -> {
+                    _uiState.update { it.copy(error = "No current user") }
+                }
             }
         }
     }

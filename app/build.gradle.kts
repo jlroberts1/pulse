@@ -111,7 +111,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     debugImplementation(libs.chucker.debug)
-    debugImplementation(libs.leakcanary)
+    // debugImplementation(libs.leakcanary)
 
     releaseImplementation(libs.chucker.noop)
 

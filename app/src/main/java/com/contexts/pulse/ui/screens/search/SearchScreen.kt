@@ -9,6 +9,7 @@
 
 package com.contexts.pulse.ui.screens.search
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,7 +23,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -40,7 +40,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -49,14 +49,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import app.bsky.actor.ProfileView
 import com.contexts.pulse.ui.composables.BorderedCircularAvatar
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val suggestedAccounts = viewModel.suggestedAccounts.collectAsLazyPagingItems()
+    val suggestedFeeds = viewModel.suggestedFeeds.collectAsLazyPagingItems()
+
+    LaunchedEffect(suggestedAccounts.loadState) {
+        when (suggestedAccounts.loadState.refresh) {
+            is LoadState.Loading -> Log.d("Search", "Loading")
+            is LoadState.Error -> Log.d("Search", "Error: ${(suggestedAccounts.loadState.refresh as LoadState.Error).error}")
+            is LoadState.NotLoading -> Log.d("Search", "Loaded: ${suggestedAccounts.itemCount} items")
+        }
+    }
     Column(modifier = Modifier.fillMaxSize()) {
         SearchBox(
             query = "",
@@ -65,16 +78,22 @@ fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
         )
         LazyColumn {
             item { SuggestedAccountHeader() }
-            item { SuggestedAccountCarousel(items = uiState.suggestedUsers) }
+            item { SuggestedAccountCarousel(pagingItems = suggestedAccounts) }
             item { SuggestedFeedHeader() }
-            items(uiState.suggestedFeeds) { feed ->
-                SuggestedFeedItem(
-                    feed.avatar?.uri,
-                    feed.displayName,
-                    feed.creator.handle.handle,
-                    feed.description,
-                    feed.likeCount,
-                )
+            items(
+                count = suggestedFeeds.itemCount,
+                key = suggestedFeeds.itemKey { it.uri.atUri },
+                contentType = suggestedAccounts.itemContentType(),
+            ) { index ->
+                suggestedFeeds[index]?.let {
+                    SuggestedFeedItem(
+                        it.avatar?.uri,
+                        it.displayName,
+                        it.creator.handle.handle,
+                        it.description,
+                        it.likeCount,
+                    )
+                }
             }
         }
     }
@@ -264,7 +283,7 @@ fun SuggestedFeedHeader() {
 }
 
 @Composable
-fun SuggestedAccountCarousel(items: List<ProfileView>) {
+fun SuggestedAccountCarousel(pagingItems: LazyPagingItems<ProfileView>) {
     LazyRow(
         modifier =
             Modifier
@@ -273,56 +292,62 @@ fun SuggestedAccountCarousel(items: List<ProfileView>) {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(horizontal = 16.dp),
     ) {
-        items(items) { item ->
-            ElevatedCard(
-                modifier =
-                    Modifier
-                        .height(240.dp)
-                        .width(240.dp),
-            ) {
-                Column(
-                    modifier = Modifier.padding(8.dp),
+        items(
+            count = pagingItems.itemCount,
+            key = pagingItems.itemKey { it.did.did },
+            contentType = pagingItems.itemContentType(),
+        ) { index ->
+            pagingItems[index]?.let { item ->
+                ElevatedCard(
+                    modifier =
+                        Modifier
+                            .height(240.dp)
+                            .width(240.dp),
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
+                    Column(
+                        modifier = Modifier.padding(8.dp),
                     ) {
-                        BorderedCircularAvatar(
-                            imageUri = item.avatar?.uri,
-                            size = 48.dp,
-                        )
-                        Column(modifier = Modifier.padding(start = 8.dp)) {
-                            item.displayName?.let {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            BorderedCircularAvatar(
+                                imageUri = item.avatar?.uri,
+                                size = 48.dp,
+                            )
+                            Column(modifier = Modifier.padding(start = 8.dp)) {
+                                item.displayName?.let {
+                                    Text(
+                                        text = it,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                }
                                 Text(
-                                    text = it,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
+                                    text = item.handle.handle,
+                                    style = MaterialTheme.typography.bodyMedium,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                 )
                             }
+                        }
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
                             Text(
-                                text = item.handle.handle,
-                                style = MaterialTheme.typography.bodyMedium,
-                                maxLines = 1,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(vertical = 8.dp),
+                                maxLines = 4,
+                                text = item.description ?: "",
                                 overflow = TextOverflow.Ellipsis,
                             )
-                        }
-                    }
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(vertical = 8.dp),
-                            maxLines = 4,
-                            text = item.description ?: "",
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Spacer(modifier = Modifier.weight(1f))
-                        Button(onClick = {}) {
-                            Text("Follow")
+                            Spacer(modifier = Modifier.weight(1f))
+                            Button(onClick = {}) {
+                                Text("Follow")
+                            }
                         }
                     }
                 }

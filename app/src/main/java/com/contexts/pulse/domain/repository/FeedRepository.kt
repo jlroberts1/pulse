@@ -9,11 +9,12 @@
 
 package com.contexts.pulse.domain.repository
 
+import androidx.paging.PagingData
+import app.bsky.feed.GeneratorView
 import app.bsky.feed.GetFeedResponse
-import app.bsky.feed.GetSuggestedFeedsQueryParams
-import app.bsky.feed.GetSuggestedFeedsResponse
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.exceptions.NetworkError
+import kotlinx.coroutines.flow.Flow
 
 interface FeedRepository {
     suspend fun getFeed(
@@ -21,7 +22,5 @@ interface FeedRepository {
         cursor: String?,
     ): Response<GetFeedResponse, NetworkError>
 
-    suspend fun getSuggestions(
-        getFeedSuggestionsQueryParams: GetSuggestedFeedsQueryParams,
-    ): Response<GetSuggestedFeedsResponse, NetworkError>
+    fun getSuggestions(): Flow<PagingData<GeneratorView>>
 }

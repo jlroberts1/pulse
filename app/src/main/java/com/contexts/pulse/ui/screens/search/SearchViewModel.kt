@@ -9,58 +9,21 @@
 
 package com.contexts.pulse.ui.screens.search
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import app.bsky.actor.GetSuggestionsQueryParams
-import app.bsky.actor.ProfileView
-import app.bsky.feed.GeneratorView
-import app.bsky.feed.GetSuggestedFeedsQueryParams
-import com.contexts.pulse.data.network.client.onError
-import com.contexts.pulse.data.network.client.onSuccess
+import androidx.paging.cachedIn
 import com.contexts.pulse.domain.repository.ActorRepository
 import com.contexts.pulse.domain.repository.FeedRepository
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-
-data class SearchUiState(
-    val suggestedUsers: List<ProfileView> = emptyList(),
-    val suggestedFeeds: List<GeneratorView> = emptyList(),
-    val error: String? = null,
-)
 
 class SearchViewModel(
-    private val actorRepository: ActorRepository,
-    private val feedRepository: FeedRepository,
+    actorRepository: ActorRepository,
+    feedRepository: FeedRepository,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(SearchUiState())
-    val uiState = _uiState.asStateFlow()
+    val suggestedAccounts =
+        actorRepository.getSuggestions()
+            .cachedIn(viewModelScope)
 
-    init {
-        getSuggestions()
-    }
-
-    private fun getSuggestions() {
-        viewModelScope.launch {
-            val users = async { actorRepository.getSuggestions(GetSuggestionsQueryParams()) }
-            val feeds = async { feedRepository.getSuggestions(GetSuggestedFeedsQueryParams()) }
-            val usersResult = users.await()
-            val feedsResult = feeds.await()
-            usersResult.onSuccess { response ->
-                _uiState.update { it.copy(suggestedUsers = response.actors) }
-            }.onError { error ->
-                _uiState.update { it.copy(error = error.message) }
-            }
-            feedsResult.onSuccess { response ->
-                Log.d("SearchViewModel", "${response.feeds}")
-                _uiState.update { it.copy(suggestedFeeds = response.feeds) }
-            }.onError { error ->
-                Log.d("SearchViewModel", error.message)
-                _uiState.update { it.copy(error = error.message) }
-            }
-        }
-    }
+    val suggestedFeeds =
+        feedRepository.getSuggestions()
+            .cachedIn(viewModelScope)
 }

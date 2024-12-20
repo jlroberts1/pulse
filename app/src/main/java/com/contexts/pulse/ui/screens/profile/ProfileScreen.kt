@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
@@ -29,6 +28,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.contexts.pulse.ui.composables.FeedItem
 import com.contexts.pulse.ui.composables.PullToRefreshBox
@@ -44,6 +46,7 @@ fun ProfileScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val profile by viewModel.profile.collectAsStateWithLifecycle()
+    val feed = viewModel.feedState.collectAsLazyPagingItems()
     val listState = rememberLazyListState()
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val isExpandedScreen =
@@ -52,7 +55,7 @@ fun ProfileScreen(
     PullToRefreshBox(
         modifier = Modifier.fillMaxSize(),
         isRefreshing = uiState.loading,
-        onRefresh = { viewModel.refreshProfile() },
+        onRefresh = { feed.refresh() },
     ) {
         if (isExpandedScreen) {
             Row(
@@ -96,15 +99,21 @@ fun ProfileScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    items(uiState.feed, key = { it.postUri }) { item ->
-                        FeedItem(
-                            post = item,
-                            onMediaOpen = { onMediaOpen(it) },
-                            onRepostClick = {},
-                            onReplyClick = {},
-                            onMenuClick = {},
-                            onLikeClick = {},
-                        )
+                    items(
+                        count = feed.itemCount,
+                        key = feed.itemKey { it.postUri },
+                        contentType = feed.itemContentType(),
+                    ) { index ->
+                        feed[index]?.let { item ->
+                            FeedItem(
+                                post = item,
+                                onMediaOpen = { media -> onMediaOpen(media) },
+                                onRepostClick = {},
+                                onReplyClick = {},
+                                onMenuClick = {},
+                                onLikeClick = {},
+                            )
+                        }
                     }
                 }
             }
@@ -141,15 +150,21 @@ fun ProfileScreen(
                         }
                     }
 
-                    items(uiState.feed, key = { it.postUri }) { item ->
-                        FeedItem(
-                            post = item,
-                            onRepostClick = {},
-                            onReplyClick = {},
-                            onMenuClick = {},
-                            onLikeClick = {},
-                            onMediaOpen = { onMediaOpen(it) },
-                        )
+                    items(
+                        count = feed.itemCount,
+                        key = feed.itemKey { it.postUri },
+                        contentType = feed.itemContentType(),
+                    ) { index ->
+                        feed[index]?.let { item ->
+                            FeedItem(
+                                post = item,
+                                onMediaOpen = { media -> onMediaOpen(media) },
+                                onRepostClick = {},
+                                onReplyClick = {},
+                                onMenuClick = {},
+                                onLikeClick = {},
+                            )
+                        }
                     }
                 }
             }

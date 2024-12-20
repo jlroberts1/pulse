@@ -9,8 +9,9 @@
 
 package com.contexts.pulse.domain.repository
 
+import androidx.paging.PagingData
 import app.bsky.actor.GetProfileResponse
-import app.bsky.feed.GetAuthorFeedResponse
+import app.bsky.feed.FeedViewPost
 import com.contexts.pulse.data.local.database.entities.FeedEntity
 import com.contexts.pulse.data.local.database.entities.ProfileEntity
 import com.contexts.pulse.data.network.client.Response
@@ -22,7 +23,7 @@ interface ProfileRepository {
 
     fun getMyProfile(): Flow<ProfileEntity?>
 
-    suspend fun getProfileFeed(): Response<GetAuthorFeedResponse, NetworkError>
+    suspend fun getProfileFeed(): RequestResult<Flow<PagingData<FeedViewPost>>>
 
     suspend fun getSavedFeeds(did: String): Response<List<FeedEntity>, NetworkError>
 

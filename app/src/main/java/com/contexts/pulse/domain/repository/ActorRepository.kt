@@ -9,17 +9,18 @@
 
 package com.contexts.pulse.domain.repository
 
-import app.bsky.actor.GetSuggestionsQueryParams
-import app.bsky.actor.GetSuggestionsResponse
+import androidx.paging.PagingData
+import app.bsky.actor.ProfileView
 import app.bsky.actor.SearchActorsTypeaheadQueryParams
 import app.bsky.actor.SearchActorsTypeaheadResponse
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.exceptions.NetworkError
+import kotlinx.coroutines.flow.Flow
 
 interface ActorRepository {
     suspend fun searchActorsTypeahead(
         searchActorsTypeaheadQueryParams: SearchActorsTypeaheadQueryParams,
     ): Response<SearchActorsTypeaheadResponse, NetworkError>
 
-    suspend fun getSuggestions(getSuggestionsQueryParams: GetSuggestionsQueryParams): Response<GetSuggestionsResponse, NetworkError>
+    fun getSuggestions(): Flow<PagingData<ProfileView>>
 }
