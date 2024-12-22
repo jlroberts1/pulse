@@ -26,8 +26,10 @@ import com.contexts.pulse.modules.localDataModule
 import com.contexts.pulse.modules.networkModule
 import com.contexts.pulse.modules.repositoryModule
 import com.contexts.pulse.modules.viewModelModule
+import com.contexts.pulse.modules.workerModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
+import org.koin.androidx.workmanager.koin.workManagerFactory
 import org.koin.core.context.startKoin
 
 class PulseApplication : Application(), SingletonImageLoader.Factory {
@@ -36,6 +38,7 @@ class PulseApplication : Application(), SingletonImageLoader.Factory {
         startKoin {
             androidLogger()
             androidContext(this@PulseApplication)
+            workManagerFactory()
             modules(
                 listOf(
                     appModule,
@@ -45,6 +48,7 @@ class PulseApplication : Application(), SingletonImageLoader.Factory {
                     networkModule,
                     localDataModule,
                     viewModelModule,
+                    workerModule,
                 ),
             )
         }

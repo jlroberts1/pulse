@@ -9,14 +9,12 @@
 
 package com.contexts.pulse.modules
 
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.work.WorkManager
-import com.contexts.pulse.domain.media.PlayerPoolManager
+import com.contexts.pulse.worker.UploadBlobWorker
+import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.workmanager.dsl.worker
 import org.koin.dsl.module
 
-val appModule =
+val workerModule =
     module {
-        single<ExoPlayer> { ExoPlayer.Builder(get()).build() }
-        single<PlayerPoolManager> { PlayerPoolManager(get()) }
-        single<WorkManager> { WorkManager.getInstance(get()) }
+        worker { UploadBlobWorker(androidContext(), get()) }
     }
