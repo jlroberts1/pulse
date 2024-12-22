@@ -51,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
@@ -61,6 +62,8 @@ import app.bsky.feed.FeedViewPost
 import com.contexts.pulse.data.local.database.entities.FeedEntity
 import com.contexts.pulse.ui.composables.FeedItem
 import com.contexts.pulse.ui.composables.PullToRefreshBox
+import com.contexts.pulse.ui.screens.main.NavigationRoutes
+import io.ktor.http.encodeURLParameter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
@@ -68,6 +71,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
+    navController: NavController,
     onMediaOpen: (String) -> Unit,
 ) {
     val visibleFeeds by viewModel.visibleFeeds.collectAsStateWithLifecycle()
@@ -97,12 +101,14 @@ fun HomeScreen(
                 }
             }
             TabletRow(
+                navController = navController,
                 feeds = visibleFeeds,
                 feedStates = feedStates,
                 onMediaOpen = { onMediaOpen(it) },
             )
         } else {
             TabPagerFeeds(
+                navController = navController,
                 feeds = visibleFeeds,
                 feedStates = feedStates,
                 onMediaOpen = { onMediaOpen(it) },
@@ -185,6 +191,7 @@ fun FeedConfigurationDialog(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TabletRow(
+    navController: NavController,
     feeds: List<FeedEntity>,
     feedStates: Map<String, Flow<PagingData<FeedViewPost>>>,
     onMediaOpen: (String) -> Unit,
@@ -213,6 +220,7 @@ fun TabletRow(
                 ) {
                     feedStates[feed.id]?.let { pagingFlow ->
                         FeedContent(
+                            navController = navController,
                             pagingFlow = pagingFlow,
                             onMediaOpen = onMediaOpen,
                         )
@@ -226,6 +234,7 @@ fun TabletRow(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TabPagerFeeds(
+    navController: NavController,
     feeds: List<FeedEntity>,
     feedStates: Map<String, Flow<PagingData<FeedViewPost>>>,
     onMediaOpen: (String) -> Unit,
@@ -270,9 +279,9 @@ fun TabPagerFeeds(
                         .widthIn(max = 840.dp)
                         .fillMaxSize(),
             ) { page ->
-                val feed = feeds[page]
-                feedStates[feed.id]?.let { pagingFlow ->
+                feedStates[feedId]?.let { pagingFlow ->
                     FeedContent(
+                        navController = navController,
                         pagingFlow = pagingFlow,
                         onMediaOpen = { onMediaOpen(it) },
                     )
@@ -284,6 +293,7 @@ fun TabPagerFeeds(
 
 @Composable
 private fun FeedContent(
+    navController: NavController,
     pagingFlow: Flow<PagingData<FeedViewPost>>,
     onMediaOpen: (String) -> Unit,
 ) {
@@ -315,6 +325,11 @@ private fun FeedContent(
                 posts[item]?.let {
                     FeedItem(
                         post = it,
+                        onPostClick = { postId ->
+                            navController.navigate(
+                                NavigationRoutes.Authenticated.PostView.createRoute(postId.encodeURLParameter()),
+                            )
+                        },
                         onReplyClick = {},
                         onRepostClick = {},
                         onLikeClick = {},

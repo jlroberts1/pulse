@@ -38,7 +38,10 @@ fun ProfileInfo(
     ) {
         description?.let { description ->
             Spacer(modifier = Modifier.height(8.dp))
-            AutoLinkText(text = description)
+            AutoLinkText(
+                text = description,
+                onClick = { },
+            )
         }
         Spacer(modifier = Modifier.height(16.dp))
         Row(

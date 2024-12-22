@@ -20,21 +20,24 @@ import com.contexts.pulse.data.network.api.ActorAPI
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.domain.repository.ActorRepository
 import com.contexts.pulse.exceptions.NetworkError
+import com.contexts.pulse.modules.AppDispatchers
 import io.ktor.client.HttpClient
 import io.ktor.util.reflect.typeInfo
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 
 class ActorRepositoryImpl(
+    private val appDispatchers: AppDispatchers,
     private val client: HttpClient,
     private val actorAPI: ActorAPI,
 ) : ActorRepository {
     override suspend fun searchActorsTypeahead(
         searchActorsTypeaheadQueryParams: SearchActorsTypeaheadQueryParams,
-    ): Response<SearchActorsTypeaheadResponse, NetworkError> {
-        return actorAPI.searchActorsTypeahead(searchActorsTypeaheadQueryParams)
-    }
+    ): Response<SearchActorsTypeaheadResponse, NetworkError> =
+        withContext(appDispatchers.io) {
+            actorAPI.searchActorsTypeahead(searchActorsTypeaheadQueryParams)
+        }
 
     override fun getSuggestions(): Flow<PagingData<ProfileView>> {
         val request = PagedRequest.SuggestedAccounts()
@@ -46,6 +49,7 @@ class ActorRepositoryImpl(
                 ),
             pagingSourceFactory = {
                 NetworkPagingSource<ProfileView, GetSuggestionsResponse>(
+                    appDispatchers = appDispatchers,
                     client = client,
                     request = request,
                     type = typeInfo<GetSuggestionsResponse>(),
@@ -53,6 +57,6 @@ class ActorRepositoryImpl(
                     getCursor = { it.cursor },
                 )
             },
-        ).flow.flowOn(Dispatchers.IO)
+        ).flow.flowOn(appDispatchers.io)
     }
 }

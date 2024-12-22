@@ -15,9 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun PostMessageText(text: String? = "") {
+fun PostMessageText(
+    text: String? = "",
+    onClick: () -> Unit,
+) {
     AutoLinkText(
         modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
         text = text ?: "",
+        onClick = { onClick() },
     )
 }

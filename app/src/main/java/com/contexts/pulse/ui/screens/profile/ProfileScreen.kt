@@ -107,6 +107,7 @@ fun ProfileScreen(
                         feed[index]?.let { item ->
                             FeedItem(
                                 post = item,
+                                onPostClick = {},
                                 onMediaOpen = { media -> onMediaOpen(media) },
                                 onRepostClick = {},
                                 onReplyClick = {},
@@ -158,6 +159,7 @@ fun ProfileScreen(
                         feed[index]?.let { item ->
                             FeedItem(
                                 post = item,
+                                onPostClick = {},
                                 onMediaOpen = { media -> onMediaOpen(media) },
                                 onRepostClick = {},
                                 onReplyClick = {},

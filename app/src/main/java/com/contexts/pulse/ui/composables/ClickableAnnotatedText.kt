@@ -31,6 +31,7 @@ fun ClickableAnnotatedText(
         MaterialTheme.typography.bodyMedium.copy(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         ),
+    onClick: () -> Unit,
     uriHandler: UriHandler = LocalUriHandler.current,
 ) {
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
@@ -42,11 +43,14 @@ fun ClickableAnnotatedText(
                 detectTapGestures { offset ->
                     layoutResult.value?.let { layoutResult ->
                         val position = layoutResult.getOffsetForPosition(offset)
-                        annotatedString
-                            .getStringAnnotations("URL", position, position)
-                            .firstOrNull()?.let { annotation ->
-                                uriHandler.openUri(annotation.item)
-                            }
+                        val annotations =
+                            annotatedString
+                                .getStringAnnotations("URL", position, position)
+                        if (annotations.isEmpty()) {
+                            onClick()
+                        } else {
+                            uriHandler.openUri(annotations.first().item)
+                        }
                     }
                 }
             },

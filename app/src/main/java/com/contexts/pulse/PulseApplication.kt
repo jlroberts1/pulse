@@ -19,9 +19,12 @@ import coil3.disk.directory
 import coil3.memory.MemoryCache
 import coil3.request.CachePolicy
 import coil3.request.crossfade
+import com.contexts.pulse.modules.apiModule
 import com.contexts.pulse.modules.appModule
+import com.contexts.pulse.modules.dispatcherModule
 import com.contexts.pulse.modules.localDataModule
 import com.contexts.pulse.modules.networkModule
+import com.contexts.pulse.modules.repositoryModule
 import com.contexts.pulse.modules.viewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -36,6 +39,9 @@ class PulseApplication : Application(), SingletonImageLoader.Factory {
             modules(
                 listOf(
                     appModule,
+                    apiModule,
+                    repositoryModule,
+                    dispatcherModule,
                     networkModule,
                     localDataModule,
                     viewModelModule,

@@ -21,33 +21,37 @@ import com.contexts.pulse.domain.repository.PreferencesRepository
 import com.contexts.pulse.domain.repository.ProfileRepository
 import com.contexts.pulse.domain.repository.UserRepository
 import com.contexts.pulse.exceptions.NetworkError
+import com.contexts.pulse.modules.AppDispatchers
+import kotlinx.coroutines.withContext
 
 class AuthenticateRepositoryImpl(
+    private val appDispatchers: AppDispatchers,
     private val api: AuthenticateAPI,
     private val userRepository: UserRepository,
     private val preferencesRepository: PreferencesRepository,
     private val profileRepository: ProfileRepository,
 ) : AuthenticateRepository {
-    override suspend fun createSession(createSessionRequest: CreateSessionRequest): Response<CreateSessionResponse, NetworkError> {
-        return api.createSession(createSessionRequest)
-            .onSuccess {
-                preferencesRepository.updateCurrentUser(it.did.did)
-                userRepository.insertUser(it.toUser())
-                profileRepository.getProfile(it.did.did).onSuccess { response ->
-                    profileRepository.insertProfile(
-                        ProfileEntity(
-                            userDid = it.did.did,
-                            handle = response.handle.handle,
-                            displayName = response.displayName,
-                            banner = response.banner?.uri,
-                            avatar = response.avatar?.uri,
-                            description = response.description,
-                            followersCount = response.followersCount,
-                            followsCount = response.followsCount,
-                            postsCount = response.postsCount,
-                        ),
-                    )
+    override suspend fun createSession(createSessionRequest: CreateSessionRequest): Response<CreateSessionResponse, NetworkError> =
+        withContext(appDispatchers.io) {
+            api.createSession(createSessionRequest)
+                .onSuccess {
+                    preferencesRepository.updateCurrentUser(it.did.did)
+                    userRepository.insertUser(it.toUser())
+                    profileRepository.getProfile(it.did.did).onSuccess { response ->
+                        profileRepository.insertProfile(
+                            ProfileEntity(
+                                userDid = it.did.did,
+                                handle = response.handle.handle,
+                                displayName = response.displayName,
+                                banner = response.banner?.uri,
+                                avatar = response.avatar?.uri,
+                                description = response.description,
+                                followersCount = response.followersCount,
+                                followsCount = response.followsCount,
+                                postsCount = response.postsCount,
+                            ),
+                        )
+                    }
                 }
-            }
-    }
+        }
 }

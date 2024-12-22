@@ -11,11 +11,13 @@ package com.contexts.pulse.data.repository
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.contexts.pulse.modules.AppDispatchers
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.util.reflect.TypeInfo
+import kotlinx.coroutines.withContext
 
 sealed interface RequestResult<out T> {
     data class Success<out T>(val data: T) : RequestResult<T>
@@ -58,33 +60,35 @@ sealed class PagedRequest {
 }
 
 class NetworkPagingSource<T : Any, R : Any>(
+    private val appDispatchers: AppDispatchers,
     private val client: HttpClient,
     private val request: PagedRequest,
     private val type: TypeInfo,
     private val getItems: (R) -> List<T>,
     private val getCursor: (R) -> String?,
 ) : PagingSource<String, T>() {
-    override suspend fun load(params: LoadParams<String>): LoadResult<String, T> {
-        return try {
-            val response =
-                client.get(request.url) {
-                    request.parameters.forEach { (key, value) ->
-                        parameter(key, value)
-                    }
+    override suspend fun load(params: LoadParams<String>): LoadResult<String, T> =
+        withContext(appDispatchers.io) {
+            try {
+                val response =
+                    client.get(request.url) {
+                        request.parameters.forEach { (key, value) ->
+                            parameter(key, value)
+                        }
 
-                    params.key?.let { parameter("cursor", it) }
-                    parameter("limit", request.limit)
-                }.body<R>(type)
+                        params.key?.let { parameter("cursor", it) }
+                        parameter("limit", request.limit)
+                    }.body<R>(type)
 
-            LoadResult.Page(
-                data = getItems(response),
-                prevKey = null,
-                nextKey = getCursor(response)?.takeIf { it.isNotBlank() },
-            )
-        } catch (e: Exception) {
-            LoadResult.Error(e)
+                LoadResult.Page(
+                    data = getItems(response),
+                    prevKey = null,
+                    nextKey = getCursor(response)?.takeIf { it.isNotBlank() },
+                )
+            } catch (e: Exception) {
+                LoadResult.Error(e)
+            }
         }
-    }
 
     override fun getRefreshKey(state: PagingState<String, T>): String? = null
 }

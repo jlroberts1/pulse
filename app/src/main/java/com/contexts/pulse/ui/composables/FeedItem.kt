@@ -9,6 +9,7 @@
 
 package com.contexts.pulse.ui.composables
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,11 +24,13 @@ import app.bsky.feed.FeedViewPost
 import app.bsky.feed.PostViewEmbedUnion
 import com.contexts.pulse.domain.media.PlayerPoolManager
 import com.contexts.pulse.extensions.getPostText
+import io.ktor.http.encodeURLParameter
 import org.koin.compose.koinInject
 
 @Composable
 fun FeedItem(
     post: FeedViewPost,
+    onPostClick: (String) -> Unit,
     onReplyClick: () -> Unit,
     onRepostClick: () -> Unit,
     onLikeClick: () -> Unit,
@@ -38,6 +41,9 @@ fun FeedItem(
     ElevatedCard(
         modifier =
             Modifier
+                .clickable {
+                    onPostClick(post.post.uri.atUri)
+                }
                 .fillMaxWidth()
                 .padding(top = 8.dp),
     ) {
@@ -53,7 +59,10 @@ fun FeedItem(
                 handle = post.post.author.handle.handle,
                 indexedAt = post.post.indexedAt,
             )
-            PostMessageText(post.post.getPostText())
+            PostMessageText(
+                text = post.post.getPostText(),
+                onClick = { onPostClick(post.post.uri.atUri.encodeURLParameter()) },
+            )
 
             post.post.embed?.let { embed ->
                 when (embed) {
@@ -108,6 +117,12 @@ fun FeedItem(
                     is PostViewEmbedUnion.Unknown -> Unit
                 }
             }
+
+            FeedItemInteractions(
+                replyCount = post.post.replyCount,
+                repostCount = post.post.repostCount,
+                likeCount = post.post.likeCount,
+            )
         }
     }
 }

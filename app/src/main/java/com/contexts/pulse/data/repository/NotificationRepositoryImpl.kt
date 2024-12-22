@@ -16,13 +16,26 @@ import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.network.response.GenericResponse
 import com.contexts.pulse.domain.repository.NotificationsRepository
 import com.contexts.pulse.exceptions.NetworkError
+import com.contexts.pulse.modules.AppDispatchers
+import kotlinx.coroutines.withContext
 import sh.christian.ozone.api.model.Timestamp
 
-class NotificationsRepositoryImpl(private val notificationsAPI: NotificationsAPI) :
-    NotificationsRepository {
-    override suspend fun listNotifications(): Response<ListNotificationsResponse, NetworkError> = notificationsAPI.listNotifications()
+class NotificationsRepositoryImpl(
+    private val appDispatchers: AppDispatchers,
+    private val notificationsAPI: NotificationsAPI,
+) : NotificationsRepository {
+    override suspend fun listNotifications(): Response<ListNotificationsResponse, NetworkError> =
+        withContext(appDispatchers.io) {
+            notificationsAPI.listNotifications()
+        }
 
-    override suspend fun getUnreadCount(): Response<GetUnreadCountResponse, NetworkError> = notificationsAPI.getUnreadCount()
+    override suspend fun getUnreadCount(): Response<GetUnreadCountResponse, NetworkError> =
+        withContext(appDispatchers.io) {
+            notificationsAPI.getUnreadCount()
+        }
 
-    override suspend fun updateSeen(seenAt: Timestamp): Response<GenericResponse, NetworkError> = notificationsAPI.updateSeen(seenAt)
+    override suspend fun updateSeen(seenAt: Timestamp): Response<GenericResponse, NetworkError> =
+        withContext(appDispatchers.io) {
+            notificationsAPI.updateSeen(seenAt)
+        }
 }

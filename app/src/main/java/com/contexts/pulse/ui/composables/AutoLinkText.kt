@@ -24,6 +24,7 @@ import androidx.core.text.util.LinkifyCompat
 fun AutoLinkText(
     text: String,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit,
     linkColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.primary,
 ) {
     val annotatedString =
@@ -60,5 +61,6 @@ fun AutoLinkText(
     ClickableAnnotatedText(
         annotatedString = annotatedString,
         modifier = modifier,
+        onClick = { onClick() },
     )
 }

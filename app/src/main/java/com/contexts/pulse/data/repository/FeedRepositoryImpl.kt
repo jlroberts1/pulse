@@ -26,13 +26,15 @@ import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.network.client.onSuccess
 import com.contexts.pulse.domain.repository.FeedRepository
 import com.contexts.pulse.exceptions.NetworkError
+import com.contexts.pulse.modules.AppDispatchers
 import io.ktor.client.HttpClient
 import io.ktor.util.reflect.typeInfo
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 
 class FeedRepositoryImpl(
+    private val appDispatchers: AppDispatchers,
     private val client: HttpClient,
     private val feedAPI: FeedAPI,
     private val feedDao: FeedDao,
@@ -41,7 +43,10 @@ class FeedRepositoryImpl(
     override suspend fun getFeed(
         feedUri: String,
         cursor: String?,
-    ): Response<GetFeedResponse, NetworkError> = feedAPI.getFeed(feedUri = feedUri, cursor = cursor)
+    ): Response<GetFeedResponse, NetworkError> =
+        withContext(appDispatchers.io) {
+            feedAPI.getFeed(feedUri = feedUri, cursor = cursor)
+        }
 
     override fun getSuggestions(): Flow<PagingData<GeneratorView>> {
         val request = PagedRequest.SuggestedFeed()
@@ -53,6 +58,7 @@ class FeedRepositoryImpl(
                 ),
             pagingSourceFactory = {
                 NetworkPagingSource<GeneratorView, GetSuggestedFeedsResponse>(
+                    appDispatchers = appDispatchers,
                     client = client,
                     request = request,
                     typeInfo<GetSuggestedFeedsResponse>(),
@@ -60,7 +66,7 @@ class FeedRepositoryImpl(
                     getCursor = { it.cursor },
                 )
             },
-        ).flow.flowOn(Dispatchers.IO)
+        ).flow.flowOn(appDispatchers.io)
     }
 
     override fun getFeed(feedUri: String): Flow<PagingData<FeedViewPost>> {
@@ -73,6 +79,7 @@ class FeedRepositoryImpl(
                 ),
             pagingSourceFactory = {
                 NetworkPagingSource<FeedViewPost, GetFeedResponse>(
+                    appDispatchers = appDispatchers,
                     client = client,
                     request = request,
                     typeInfo<GetFeedResponse>(),
@@ -80,35 +87,36 @@ class FeedRepositoryImpl(
                     getCursor = { it.cursor },
                 )
             },
-        ).flow.flowOn(Dispatchers.IO)
+        ).flow.flowOn(appDispatchers.io)
     }
 
-    override suspend fun refreshFeeds(did: String) {
-        profileAPI.getPreferences().onSuccess { response ->
-            val savedFeeds =
-                response.preferences
-                    .filterIsInstance<PreferencesUnion.SavedFeedsPrefV2>()
-                    .map { it.value.items.filter { item -> item.type is Type.Feed } }
-                    .firstOrNull()
+    override suspend fun refreshFeeds(did: String): Unit =
+        withContext(appDispatchers.io) {
+            profileAPI.getPreferences().onSuccess { response ->
+                val savedFeeds =
+                    response.preferences
+                        .filterIsInstance<PreferencesUnion.SavedFeedsPrefV2>()
+                        .map { it.value.items.filter { item -> item.type is Type.Feed } }
+                        .firstOrNull()
 
-            savedFeeds?.forEach { savedFeed ->
-                feedAPI.getFeedGenerator(savedFeed.value).onSuccess { response ->
-                    val feed =
-                        FeedEntity(
-                            id = savedFeed.id,
-                            userDid = did,
-                            type = savedFeed.type.value,
-                            uri = savedFeed.value,
-                            pinned = savedFeed.pinned,
-                            displayName = response.view.displayName,
-                        )
-                    feedDao.insertFeed(feed)
+                savedFeeds?.forEach { savedFeed ->
+                    feedAPI.getFeedGenerator(savedFeed.value).onSuccess { response ->
+                        val feed =
+                            FeedEntity(
+                                id = savedFeed.id,
+                                userDid = did,
+                                type = savedFeed.type.value,
+                                uri = savedFeed.value,
+                                pinned = savedFeed.pinned,
+                                displayName = response.view.displayName,
+                            )
+                        feedDao.insertFeed(feed)
+                    }
                 }
             }
         }
-    }
 
     override fun getAvailableFeeds(did: String): Flow<List<FeedEntity>> {
-        return feedDao.getFeedsForUser(did).flowOn(Dispatchers.IO)
+        return feedDao.getFeedsForUser(did).flowOn(appDispatchers.io)
     }
 }

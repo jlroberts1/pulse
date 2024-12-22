@@ -24,6 +24,7 @@ import com.contexts.pulse.data.network.client.onSuccess
 import com.contexts.pulse.domain.repository.PreferencesRepository
 import com.contexts.pulse.domain.repository.ProfileRepository
 import com.contexts.pulse.exceptions.NetworkError
+import com.contexts.pulse.modules.AppDispatchers
 import io.ktor.client.HttpClient
 import io.ktor.util.reflect.typeInfo
 import kotlinx.coroutines.Dispatchers
@@ -32,14 +33,19 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.withContext
 
 class ProfileRepositoryImpl(
+    private val appDispatchers: AppDispatchers,
     private val client: HttpClient,
     private val profileAPI: ProfileAPI,
     private val profileDao: ProfileDao,
     private val preferencesRepository: PreferencesRepository,
 ) : ProfileRepository {
-    override suspend fun getProfile(actor: String): Response<GetProfileResponse, NetworkError> = profileAPI.getProfile(actor)
+    override suspend fun getProfile(actor: String): Response<GetProfileResponse, NetworkError> =
+        withContext(appDispatchers.io) {
+            profileAPI.getProfile(actor)
+        }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getMyProfile(): Flow<ProfileEntity?> =
@@ -48,7 +54,7 @@ class ProfileRepositoryImpl(
                 profileDao.insertProfile(response.toProfileEntity())
             }
             profileDao.getProfileByDid(it)
-        }
+        }.flowOn(appDispatchers.io)
 
     override suspend fun getProfileFeed(): RequestResult<Flow<PagingData<FeedViewPost>>> {
         val current = preferencesRepository.getCurrentUser() ?: return RequestResult.NoCurrentUser
@@ -62,6 +68,7 @@ class ProfileRepositoryImpl(
                     ),
                 pagingSourceFactory = {
                     NetworkPagingSource<FeedViewPost, GetAuthorFeedResponse>(
+                        appDispatchers = appDispatchers,
                         client = client,
                         request = request,
                         type = typeInfo<GetAuthorFeedResponse>(),
@@ -73,7 +80,8 @@ class ProfileRepositoryImpl(
         )
     }
 
-    override suspend fun insertProfile(profile: ProfileEntity) {
-        profileDao.insertProfile(profile)
-    }
+    override suspend fun insertProfile(profile: ProfileEntity) =
+        withContext(appDispatchers.io) {
+            profileDao.insertProfile(profile)
+        }
 }

@@ -18,33 +18,37 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.contexts.pulse.domain.model.Theme
 import com.contexts.pulse.domain.repository.PreferencesRepository
-import kotlinx.coroutines.Dispatchers
+import com.contexts.pulse.modules.AppDispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.withContext
 
 class PreferencesRepositoryImpl(
+    private val appDispatchers: AppDispatchers,
     private val dataStore: DataStore<Preferences>,
 ) : PreferencesRepository {
-    override suspend fun updateCurrentUser(did: String) {
-        dataStore.edit { preferences ->
-            preferences[CURRENT_USER] = did
+    override suspend fun updateCurrentUser(did: String): Unit =
+        withContext(appDispatchers.io) {
+            dataStore.edit { preferences ->
+                preferences[CURRENT_USER] = did
+            }
         }
-    }
 
-    override suspend fun getCurrentUser(): String? {
-        return try {
-            dataStore.data
-                .map { preferences -> preferences[CURRENT_USER] }
-                .mapNotNull { it }
-                .first()
-        } catch (e: Exception) {
-            null
+    override suspend fun getCurrentUser(): String? =
+        withContext(appDispatchers.io) {
+            try {
+                dataStore.data
+                    .map { preferences -> preferences[CURRENT_USER] }
+                    .mapNotNull { it }
+                    .first()
+            } catch (e: Exception) {
+                null
+            }
         }
-    }
 
     override fun getCurrentUserFlow(): Flow<String?> =
         dataStore.data
@@ -57,13 +61,14 @@ class PreferencesRepositoryImpl(
             }.map { preferences ->
                 preferences[CURRENT_USER]
             }
-            .flowOn(Dispatchers.IO)
+            .flowOn(appDispatchers.io)
 
-    override suspend fun updateTheme(theme: Theme) {
-        dataStore.edit { preferences ->
-            preferences[THEME] = theme.name
+    override suspend fun updateTheme(theme: Theme): Unit =
+        withContext(appDispatchers.io) {
+            dataStore.edit { preferences ->
+                preferences[THEME] = theme.name
+            }
         }
-    }
 
     override fun getTheme(): Flow<Theme> =
         dataStore.data
@@ -75,13 +80,14 @@ class PreferencesRepositoryImpl(
                 }
             }.map { preferences ->
                 Theme.fromString(preferences[THEME])
-            }.flowOn(Dispatchers.IO)
+            }.flowOn(appDispatchers.io)
 
-    override suspend fun updateUnreadCount(count: Long) {
-        dataStore.edit { preferences ->
-            preferences[UNREAD_COUNT] = count
+    override suspend fun updateUnreadCount(count: Long): Unit =
+        withContext(appDispatchers.io) {
+            dataStore.edit { preferences ->
+                preferences[UNREAD_COUNT] = count
+            }
         }
-    }
 
     override fun getUnreadCount(): Flow<Long> =
         dataStore.data
@@ -93,7 +99,7 @@ class PreferencesRepositoryImpl(
                 }
             }.map { preferences ->
                 preferences[UNREAD_COUNT] ?: 0L
-            }.flowOn(Dispatchers.IO)
+            }.flowOn(appDispatchers.io)
 
     companion object {
         val CURRENT_USER = stringPreferencesKey("current_user")
