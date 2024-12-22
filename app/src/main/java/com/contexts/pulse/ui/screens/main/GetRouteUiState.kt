@@ -56,6 +56,10 @@ fun getRouteUiState(
             RouteUiState(
                 topAppBarTitle = "Add new post",
             )
+        NavigationRoutes.Authenticated.PostView.route ->
+            RouteUiState(
+                topAppBarTitle = "Post",
+            )
         NavigationRoutes.Unauthenticated.Login.route ->
             RouteUiState(
                 showTopAppBar = false,

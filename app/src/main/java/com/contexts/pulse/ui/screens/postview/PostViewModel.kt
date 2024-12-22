@@ -13,6 +13,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.bsky.feed.GetPostThreadResponseThreadUnion
+import com.contexts.pulse.data.network.client.onError
 import com.contexts.pulse.data.network.client.onSuccess
 import com.contexts.pulse.domain.repository.PostRepository
 import com.contexts.pulse.ui.screens.main.NavigationRoutes
@@ -21,26 +22,45 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+data class PostViewUiState(
+    val threadViewPost: GetPostThreadResponseThreadUnion.ThreadViewPost? = null,
+    val loading: Boolean = false,
+    val error: String? = null,
+)
+
 class PostViewModel(
     savedStateHandle: SavedStateHandle,
-    postRepository: PostRepository,
+    private val postRepository: PostRepository,
 ) : ViewModel() {
     private val postId: String = checkNotNull(savedStateHandle[NavigationRoutes.Authenticated.PostView.ARG_POST_ID])
-    private val _thread = MutableStateFlow<GetPostThreadResponseThreadUnion.ThreadViewPost?>(null)
-    val thread = _thread.asStateFlow()
+
+    private val _uiState = MutableStateFlow(PostViewUiState())
+    val uiState = _uiState.asStateFlow()
 
     init {
+        getThread()
+    }
+
+    fun getThread() {
         viewModelScope.launch {
+            _uiState.update { it.copy(loading = true, error = null) }
             postRepository.getPostThread(postId).onSuccess { response ->
                 when (response.thread) {
                     is GetPostThreadResponseThreadUnion.ThreadViewPost -> {
-                        _thread.update { response.thread as GetPostThreadResponseThreadUnion.ThreadViewPost }
+                        _uiState.update {
+                            it.copy(
+                                loading = false,
+                                threadViewPost = response.thread as GetPostThreadResponseThreadUnion.ThreadViewPost,
+                            )
+                        }
                     }
                     is GetPostThreadResponseThreadUnion.BlockedPost,
                     is GetPostThreadResponseThreadUnion.NotFoundPost,
                     is GetPostThreadResponseThreadUnion.Unknown,
                     -> Unit
                 }
+            }.onError { error ->
+                _uiState.update { it.copy(loading = false, error = error.message) }
             }
         }
     }

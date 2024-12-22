@@ -20,15 +20,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
-import app.bsky.feed.FeedViewPost
+import app.bsky.feed.PostView
 import app.bsky.feed.PostViewEmbedUnion
 import com.contexts.pulse.domain.media.PlayerPoolManager
 import com.contexts.pulse.extensions.getPostText
+import io.ktor.http.encodeURLParameter
 import org.koin.compose.koinInject
 
 @Composable
-fun FeedItem(
-    post: FeedViewPost,
+fun PostViewReply(
+    post: PostView,
     onPostClick: (String) -> Unit,
     onReplyClick: () -> Unit,
     onRepostClick: () -> Unit,
@@ -41,10 +42,10 @@ fun FeedItem(
         modifier =
             Modifier
                 .clickable {
-                    onPostClick(post.post.uri.atUri)
+                    onPostClick(post.uri.atUri)
                 }
                 .fillMaxWidth()
-                .padding(top = 8.dp),
+                .padding(start = 32.dp, top = 8.dp, end = 8.dp),
     ) {
         Column(
             modifier =
@@ -53,17 +54,17 @@ fun FeedItem(
                     .padding(top = 8.dp, start = 8.dp, end = 8.dp),
         ) {
             PostHeader(
-                avatar = post.post.author.avatar?.uri,
-                displayName = post.post.author.displayName,
-                handle = post.post.author.handle.handle,
-                indexedAt = post.post.indexedAt,
+                avatar = post.author.avatar?.uri,
+                displayName = post.author.displayName,
+                handle = post.author.handle.handle,
+                indexedAt = post.indexedAt,
             )
             PostMessageText(
-                text = post.post.getPostText(),
-                onClick = { onPostClick(post.post.uri.atUri) },
+                text = post.getPostText(),
+                onClick = { onPostClick(post.uri.atUri.encodeURLParameter()) },
             )
 
-            post.post.embed?.let { embed ->
+            post.embed?.let { embed ->
                 when (embed) {
                     is PostViewEmbedUnion.ExternalView -> {
                         with(embed.value.external) {
@@ -118,9 +119,9 @@ fun FeedItem(
             }
 
             FeedItemInteractions(
-                replyCount = post.post.replyCount,
-                repostCount = post.post.repostCount,
-                likeCount = post.post.likeCount,
+                replyCount = post.replyCount,
+                repostCount = post.repostCount,
+                likeCount = post.likeCount,
             )
         }
     }
