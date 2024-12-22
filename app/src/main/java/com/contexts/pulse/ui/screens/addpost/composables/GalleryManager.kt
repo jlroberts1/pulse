@@ -9,33 +9,57 @@
 
 package com.contexts.pulse.ui.screens.addpost.composables
 
-import android.content.ContentResolver
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import com.contexts.pulse.utils.BitmapUtils
+
+enum class PickType {
+    IMAGES,
+    VIDEOS,
+}
 
 @Composable
-fun rememberGalleryManager(onResult: (SharedImage?) -> Unit): GalleryManager {
-    val context = LocalContext.current
-    val contentResolver: ContentResolver = context.contentResolver
-    val galleryLauncher =
+fun rememberGalleryManager(
+    pickType: PickType,
+    onResult: (List<Uri>) -> Unit,
+): GalleryManager {
+    val imageLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(4)) { uris ->
+            onResult(uris)
+        }
+    val videoLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-            uri?.let {
-                onResult.invoke(SharedImage(BitmapUtils.getBitmapFromUri(uri, contentResolver)))
+            uri?.let { onResult(listOf(uri)) }
+        }
+    return when (pickType) {
+        PickType.IMAGES -> {
+            remember {
+                GalleryManager(onLaunch = {
+                    imageLauncher.launch(
+                        PickVisualMediaRequest(
+                            mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly,
+                        ),
+                    )
+                })
             }
         }
-    return remember {
-        GalleryManager(onLaunch = {
-            galleryLauncher.launch(
-                PickVisualMediaRequest(
-                    mediaType = ActivityResultContracts.PickVisualMedia.ImageAndVideo,
-                ),
-            )
-        })
+
+        PickType.VIDEOS -> {
+            remember {
+                GalleryManager(onLaunch = {
+                    videoLauncher.launch(
+                        (
+                            PickVisualMediaRequest(
+                                mediaType = ActivityResultContracts.PickVisualMedia.VideoOnly,
+                            )
+                        ),
+                    )
+                })
+            }
+        }
     }
 }
 

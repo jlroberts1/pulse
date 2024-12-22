@@ -9,7 +9,7 @@
 
 package com.contexts.pulse.ui.screens.addpost
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -38,6 +39,7 @@ import coil3.compose.AsyncImage
 import com.contexts.pulse.domain.model.getBestFormat
 import com.contexts.pulse.ui.screens.addpost.composables.AddPostBottomBar
 import com.contexts.pulse.ui.screens.addpost.composables.AddPostSuggestions
+import com.contexts.pulse.ui.screens.addpost.composables.PickType
 import com.contexts.pulse.ui.screens.addpost.composables.TenorSearch
 import com.contexts.pulse.ui.screens.addpost.composables.rememberGalleryManager
 import kotlinx.coroutines.launch
@@ -46,19 +48,33 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun AddPostScreen(viewModel: AddPostViewModel = koinViewModel()) {
     val uiState by viewModel.uiState.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
-    var launchGallery by remember { mutableStateOf(value = false) }
+    val scope = rememberCoroutineScope()
+    var launchImageGallery by remember { mutableStateOf(value = false) }
+    var launchVideoGallery by remember { mutableStateOf(value = false) }
     var launchGif by remember { mutableStateOf(value = false) }
 
-    val galleryManager =
-        rememberGalleryManager {
-            coroutineScope.launch {
-                viewModel.onImageSelected(it?.toImageBitmap())
+    val imagePicker =
+        rememberGalleryManager(pickType = PickType.IMAGES) {
+            scope.launch {
+                launchImageGallery = false
+                viewModel.onImagesSelected(it)
             }
         }
 
-    if (launchGallery) {
-        galleryManager.launch()
+    val videoPicker =
+        rememberGalleryManager(pickType = PickType.VIDEOS) {
+            scope.launch {
+                launchVideoGallery = false
+                viewModel.onImagesSelected(it)
+            }
+        }
+
+    if (launchImageGallery) {
+        imagePicker.launch()
+    }
+
+    if (launchVideoGallery) {
+        videoPicker.launch()
     }
 
     Box(
@@ -106,16 +122,23 @@ fun AddPostScreen(viewModel: AddPostViewModel = koinViewModel()) {
                         .align(Alignment.End),
             )
 
-            uiState.image?.let {
-                Spacer(modifier = Modifier.padding(8.dp))
-                Image(
-                    bitmap = it,
-                    contentDescription = "Image",
-                    modifier =
-                        Modifier.size(140.dp)
-                            .clip(RoundedCornerShape(8.dp)),
-                    contentScale = ContentScale.Crop,
-                )
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                uiState.imageUris.forEach {
+                    item {
+                        AsyncImage(
+                            model = it,
+                            contentDescription = "Image",
+                            modifier =
+                                Modifier
+                                    .size(140.dp)
+                                    .clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Crop,
+                        )
+                    }
+                }
             }
 
             uiState.selectedGif?.let {
@@ -124,7 +147,8 @@ fun AddPostScreen(viewModel: AddPostViewModel = koinViewModel()) {
                     model = it.getBestFormat(),
                     contentDescription = "Image",
                     modifier =
-                        Modifier.size(140.dp)
+                        Modifier
+                            .size(140.dp)
                             .clip(RoundedCornerShape(8.dp)),
                     contentScale = ContentScale.Crop,
                 )
@@ -132,7 +156,8 @@ fun AddPostScreen(viewModel: AddPostViewModel = koinViewModel()) {
         }
 
         AddPostBottomBar(
-            launchGallery = { launchGallery = true },
+            launchImageGallery = { launchImageGallery = true },
+            launchVideoGallery = { launchVideoGallery = true },
             launchGif = { launchGif = true },
             sendPost = {},
             Modifier
@@ -143,7 +168,7 @@ fun AddPostScreen(viewModel: AddPostViewModel = koinViewModel()) {
             TenorSearch(
                 searchResults = uiState.gifSearchResults,
                 searchQuery = {
-                    coroutineScope.launch {
+                    scope.launch {
                         viewModel.onGifSearchQueryChanged(it)
                     }
                 },

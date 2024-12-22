@@ -9,7 +9,7 @@
 
 package com.contexts.pulse.ui.screens.addpost
 
-import androidx.compose.ui.graphics.ImageBitmap
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.bsky.actor.ProfileViewBasic
@@ -32,7 +32,7 @@ data class AddPostUiState(
     val showSuggestions: Boolean = false,
     val loading: Boolean = false,
     val charactersLeft: Int = 300,
-    val image: ImageBitmap? = null,
+    val imageUris: List<Uri> = emptyList(),
     val gifSearchResults: List<TenorGif> = emptyList(),
     val selectedGif: TenorGif? = null,
     val error: String? = null,
@@ -134,9 +134,9 @@ class AddPostViewModel(
         }
     }
 
-    fun onImageSelected(image: ImageBitmap?) {
+    fun onImagesSelected(imageUris: List<Uri>) {
         _uiState.update {
-            it.copy(image = image)
+            it.copy(imageUris = imageUris)
         }
     }
 

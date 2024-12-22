@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Gif
 import androidx.compose.material.icons.filled.Photo
+import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -25,7 +26,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun AddPostBottomBar(
-    launchGallery: () -> Unit,
+    launchImageGallery: () -> Unit,
+    launchVideoGallery: () -> Unit,
     launchGif: () -> Unit,
     sendPost: () -> Unit,
     modifier: Modifier,
@@ -33,8 +35,11 @@ fun AddPostBottomBar(
     BottomAppBar(
         modifier = modifier,
         actions = {
-            IconButton(onClick = { launchGallery() }) {
-                Icon(Icons.Default.Photo, "Gallery")
+            IconButton(onClick = { launchImageGallery() }) {
+                Icon(Icons.Default.Photo, "Images")
+            }
+            IconButton(onClick = { launchVideoGallery() }) {
+                Icon(Icons.Default.VideoLibrary, "Videos")
             }
             IconButton(onClick = { launchGif() }) {
                 Icon(Icons.Default.Gif, "Gif")
