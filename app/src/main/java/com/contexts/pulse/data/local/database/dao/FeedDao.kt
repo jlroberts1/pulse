@@ -14,12 +14,13 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.contexts.pulse.data.local.database.entities.FeedEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FeedDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertFeed(feedEntity: FeedEntity)
+    suspend fun insertFeed(feedEntities: FeedEntity)
 
     @Query("SELECT * FROM feeds WHERE userDid = :did ORDER BY id ASC")
-    suspend fun getFeedsForUser(did: String): List<FeedEntity>
+    fun getFeedsForUser(did: String): Flow<List<FeedEntity>>
 }

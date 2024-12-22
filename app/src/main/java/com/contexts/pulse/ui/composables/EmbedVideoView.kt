@@ -41,7 +41,7 @@ fun EmbedVideoView(
     thumbnail: Uri?,
     playlist: Uri,
     aspectRatio: AspectRatio?,
-    onClick: (String) -> Unit,
+    onMediaOpen: (String) -> Unit,
     player: ExoPlayer?,
     playerState: StateFlow<Boolean>,
 ) {
@@ -56,7 +56,7 @@ fun EmbedVideoView(
         },
     )
     Surface(
-        onClick = { onClick(playlist.uri) },
+        onClick = { onMediaOpen(playlist.uri) },
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
         border =
@@ -78,7 +78,7 @@ fun EmbedVideoView(
                         Modifier
                             .fillMaxWidth()
                             .aspectRatio(aspectRatio.toFloat())
-                            .clickable { onClick(playlist.uri) },
+                            .clickable { onMediaOpen(playlist.uri) },
                 )
             } else {
                 AndroidView(

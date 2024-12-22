@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.SmallFloatingActionButton
@@ -50,14 +51,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
 import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
-import androidx.paging.compose.itemKey
 import androidx.window.core.layout.WindowWidthSizeClass
+import app.bsky.feed.FeedViewPost
 import com.contexts.pulse.data.local.database.entities.FeedEntity
-import com.contexts.pulse.data.local.database.entities.FeedPostEntity
 import com.contexts.pulse.ui.composables.FeedItem
+import com.contexts.pulse.ui.composables.PullToRefreshBox
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
@@ -105,6 +108,7 @@ fun HomeScreen(
                 onMediaOpen = { onMediaOpen(it) },
             )
         }
+
 //        if (showFeedConfig) {
 //            FeedConfigurationDialog(
 //                visibleFeeds = visibleFeeds,
@@ -178,10 +182,11 @@ fun FeedConfigurationDialog(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TabletRow(
     feeds: List<FeedEntity>,
-    feedStates: Map<String, Flow<PagingData<FeedPostEntity>>>,
+    feedStates: Map<String, Flow<PagingData<FeedViewPost>>>,
     onMediaOpen: (String) -> Unit,
 ) {
     Row(
@@ -191,28 +196,38 @@ fun TabletRow(
                 .padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        feeds.forEach { feed ->
-            Box(
+        feeds.take(4).forEach { feed ->
+            val feedState = feedStates[feed.id] ?: return
+            val feedData = feedState.collectAsLazyPagingItems()
+            PullToRefreshBox(
                 modifier =
                     Modifier
                         .weight(1f)
                         .fillMaxHeight(),
+                isRefreshing = feedData.loadState.refresh is LoadState.Loading,
+                onRefresh = { feedData.refresh() },
             ) {
-                feedStates[feed.id]?.let { pagingFlow ->
-                    FeedContent(
-                        pagingFlow = pagingFlow,
-                        onMediaOpen = onMediaOpen,
-                    )
+                Box(
+                    modifier =
+                        Modifier.fillMaxSize(),
+                ) {
+                    feedStates[feed.id]?.let { pagingFlow ->
+                        FeedContent(
+                            pagingFlow = pagingFlow,
+                            onMediaOpen = onMediaOpen,
+                        )
+                    }
                 }
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TabPagerFeeds(
     feeds: List<FeedEntity>,
-    feedStates: Map<String, Flow<PagingData<FeedPostEntity>>>,
+    feedStates: Map<String, Flow<PagingData<FeedViewPost>>>,
     onMediaOpen: (String) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
@@ -234,23 +249,34 @@ fun TabPagerFeeds(
             )
         }
     }
-    Box(
+
+    val feedId = feeds[pagerState.currentPage].id
+    val feed = feedStates[feedId] ?: return
+    val feedData: LazyPagingItems<FeedViewPost> = feed.collectAsLazyPagingItems()
+
+    PullToRefreshBox(
         modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.TopCenter,
+        isRefreshing = feedData.loadState.refresh is LoadState.Loading,
+        onRefresh = { feedData.refresh() },
     ) {
-        HorizontalPager(
-            state = pagerState,
-            modifier =
-                Modifier
-                    .widthIn(max = 840.dp)
-                    .fillMaxSize(),
-        ) { page ->
-            val feed = feeds[page]
-            feedStates[feed.id]?.let { pagingFlow ->
-                FeedContent(
-                    pagingFlow = pagingFlow,
-                    onMediaOpen = { onMediaOpen(it) },
-                )
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.TopCenter,
+        ) {
+            HorizontalPager(
+                state = pagerState,
+                modifier =
+                    Modifier
+                        .widthIn(max = 840.dp)
+                        .fillMaxSize(),
+            ) { page ->
+                val feed = feeds[page]
+                feedStates[feed.id]?.let { pagingFlow ->
+                    FeedContent(
+                        pagingFlow = pagingFlow,
+                        onMediaOpen = { onMediaOpen(it) },
+                    )
+                }
             }
         }
     }
@@ -258,7 +284,7 @@ fun TabPagerFeeds(
 
 @Composable
 private fun FeedContent(
-    pagingFlow: Flow<PagingData<FeedPostEntity>>,
+    pagingFlow: Flow<PagingData<FeedViewPost>>,
     onMediaOpen: (String) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
@@ -283,7 +309,7 @@ private fun FeedContent(
         ) {
             items(
                 count = posts.itemCount,
-                key = posts.itemKey { it.postUri },
+                key = { index -> "${index}_${posts[index]?.post?.uri?.atUri}" },
                 contentType = posts.itemContentType(),
             ) { item ->
                 posts[item]?.let {

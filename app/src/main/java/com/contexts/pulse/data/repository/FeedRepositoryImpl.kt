@@ -12,14 +12,19 @@ package com.contexts.pulse.data.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import app.bsky.actor.PreferencesUnion
+import app.bsky.actor.Type
+import app.bsky.feed.FeedViewPost
 import app.bsky.feed.GeneratorView
 import app.bsky.feed.GetFeedResponse
 import app.bsky.feed.GetSuggestedFeedsResponse
+import com.contexts.pulse.data.local.database.dao.FeedDao
+import com.contexts.pulse.data.local.database.entities.FeedEntity
 import com.contexts.pulse.data.network.api.FeedAPI
+import com.contexts.pulse.data.network.api.ProfileAPI
 import com.contexts.pulse.data.network.client.Response
+import com.contexts.pulse.data.network.client.onSuccess
 import com.contexts.pulse.domain.repository.FeedRepository
-import com.contexts.pulse.domain.repository.NetworkPagingSource
-import com.contexts.pulse.domain.repository.PagedRequest
 import com.contexts.pulse.exceptions.NetworkError
 import io.ktor.client.HttpClient
 import io.ktor.util.reflect.typeInfo
@@ -30,6 +35,8 @@ import kotlinx.coroutines.flow.flowOn
 class FeedRepositoryImpl(
     private val client: HttpClient,
     private val feedAPI: FeedAPI,
+    private val feedDao: FeedDao,
+    private val profileAPI: ProfileAPI,
 ) : FeedRepository {
     override suspend fun getFeed(
         feedUri: String,
@@ -54,5 +61,54 @@ class FeedRepositoryImpl(
                 )
             },
         ).flow.flowOn(Dispatchers.IO)
+    }
+
+    override fun getFeed(feedUri: String): Flow<PagingData<FeedViewPost>> {
+        val request = PagedRequest.GetFeed(feedUri)
+        return Pager(
+            config =
+                PagingConfig(
+                    pageSize = request.limit,
+                    enablePlaceholders = false,
+                ),
+            pagingSourceFactory = {
+                NetworkPagingSource<FeedViewPost, GetFeedResponse>(
+                    client = client,
+                    request = request,
+                    typeInfo<GetFeedResponse>(),
+                    getItems = { it.feed },
+                    getCursor = { it.cursor },
+                )
+            },
+        ).flow.flowOn(Dispatchers.IO)
+    }
+
+    override suspend fun refreshFeeds(did: String) {
+        profileAPI.getPreferences().onSuccess { response ->
+            val savedFeeds =
+                response.preferences
+                    .filterIsInstance<PreferencesUnion.SavedFeedsPrefV2>()
+                    .map { it.value.items.filter { item -> item.type is Type.Feed } }
+                    .firstOrNull()
+
+            savedFeeds?.forEach { savedFeed ->
+                feedAPI.getFeedGenerator(savedFeed.value).onSuccess { response ->
+                    val feed =
+                        FeedEntity(
+                            id = savedFeed.id,
+                            userDid = did,
+                            type = savedFeed.type.value,
+                            uri = savedFeed.value,
+                            pinned = savedFeed.pinned,
+                            displayName = response.view.displayName,
+                        )
+                    feedDao.insertFeed(feed)
+                }
+            }
+        }
+    }
+
+    override fun getAvailableFeeds(did: String): Flow<List<FeedEntity>> {
+        return feedDao.getFeedsForUser(did).flowOn(Dispatchers.IO)
     }
 }

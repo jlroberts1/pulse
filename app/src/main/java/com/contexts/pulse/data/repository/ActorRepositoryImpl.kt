@@ -19,8 +19,6 @@ import app.bsky.actor.SearchActorsTypeaheadResponse
 import com.contexts.pulse.data.network.api.ActorAPI
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.domain.repository.ActorRepository
-import com.contexts.pulse.domain.repository.NetworkPagingSource
-import com.contexts.pulse.domain.repository.PagedRequest
 import com.contexts.pulse.exceptions.NetworkError
 import io.ktor.client.HttpClient
 import io.ktor.util.reflect.typeInfo

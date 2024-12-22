@@ -13,10 +13,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.paging.map
-import com.contexts.pulse.data.local.database.entities.FeedPostEntity
+import app.bsky.feed.FeedViewPost
+import com.contexts.pulse.data.repository.RequestResult
 import com.contexts.pulse.domain.repository.ProfileRepository
-import com.contexts.pulse.domain.repository.RequestResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,7 +31,7 @@ data class ProfileUiState(
 class ProfileViewModel(
     private val profileRepository: ProfileRepository,
 ) : ViewModel() {
-    private val _feedState = MutableStateFlow<PagingData<FeedPostEntity>>(PagingData.empty())
+    private val _feedState = MutableStateFlow<PagingData<FeedViewPost>>(PagingData.empty())
     val feedState = _feedState.asStateFlow()
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -49,7 +48,7 @@ class ProfileViewModel(
                     result.data
                         .cachedIn(viewModelScope)
                         .collect { pagingData ->
-                            _feedState.update { pagingData.map { FeedPostEntity.from(it, "") } }
+                            _feedState.update { pagingData }
                         }
                 }
                 is RequestResult.NoCurrentUser -> {

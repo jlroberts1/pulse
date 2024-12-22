@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-package com.contexts.pulse.domain.repository
+package com.contexts.pulse.data.repository
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
@@ -16,15 +16,6 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.util.reflect.TypeInfo
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class PaginatedResponse<T>(
-    val items: List<T>,
-    @SerialName("cursor")
-    val nextCursor: String?,
-)
 
 sealed interface RequestResult<out T> {
     data class Success<out T>(val data: T) : RequestResult<T>
@@ -43,6 +34,14 @@ sealed class PagedRequest {
         override val limit: Int = 15,
     ) : PagedRequest() {
         override val parameters: Map<String, String> = mapOf("actor" to actorId)
+    }
+
+    data class GetFeed(
+        val feedUri: String,
+        override val url: String = "xrpc/app.bsky.feed.getFeed",
+        override val limit: Int = 15,
+    ) : PagedRequest() {
+        override val parameters: Map<String, String> = mapOf("feed" to feedUri)
     }
 
     data class SuggestedFeed(

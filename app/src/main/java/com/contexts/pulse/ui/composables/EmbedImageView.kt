@@ -15,17 +15,17 @@ import app.bsky.embed.ImagesViewImage
 @Composable
 fun EmbedImageView(
     images: List<ImagesViewImage>,
-    onClick: (String) -> Unit,
+    onMediaOpen: (String) -> Unit,
 ) {
     if (images.size == 1) {
         SingleImageHolder(
             images.first(),
-            onClick = { onClick(it) },
+            onClick = { onMediaOpen(it) },
         )
     } else {
         MultiImageHolder(
             images,
-            onClick = { onClick(it) },
+            onClick = { onMediaOpen(it) },
         )
     }
 }

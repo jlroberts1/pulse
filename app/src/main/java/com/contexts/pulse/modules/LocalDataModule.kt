@@ -12,9 +12,7 @@ package com.contexts.pulse.modules
 import androidx.room.Room
 import com.contexts.pulse.data.local.database.PulseDatabase
 import com.contexts.pulse.data.local.database.dao.FeedDao
-import com.contexts.pulse.data.local.database.dao.FeedPostDao
 import com.contexts.pulse.data.local.database.dao.ProfileDao
-import com.contexts.pulse.data.local.database.dao.RemoteKeysDao
 import com.contexts.pulse.data.local.database.dao.UserDao
 import com.contexts.pulse.data.local.datastore.PreferencesDataStore
 import org.koin.dsl.module
@@ -27,9 +25,7 @@ val localDataModule =
                 .fallbackToDestructiveMigration()
                 .build()
         }
-        single<RemoteKeysDao> { get<PulseDatabase>().remoteKeysDao() }
         single<FeedDao> { get<PulseDatabase>().feedDao() }
-        single<FeedPostDao> { get<PulseDatabase>().feedPostDao() }
         single<ProfileDao> { get<PulseDatabase>().profileDao() }
         single<UserDao> { get<PulseDatabase>().userDao() }
     }

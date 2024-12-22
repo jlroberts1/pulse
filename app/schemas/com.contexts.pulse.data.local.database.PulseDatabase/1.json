@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "377ad295bc0b167546450e371aa2308f",
+    "identityHash": "0a3c702e58d76425e889108b06a658f2",
     "entities": [
       {
         "tableName": "users",
@@ -138,12 +138,12 @@
         "indices": [
           {
             "name": "index_feeds_userDid",
-            "unique": true,
+            "unique": false,
             "columnNames": [
               "userDid"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_feeds_userDid` ON `${TABLE_NAME}` (`userDid`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_feeds_userDid` ON `${TABLE_NAME}` (`userDid`)"
           }
         ],
         "foreignKeys": [
@@ -159,210 +159,6 @@
             ]
           }
         ]
-      },
-      {
-        "tableName": "feed_posts",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`postUri` TEXT NOT NULL, `feedId` TEXT NOT NULL, `authorDid` TEXT NOT NULL, `authorHandle` TEXT NOT NULL, `authorDisplayName` TEXT, `authorAvatar` TEXT, `content` TEXT NOT NULL, `indexedAt` INTEGER NOT NULL, `embedType` TEXT, `embedImages` TEXT, `embedExternal` TEXT, `embedVideo` TEXT, `embedRecord` TEXT, `embedRecordWithMedia` TEXT, `isLiked` INTEGER NOT NULL, `isReposted` INTEGER NOT NULL, `replyCount` INTEGER NOT NULL, `repostCount` INTEGER NOT NULL, `likeCount` INTEGER NOT NULL, `replyParentUri` TEXT, `replyRootUri` TEXT, `reasonType` TEXT, `reasonActorDid` TEXT, PRIMARY KEY(`postUri`))",
-        "fields": [
-          {
-            "fieldPath": "postUri",
-            "columnName": "postUri",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "feedId",
-            "columnName": "feedId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "authorDid",
-            "columnName": "authorDid",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "authorHandle",
-            "columnName": "authorHandle",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "authorDisplayName",
-            "columnName": "authorDisplayName",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "authorAvatar",
-            "columnName": "authorAvatar",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "content",
-            "columnName": "content",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "indexedAt",
-            "columnName": "indexedAt",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "embedType",
-            "columnName": "embedType",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "embedImages",
-            "columnName": "embedImages",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "embedExternal",
-            "columnName": "embedExternal",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "embedVideo",
-            "columnName": "embedVideo",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "embedRecord",
-            "columnName": "embedRecord",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "embedRecordWithMedia",
-            "columnName": "embedRecordWithMedia",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "isLiked",
-            "columnName": "isLiked",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "isReposted",
-            "columnName": "isReposted",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "replyCount",
-            "columnName": "replyCount",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "repostCount",
-            "columnName": "repostCount",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "likeCount",
-            "columnName": "likeCount",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "replyParentUri",
-            "columnName": "replyParentUri",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "replyRootUri",
-            "columnName": "replyRootUri",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "reasonType",
-            "columnName": "reasonType",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "reasonActorDid",
-            "columnName": "reasonActorDid",
-            "affinity": "TEXT",
-            "notNull": false
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "postUri"
-          ]
-        },
-        "indices": [
-          {
-            "name": "index_feed_posts_feedId",
-            "unique": false,
-            "columnNames": [
-              "feedId"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_feed_posts_feedId` ON `${TABLE_NAME}` (`feedId`)"
-          }
-        ],
-        "foreignKeys": []
-      },
-      {
-        "tableName": "remote_keys",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`feedId` TEXT NOT NULL, `prevKey` TEXT, `nextKey` TEXT, PRIMARY KEY(`feedId`))",
-        "fields": [
-          {
-            "fieldPath": "feedId",
-            "columnName": "feedId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "prevKey",
-            "columnName": "prevKey",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "nextKey",
-            "columnName": "nextKey",
-            "affinity": "TEXT",
-            "notNull": false
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "feedId"
-          ]
-        },
-        "indices": [
-          {
-            "name": "index_remote_keys_feedId",
-            "unique": false,
-            "columnNames": [
-              "feedId"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_remote_keys_feedId` ON `${TABLE_NAME}` (`feedId`)"
-          }
-        ],
-        "foreignKeys": []
       },
       {
         "tableName": "profiles",
@@ -464,7 +260,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '377ad295bc0b167546450e371aa2308f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0a3c702e58d76425e889108b06a658f2')"
     ]
   }
 }

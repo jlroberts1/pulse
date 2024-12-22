@@ -20,7 +20,6 @@ import com.contexts.pulse.data.network.api.TenorAPI
 import com.contexts.pulse.data.repository.ActorRepositoryImpl
 import com.contexts.pulse.data.repository.AuthenticateRepositoryImpl
 import com.contexts.pulse.data.repository.ChatRepositoryImpl
-import com.contexts.pulse.data.repository.FeedManager
 import com.contexts.pulse.data.repository.FeedRepositoryImpl
 import com.contexts.pulse.data.repository.NotificationsRepositoryImpl
 import com.contexts.pulse.data.repository.PreferencesRepositoryImpl
@@ -50,12 +49,11 @@ val appModule =
         single { NotificationsAPI(get()) }
         single { ProfileAPI(get()) }
         single { TenorAPI() }
-        single { FeedManager(get(), get(), get(), get(), get(), get()) }
 
         single<ActorRepository> { ActorRepositoryImpl(get(), get()) }
         single<AuthenticateRepository> { AuthenticateRepositoryImpl(get(), get(), get(), get()) }
         single<ChatRepository> { ChatRepositoryImpl(get(), get(), get()) }
-        single<FeedRepository> { FeedRepositoryImpl(get(), get()) }
+        single<FeedRepository> { FeedRepositoryImpl(get(), get(), get(), get()) }
         single<NotificationsRepository> { NotificationsRepositoryImpl(get()) }
         single<PreferencesRepository> { PreferencesRepositoryImpl(get()) }
         single<ProfileRepository> { ProfileRepositoryImpl(get(), get(), get(), get()) }

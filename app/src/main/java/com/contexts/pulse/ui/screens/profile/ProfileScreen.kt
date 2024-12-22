@@ -101,7 +101,7 @@ fun ProfileScreen(
                 ) {
                     items(
                         count = feed.itemCount,
-                        key = feed.itemKey { it.postUri },
+                        key = feed.itemKey { it.post.uri.atUri },
                         contentType = feed.itemContentType(),
                     ) { index ->
                         feed[index]?.let { item ->
@@ -152,7 +152,7 @@ fun ProfileScreen(
 
                     items(
                         count = feed.itemCount,
-                        key = feed.itemKey { it.postUri },
+                        key = feed.itemKey { it.post.uri.atUri },
                         contentType = feed.itemContentType(),
                     ) { index ->
                         feed[index]?.let { item ->

@@ -10,11 +10,6 @@
 package com.contexts.pulse.data.local.database.converters
 
 import androidx.room.TypeConverter
-import app.bsky.embed.ExternalView
-import app.bsky.embed.ImagesViewImage
-import app.bsky.embed.RecordView
-import app.bsky.embed.RecordWithMediaView
-import app.bsky.embed.VideoView
 import com.contexts.pulse.domain.model.Service
 import com.contexts.pulse.domain.model.VerificationMethod
 import kotlinx.datetime.Instant
@@ -67,41 +62,4 @@ class InstantConvertor {
     fun toInstant(epochMillis: Long): Instant {
         return Instant.fromEpochMilliseconds(epochMillis)
     }
-}
-
-class FeedConverters {
-    private val json =
-        Json {
-            ignoreUnknownKeys = true
-        }
-
-    @TypeConverter
-    fun fromImagesList(images: List<ImagesViewImage>?): String? = images?.let { json.encodeToString(it) }
-
-    @TypeConverter
-    fun toImagesList(value: String?): List<ImagesViewImage>? = value?.let { json.decodeFromString(it) }
-
-    @TypeConverter
-    fun fromExternalView(external: ExternalView?): String? = external?.let { json.encodeToString(it) }
-
-    @TypeConverter
-    fun toExternalView(value: String?): ExternalView? = value?.let { json.decodeFromString(it) }
-
-    @TypeConverter
-    fun fromVideoView(video: VideoView?): String? = video?.let { json.encodeToString(it) }
-
-    @TypeConverter
-    fun toVideoView(value: String?): VideoView? = value?.let { json.decodeFromString(it) }
-
-    @TypeConverter
-    fun fromRecordView(record: RecordView?): String? = record?.let { json.encodeToString(it) }
-
-    @TypeConverter
-    fun toRecordView(value: String?): RecordView? = value?.let { json.decodeFromString(it) }
-
-    @TypeConverter
-    fun fromRecordWithMediaView(recordWithMedia: RecordWithMediaView?): String? = recordWithMedia?.let { json.encodeToString(it) }
-
-    @TypeConverter
-    fun toRecordWithMediaView(value: String?): RecordWithMediaView? = value?.let { json.decodeFromString(it) }
 }

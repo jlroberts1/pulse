@@ -69,7 +69,6 @@ fun NavigationScaffold(
     mediaState: MediaState,
     drawerState: DrawerState,
 ) {
-    val topAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     var controlsVisible by remember { mutableStateOf(true) }
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val isExpandedScreen =
@@ -79,6 +78,12 @@ fun NavigationScaffold(
             navController.currentBackStackEntryAsState().value?.destination?.route
                 ?: TopDestinations.HOME.route,
         )
+    val topAppBarScrollBehavior =
+        if (isExpandedScreen) {
+            TopAppBarDefaults.pinnedScrollBehavior()
+        } else {
+            TopAppBarDefaults.enterAlwaysScrollBehavior()
+        }
     val nestedScrollConnection =
         remember {
             object : NestedScrollConnection {
@@ -112,7 +117,8 @@ fun NavigationScaffold(
 
     Scaffold(
         modifier =
-            modifier.nestedScroll(nestedScrollConnection)
+            modifier
+                .nestedScroll(nestedScrollConnection)
                 .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
         topBar = {
             if (routeUiState.showTopAppBar && mediaState.url == null) {

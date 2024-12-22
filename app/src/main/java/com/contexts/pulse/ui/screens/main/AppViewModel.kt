@@ -12,6 +12,7 @@ package com.contexts.pulse.ui.screens.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.contexts.pulse.domain.model.Theme
+import com.contexts.pulse.domain.repository.FeedRepository
 import com.contexts.pulse.domain.repository.PreferencesRepository
 import com.contexts.pulse.domain.repository.ProfileRepository
 import com.contexts.pulse.domain.repository.UserRepository
@@ -29,6 +30,7 @@ data class MediaState(
 )
 
 class AppViewModel(
+    private val feedRepository: FeedRepository,
     profileRepository: ProfileRepository,
     preferencesRepository: PreferencesRepository,
     userRepository: UserRepository,
@@ -40,9 +42,6 @@ class AppViewModel(
     private val _mediaState = MutableStateFlow(MediaState())
     val mediaState = _mediaState.asStateFlow()
 
-    private val _controlsVisibility = MutableStateFlow(1f)
-    val controlsVisibility = _controlsVisibility.asStateFlow()
-
     private val _navigationEvent = MutableSharedFlow<String>()
     val navigationEvent = _navigationEvent.asSharedFlow()
 
@@ -50,11 +49,18 @@ class AppViewModel(
         userRepository.isLoggedIn()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), null)
 
+    private val currentUser = preferencesRepository.getCurrentUserFlow()
+
     val profile =
         profileRepository.getMyProfile()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), null)
 
     init {
+        checkAuthState()
+        refreshFeeds()
+    }
+
+    private fun checkAuthState() {
         viewModelScope.launch {
             isLoggedIn.collect { isLoggedInState ->
                 isLoggedInState?.let { loggedIn ->
@@ -67,6 +73,12 @@ class AppViewModel(
                     )
                 }
             }
+        }
+    }
+
+    private fun refreshFeeds() {
+        viewModelScope.launch {
+            currentUser.collect { it?.let { feedRepository.refreshFeeds(it) } }
         }
     }
 

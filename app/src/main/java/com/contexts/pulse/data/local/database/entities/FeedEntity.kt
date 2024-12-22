@@ -25,7 +25,7 @@ import androidx.room.PrimaryKey
         ),
     ],
     indices = [
-        Index(value = ["userDid"], unique = true),
+        Index(value = ["userDid"]),
     ],
 )
 data class FeedEntity(

@@ -16,17 +16,13 @@ import app.bsky.actor.GetProfileResponse
 import app.bsky.feed.FeedViewPost
 import app.bsky.feed.GetAuthorFeedResponse
 import com.contexts.pulse.data.local.database.dao.ProfileDao
-import com.contexts.pulse.data.local.database.entities.FeedEntity
 import com.contexts.pulse.data.local.database.entities.ProfileEntity
 import com.contexts.pulse.data.local.database.entities.toProfileEntity
 import com.contexts.pulse.data.network.api.ProfileAPI
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.network.client.onSuccess
-import com.contexts.pulse.domain.repository.NetworkPagingSource
-import com.contexts.pulse.domain.repository.PagedRequest
 import com.contexts.pulse.domain.repository.PreferencesRepository
 import com.contexts.pulse.domain.repository.ProfileRepository
-import com.contexts.pulse.domain.repository.RequestResult
 import com.contexts.pulse.exceptions.NetworkError
 import io.ktor.client.HttpClient
 import io.ktor.util.reflect.typeInfo
@@ -75,10 +71,6 @@ class ProfileRepositoryImpl(
                 },
             ).flow.flowOn(Dispatchers.IO),
         )
-    }
-
-    override suspend fun getSavedFeeds(did: String): Response<List<FeedEntity>, NetworkError> {
-        return profileAPI.getSavedFeeds(did)
     }
 
     override suspend fun insertProfile(profile: ProfileEntity) {

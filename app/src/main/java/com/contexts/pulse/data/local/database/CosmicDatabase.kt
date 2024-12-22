@@ -12,28 +12,21 @@ package com.contexts.pulse.data.local.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.contexts.pulse.data.local.database.converters.FeedConverters
 import com.contexts.pulse.data.local.database.converters.InstantConvertor
 import com.contexts.pulse.data.local.database.converters.ServiceConverter
 import com.contexts.pulse.data.local.database.converters.StringListConverter
 import com.contexts.pulse.data.local.database.converters.VerificationMethodConverter
 import com.contexts.pulse.data.local.database.dao.FeedDao
-import com.contexts.pulse.data.local.database.dao.FeedPostDao
 import com.contexts.pulse.data.local.database.dao.ProfileDao
-import com.contexts.pulse.data.local.database.dao.RemoteKeysDao
 import com.contexts.pulse.data.local.database.dao.UserDao
 import com.contexts.pulse.data.local.database.entities.FeedEntity
-import com.contexts.pulse.data.local.database.entities.FeedPostEntity
 import com.contexts.pulse.data.local.database.entities.ProfileEntity
-import com.contexts.pulse.data.local.database.entities.RemoteKeys
 import com.contexts.pulse.data.local.database.entities.UserEntity
 
 @Database(
     entities = [
         UserEntity::class,
         FeedEntity::class,
-        FeedPostEntity::class,
-        RemoteKeys::class,
         ProfileEntity::class,
     ],
     version = 1,
@@ -43,16 +36,11 @@ import com.contexts.pulse.data.local.database.entities.UserEntity
     VerificationMethodConverter::class,
     ServiceConverter::class,
     InstantConvertor::class,
-    FeedConverters::class,
 )
 abstract class PulseDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
 
     abstract fun feedDao(): FeedDao
-
-    abstract fun feedPostDao(): FeedPostDao
-
-    abstract fun remoteKeysDao(): RemoteKeysDao
 
     abstract fun profileDao(): ProfileDao
 }
