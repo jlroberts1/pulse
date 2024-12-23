@@ -12,6 +12,7 @@ package com.contexts.pulse.modules
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.contexts.pulse.data.local.database.dao.FeedDao
+import com.contexts.pulse.data.local.database.dao.PendingUploadDao
 import com.contexts.pulse.data.local.database.dao.ProfileDao
 import com.contexts.pulse.data.local.database.dao.UserDao
 import com.contexts.pulse.data.network.api.AuthenticateAPI
@@ -21,11 +22,13 @@ import com.contexts.pulse.data.network.api.NotificationsAPI
 import com.contexts.pulse.data.network.api.PostAPI
 import com.contexts.pulse.data.network.api.ProfileAPI
 import com.contexts.pulse.data.network.api.TenorAPI
+import com.contexts.pulse.data.network.api.UploadAPI
 import com.contexts.pulse.data.repository.ActorRepositoryImpl
 import com.contexts.pulse.data.repository.AuthenticateRepositoryImpl
 import com.contexts.pulse.data.repository.ChatRepositoryImpl
 import com.contexts.pulse.data.repository.FeedRepositoryImpl
 import com.contexts.pulse.data.repository.NotificationsRepositoryImpl
+import com.contexts.pulse.data.repository.PendingUploadRepositoryImpl
 import com.contexts.pulse.data.repository.PostRepositoryImpl
 import com.contexts.pulse.data.repository.PreferencesRepositoryImpl
 import com.contexts.pulse.data.repository.ProfileRepositoryImpl
@@ -36,6 +39,7 @@ import com.contexts.pulse.domain.repository.AuthenticateRepository
 import com.contexts.pulse.domain.repository.ChatRepository
 import com.contexts.pulse.domain.repository.FeedRepository
 import com.contexts.pulse.domain.repository.NotificationsRepository
+import com.contexts.pulse.domain.repository.PendingUploadRepository
 import com.contexts.pulse.domain.repository.PostRepository
 import com.contexts.pulse.domain.repository.PreferencesRepository
 import com.contexts.pulse.domain.repository.ProfileRepository
@@ -60,8 +64,6 @@ val repositoryModule =
             ChatRepositoryImpl(
                 get<AppDispatchers>(),
                 get<ChatAPI>(),
-                get<UserDao>(),
-                get<PreferencesRepository>(),
             )
         }
         single<FeedRepository> {
@@ -110,6 +112,13 @@ val repositoryModule =
             PostRepositoryImpl(
                 get<AppDispatchers>(),
                 get<PostAPI>(),
+            )
+        }
+        single<PendingUploadRepository> {
+            PendingUploadRepositoryImpl(
+                get<AppDispatchers>(),
+                get<PendingUploadDao>(),
+                get<UploadAPI>(),
             )
         }
     }

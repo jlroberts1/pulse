@@ -27,14 +27,21 @@ import com.contexts.pulse.modules.networkModule
 import com.contexts.pulse.modules.repositoryModule
 import com.contexts.pulse.modules.viewModelModule
 import com.contexts.pulse.modules.workerModule
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.workmanager.koin.workManagerFactory
 import org.koin.core.context.startKoin
 
 class PulseApplication : Application(), SingletonImageLoader.Factory {
+    private lateinit var applicationScope: ApplicationScope
+
     override fun onCreate() {
         super.onCreate()
+        applicationScope = ApplicationScope()
         startKoin {
             androidLogger()
             androidContext(this@PulseApplication)
@@ -79,5 +86,19 @@ class PulseApplication : Application(), SingletonImageLoader.Factory {
                     .build()
             }
             .build()
+    }
+
+    override fun onTerminate() {
+        applicationScope.clear()
+        super.onTerminate()
+    }
+}
+
+class ApplicationScope : CoroutineScope {
+    private val job = SupervisorJob()
+    override val coroutineContext = job + Dispatchers.Default + CoroutineName("ApplicationScope")
+
+    fun clear() {
+        job.cancel()
     }
 }

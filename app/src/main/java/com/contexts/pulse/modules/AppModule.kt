@@ -11,6 +11,7 @@ package com.contexts.pulse.modules
 
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.work.WorkManager
+import com.contexts.pulse.ApplicationScope
 import com.contexts.pulse.domain.media.PlayerPoolManager
 import org.koin.dsl.module
 
@@ -19,4 +20,5 @@ val appModule =
         single<ExoPlayer> { ExoPlayer.Builder(get()).build() }
         single<PlayerPoolManager> { PlayerPoolManager(get()) }
         single<WorkManager> { WorkManager.getInstance(get()) }
+        single { ApplicationScope() }
     }

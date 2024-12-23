@@ -11,6 +11,7 @@ package com.contexts.pulse.data.network.api
 
 import app.bsky.notification.GetUnreadCountResponse
 import app.bsky.notification.ListNotificationsResponse
+import com.contexts.pulse.data.network.client.AccountManager
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.network.client.safeRequest
 import com.contexts.pulse.data.network.response.GenericResponse
@@ -21,13 +22,17 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.path
 import sh.christian.ozone.api.model.Timestamp
 
-class NotificationsAPI(private val client: HttpClient) {
+class NotificationsAPI(
+    client: HttpClient,
+    accountManager: AccountManager,
+) : BaseAPI(client, accountManager) {
     suspend fun listNotifications(
         limit: Int = 50,
         cursor: String? = null,
         priority: Boolean? = false,
     ): Response<ListNotificationsResponse, NetworkError> {
         return client.safeRequest {
+            configurePds()
             url {
                 method = HttpMethod.Get
                 path("xrpc/app.bsky.notification.listNotifications")
@@ -40,6 +45,7 @@ class NotificationsAPI(private val client: HttpClient) {
 
     suspend fun updateSeen(seenAt: Timestamp): Response<GenericResponse, NetworkError> {
         return client.safeRequest {
+            configurePds()
             url {
                 method = HttpMethod.Post
                 path("xrpc/app.bsky.notification.updateSeen")
@@ -50,6 +56,7 @@ class NotificationsAPI(private val client: HttpClient) {
 
     suspend fun getUnreadCount(): Response<GetUnreadCountResponse, NetworkError> {
         return client.safeRequest {
+            configurePds()
             url {
                 method = HttpMethod.Get
                 path("xrpc/app.bsky.notification.getUnreadCount")

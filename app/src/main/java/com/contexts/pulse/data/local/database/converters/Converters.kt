@@ -10,13 +10,17 @@
 package com.contexts.pulse.data.local.database.converters
 
 import androidx.room.TypeConverter
+import com.contexts.pulse.data.local.database.entities.MediaType
+import com.contexts.pulse.data.local.database.entities.MediaUploadState
+import com.contexts.pulse.data.local.database.entities.PostUploadState
+import com.contexts.pulse.data.local.database.entities.VideoProcessingState
 import com.contexts.pulse.domain.model.Service
 import com.contexts.pulse.domain.model.VerificationMethod
 import kotlinx.datetime.Instant
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class StringListConverter {
+class Converters {
     @TypeConverter
     fun fromString(value: String): List<String> {
         return if (value.isEmpty()) emptyList() else value.split(",")
@@ -26,33 +30,27 @@ class StringListConverter {
     fun toString(list: List<String>): String {
         return list.joinToString(",")
     }
-}
 
-class VerificationMethodConverter {
     @TypeConverter
-    fun fromJson(value: String): List<VerificationMethod> {
+    fun fromVerificationJson(value: String): List<VerificationMethod> {
         return Json.decodeFromString(value)
     }
 
     @TypeConverter
-    fun toJson(list: List<VerificationMethod>): String {
+    fun toVerificationJson(list: List<VerificationMethod>): String {
         return Json.encodeToString(list)
     }
-}
 
-class ServiceConverter {
     @TypeConverter
-    fun fromJson(value: String): List<Service> {
+    fun fromServiceJson(value: String): List<Service> {
         return Json.decodeFromString(value)
     }
 
     @TypeConverter
-    fun toJson(list: List<Service>): String {
+    fun toServiceJson(list: List<Service>): String {
         return Json.encodeToString(list)
     }
-}
 
-class InstantConvertor {
     @TypeConverter
     fun fromInstant(instant: Instant): Long {
         return instant.toEpochMilliseconds()
@@ -61,5 +59,45 @@ class InstantConvertor {
     @TypeConverter
     fun toInstant(epochMillis: Long): Instant {
         return Instant.fromEpochMilliseconds(epochMillis)
+    }
+
+    @TypeConverter
+    fun toMediaType(value: String): MediaType {
+        return enumValueOf(value)
+    }
+
+    @TypeConverter
+    fun fromMediaType(type: MediaType): String {
+        return type.name
+    }
+
+    @TypeConverter
+    fun toMediaUploadState(value: String): MediaUploadState {
+        return enumValueOf(value)
+    }
+
+    @TypeConverter
+    fun fromMediaUploadState(state: MediaUploadState): String {
+        return state.name
+    }
+
+    @TypeConverter
+    fun toPostUploadState(value: String): PostUploadState {
+        return enumValueOf(value)
+    }
+
+    @TypeConverter
+    fun fromPostUploadState(state: PostUploadState): String {
+        return state.name
+    }
+
+    @TypeConverter
+    fun toVideoProcessingState(value: String): VideoProcessingState {
+        return enumValueOf(value)
+    }
+
+    @TypeConverter
+    fun fromVideoProcessingState(state: VideoProcessingState): String {
+        return state.name
     }
 }

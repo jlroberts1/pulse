@@ -11,6 +11,7 @@ package com.contexts.pulse.data.network.api
 
 import app.bsky.actor.GetPreferencesResponse
 import app.bsky.actor.GetProfileResponse
+import com.contexts.pulse.data.network.client.AccountManager
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.network.client.safeRequest
 import com.contexts.pulse.exceptions.NetworkError
@@ -18,9 +19,13 @@ import io.ktor.client.HttpClient
 import io.ktor.http.HttpMethod
 import io.ktor.http.path
 
-class ProfileAPI(private val client: HttpClient) {
+class ProfileAPI(
+    client: HttpClient,
+    accountManager: AccountManager,
+) : BaseAPI(client, accountManager) {
     suspend fun getProfile(actor: String): Response<GetProfileResponse, NetworkError> {
         return client.safeRequest {
+            configurePds()
             url {
                 method = HttpMethod.Get
                 path("xrpc/app.bsky.actor.getProfile")
@@ -31,6 +36,7 @@ class ProfileAPI(private val client: HttpClient) {
 
     suspend fun getPreferences(): Response<GetPreferencesResponse, NetworkError> {
         return client.safeRequest {
+            configurePds()
             url {
                 method = HttpMethod.Get
                 path("xrpc/app.bsky.actor.getPreferences")

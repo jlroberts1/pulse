@@ -10,6 +10,7 @@
 package com.contexts.pulse.data.network.api
 
 import app.bsky.feed.GetPostThreadResponse
+import com.contexts.pulse.data.network.client.AccountManager
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.network.client.safeRequest
 import com.contexts.pulse.exceptions.NetworkError
@@ -17,9 +18,13 @@ import io.ktor.client.HttpClient
 import io.ktor.http.HttpMethod
 import io.ktor.http.path
 
-class PostAPI(private val client: HttpClient) {
+class PostAPI(
+    client: HttpClient,
+    accountManager: AccountManager,
+) : BaseAPI(client, accountManager) {
     suspend fun getPostThread(uri: String): Response<GetPostThreadResponse, NetworkError> {
         return client.safeRequest<GetPostThreadResponse> {
+            configurePds()
             url {
                 method = HttpMethod.Get
                 path("xrpc/app.bsky.feed.getPostThread")
