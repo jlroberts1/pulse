@@ -24,7 +24,10 @@ import com.contexts.pulse.data.local.database.relations.PendingUploadWithMedia
 interface PendingUploadDao {
     @Transaction
     @Query("SELECT * FROM pending_uploads")
-    suspend fun getPendingUploadsWithMedia(): List<PendingUploadWithMedia>
+    suspend fun getPendingUploadsWithMedia(): List<PendingUploadWithMedia>?
+
+    @Query("SELECT * FROM pending_uploads WHERE id = :id")
+    suspend fun getPendingUploadById(id: Long): PendingUploadEntity?
 
     @Insert
     suspend fun insertUpload(upload: PendingUploadEntity): Long

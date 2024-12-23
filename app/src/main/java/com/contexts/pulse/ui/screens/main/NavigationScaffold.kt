@@ -39,6 +39,8 @@ import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
@@ -66,6 +68,7 @@ fun NavigationScaffold(
     modifier: Modifier = Modifier,
     viewModel: AppViewModel,
     navController: NavHostController,
+    snackbarHostState: SnackbarHostState,
     mediaState: MediaState,
     drawerState: DrawerState,
 ) {
@@ -131,6 +134,7 @@ fun NavigationScaffold(
                 )
             }
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             AnimatedVisibility(
                 visible = routeUiState.showFab && controlsVisible && mediaState.url == null,

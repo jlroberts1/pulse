@@ -9,6 +9,8 @@
 
 package com.contexts.pulse.ui.screens.home
 
+import android.Manifest
+import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
@@ -41,6 +43,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -63,11 +66,15 @@ import com.contexts.pulse.data.local.database.entities.FeedEntity
 import com.contexts.pulse.ui.composables.FeedItem
 import com.contexts.pulse.ui.composables.PullToRefreshBox
 import com.contexts.pulse.ui.screens.main.NavigationRoutes
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import io.ktor.http.encodeURLParameter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
@@ -79,6 +86,30 @@ fun HomeScreen(
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val isExpandedScreen =
         adaptiveInfo.windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED
+    val isLoggedIn by viewModel.isLoggedIn.collectAsStateWithLifecycle()
+
+    val notificationPermissionState =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            rememberPermissionState(
+                Manifest.permission.POST_NOTIFICATIONS,
+            )
+        } else {
+            null
+        }
+
+    LaunchedEffect(isLoggedIn) {
+        isLoggedIn?.let {
+            if (it) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    notificationPermissionState?.let {
+                        if (!notificationPermissionState.status.isGranted) {
+                            notificationPermissionState.launchPermissionRequest()
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),

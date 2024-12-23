@@ -10,9 +10,13 @@
 package com.contexts.pulse.domain.repository
 
 import app.bsky.feed.GetPostThreadResponse
+import com.atproto.repo.CreateRecordRequest
+import com.atproto.repo.CreateRecordResponse
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.exceptions.NetworkError
 
 interface PostRepository {
     suspend fun getPostThread(uri: String): Response<GetPostThreadResponse, NetworkError>
+
+    suspend fun createPost(createRecordRequest: CreateRecordRequest): Response<CreateRecordResponse, NetworkError>
 }

@@ -126,7 +126,9 @@ fun NavGraphBuilder.authenticatedGraph(
             SettingsScreen()
         }
         composable(route = NavigationRoutes.Authenticated.AddPost.route) {
-            AddPostScreen()
+            AddPostScreen(
+                onPostSent = { navController.navigateUp() },
+            )
         }
         composable(
             route = NavigationRoutes.Authenticated.PostView.route,

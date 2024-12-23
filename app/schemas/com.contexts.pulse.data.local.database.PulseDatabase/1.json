@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "e77dcc55cc08ad5210322e481cfe4c4a",
+    "identityHash": "15e0be585e197ff8ed61b58cba96030a",
     "entities": [
       {
         "tableName": "users",
@@ -258,12 +258,18 @@
       },
       {
         "tableName": "pending_uploads",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `text` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `uploadState` TEXT NOT NULL, `errorMessage` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userDid` TEXT NOT NULL, `text` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `uploadState` TEXT NOT NULL, `errorMessage` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userDid",
+            "columnName": "userDid",
+            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -508,7 +514,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e77dcc55cc08ad5210322e481cfe4c4a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '15e0be585e197ff8ed61b58cba96030a')"
     ]
   }
 }

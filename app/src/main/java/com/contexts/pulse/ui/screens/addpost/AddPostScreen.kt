@@ -22,7 +22,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +34,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
 import com.contexts.pulse.domain.model.getBestFormat
 import com.contexts.pulse.ui.screens.addpost.composables.AddPostBottomBar
@@ -46,12 +47,16 @@ import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun AddPostScreen(viewModel: AddPostViewModel = koinViewModel()) {
-    val uiState by viewModel.uiState.collectAsState()
+fun AddPostScreen(
+    viewModel: AddPostViewModel = koinViewModel(),
+    onPostSent: () -> Unit,
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     var launchImageGallery by remember { mutableStateOf(value = false) }
     var launchVideoGallery by remember { mutableStateOf(value = false) }
     var launchGif by remember { mutableStateOf(value = false) }
+    val navController = rememberNavController()
 
     val imagePicker =
         rememberGalleryManager(pickType = PickType.IMAGES) {
@@ -68,6 +73,10 @@ fun AddPostScreen(viewModel: AddPostViewModel = koinViewModel()) {
                 viewModel.onImagesSelected(it)
             }
         }
+
+    if (uiState.uploadSent) {
+        onPostSent()
+    }
 
     if (launchImageGallery) {
         imagePicker.launch()
@@ -159,7 +168,7 @@ fun AddPostScreen(viewModel: AddPostViewModel = koinViewModel()) {
             launchImageGallery = { launchImageGallery = true },
             launchVideoGallery = { launchVideoGallery = true },
             launchGif = { launchGif = true },
-            sendPost = {},
+            sendPost = { viewModel.onUpload() },
             Modifier
                 .align(Alignment.BottomCenter),
         )

@@ -11,11 +11,13 @@ package com.contexts.pulse.modules
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.work.WorkManager
 import com.contexts.pulse.domain.repository.ActorRepository
 import com.contexts.pulse.domain.repository.AuthenticateRepository
 import com.contexts.pulse.domain.repository.ChatRepository
 import com.contexts.pulse.domain.repository.FeedRepository
 import com.contexts.pulse.domain.repository.NotificationsRepository
+import com.contexts.pulse.domain.repository.PendingUploadRepository
 import com.contexts.pulse.domain.repository.PostRepository
 import com.contexts.pulse.domain.repository.PreferencesRepository
 import com.contexts.pulse.domain.repository.ProfileRepository
@@ -37,18 +39,37 @@ import org.koin.dsl.module
 
 val viewModelModule =
     module {
-        viewModel { AddPostViewModel(get<ActorRepository>(), get<TenorRepository>()) }
+        viewModel {
+            AddPostViewModel(
+                get<ActorRepository>(),
+                get<TenorRepository>(),
+                get<PreferencesRepository>(),
+                get<PendingUploadRepository>(),
+                get<WorkManager>(),
+            )
+        }
         viewModel {
             AppViewModel(
                 get<FeedRepository>(),
                 get<ProfileRepository>(),
                 get<PreferencesRepository>(),
                 get<UserRepository>(),
+                get<WorkManager>(),
             )
         }
         viewModel { ChatViewModel(get<ChatRepository>(), get<PreferencesRepository>()) }
-        viewModel { HomeViewModel(get<FeedRepository>(), get<PreferencesRepository>()) }
-        viewModel { LoginViewModel(get<AuthenticateRepository>()) }
+        viewModel {
+            HomeViewModel(
+                get<FeedRepository>(),
+                get<PreferencesRepository>(),
+                get<UserRepository>(),
+            )
+        }
+        viewModel {
+            LoginViewModel(
+                get<AuthenticateRepository>(),
+            )
+        }
         viewModel {
             NotificationViewModel(get<NotificationsRepository>(), get<PreferencesRepository>())
         }

@@ -31,9 +31,14 @@ class PendingUploadRepositoryImpl(
     private val pendingUploadDao: PendingUploadDao,
     private val uploadAPI: UploadAPI,
 ) : PendingUploadRepository {
-    override suspend fun getPendingUploadsWithMedia(): List<PendingUploadWithMedia> =
+    override suspend fun getPendingUploadsWithMedia(): List<PendingUploadWithMedia>? =
         withContext(appDispatchers.io) {
             pendingUploadDao.getPendingUploadsWithMedia()
+        }
+
+    override suspend fun getPendingUploadById(id: Long): PendingUploadEntity? =
+        withContext(appDispatchers.io) {
+            pendingUploadDao.getPendingUploadById(id)
         }
 
     override suspend fun insertUpload(upload: PendingUploadEntity): Long =

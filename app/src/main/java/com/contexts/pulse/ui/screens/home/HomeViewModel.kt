@@ -16,6 +16,7 @@ import androidx.paging.cachedIn
 import app.bsky.feed.FeedViewPost
 import com.contexts.pulse.domain.repository.FeedRepository
 import com.contexts.pulse.domain.repository.PreferencesRepository
+import com.contexts.pulse.domain.repository.UserRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +33,7 @@ import kotlinx.coroutines.launch
 class HomeViewModel(
     private val feedRepository: FeedRepository,
     preferencesRepository: PreferencesRepository,
+    userRepository: UserRepository,
 ) : ViewModel() {
     private val currentUser = preferencesRepository.getCurrentUserFlow()
     private val allFeedsFlow =
@@ -43,6 +45,10 @@ class HomeViewModel(
     val visibleFeeds =
         allFeedsFlow.map { feeds -> feeds.filter { it.pinned } }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
+
+    val isLoggedIn =
+        userRepository.isLoggedIn()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), null)
 
     private val _feedStates =
         MutableStateFlow<Map<String, Flow<PagingData<FeedViewPost>>>>(emptyMap())

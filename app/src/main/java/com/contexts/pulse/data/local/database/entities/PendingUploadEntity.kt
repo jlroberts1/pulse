@@ -18,6 +18,7 @@ import kotlinx.datetime.Instant
 data class PendingUploadEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
+    val userDid: String,
     val text: String,
     val createdAt: Instant = Clock.System.now(),
     val uploadState: PostUploadState = PostUploadState.PENDING,
@@ -27,6 +28,5 @@ data class PendingUploadEntity(
 enum class PostUploadState {
     PENDING,
     UPLOADING,
-    UPLOADED,
     FAILED,
 }

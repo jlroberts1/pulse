@@ -12,13 +12,21 @@ package com.contexts.pulse.ui.screens.addpost
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import app.bsky.actor.ProfileViewBasic
 import app.bsky.actor.SearchActorsTypeaheadQueryParams
+import com.contexts.pulse.data.local.database.entities.PendingUploadEntity
 import com.contexts.pulse.data.network.client.onError
 import com.contexts.pulse.data.network.client.onSuccess
 import com.contexts.pulse.domain.model.TenorGif
 import com.contexts.pulse.domain.repository.ActorRepository
+import com.contexts.pulse.domain.repository.PendingUploadRepository
+import com.contexts.pulse.domain.repository.PreferencesRepository
 import com.contexts.pulse.domain.repository.TenorRepository
+import com.contexts.pulse.worker.CreatePostWorker
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,11 +44,15 @@ data class AddPostUiState(
     val gifSearchResults: List<TenorGif> = emptyList(),
     val selectedGif: TenorGif? = null,
     val error: String? = null,
+    val uploadSent: Boolean = false,
 )
 
 class AddPostViewModel(
     private val actorRepository: ActorRepository,
     private val tenorRepository: TenorRepository,
+    private val preferencesRepository: PreferencesRepository,
+    private val pendingUploadRepository: PendingUploadRepository,
+    private val workManager: WorkManager,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AddPostUiState())
     val uiState = _uiState.asStateFlow()
@@ -54,6 +66,32 @@ class AddPostViewModel(
             _uiState.update { it.copy(gifSearchResults = response.results) }
         }.onError { error ->
             _uiState.update { it.copy(loading = false, error = error.message) }
+        }
+    }
+
+    fun onUpload() {
+        viewModelScope.launch {
+            val currentUser = preferencesRepository.getCurrentUser()
+            currentUser?.let {
+                val pendingUpload =
+                    PendingUploadEntity(
+                        userDid = currentUser,
+                        text = uiState.value.text,
+                    )
+                val uploadId = pendingUploadRepository.insertUpload(pendingUpload)
+                val inputData = workDataOf("uploadId" to uploadId)
+                val workRequest =
+                    OneTimeWorkRequestBuilder<CreatePostWorker>()
+                        .addTag("post_upload")
+                        .setInputData(inputData)
+                        .build()
+                workManager.enqueueUniqueWork(
+                    uploadId.toString(),
+                    ExistingWorkPolicy.REPLACE,
+                    workRequest,
+                )
+            }
+            _uiState.update { it.copy(uploadSent = true) }
         }
     }
 

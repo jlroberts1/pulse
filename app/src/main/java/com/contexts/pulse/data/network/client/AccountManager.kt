@@ -31,7 +31,7 @@ class AccountManager(
                 did?.let {
                     val user = userDao.getUser(did)
                     _currentPdsUrl.update {
-                        user.didDoc?.service?.firstOrNull()?.serviceEndpoint
+                        user?.didDoc?.service?.firstOrNull()?.serviceEndpoint
                     }
                 }
             }

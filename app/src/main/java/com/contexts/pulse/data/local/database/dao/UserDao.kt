@@ -43,5 +43,5 @@ interface UserDao {
     )
 
     @Query("SELECT * FROM users WHERE did = :did")
-    suspend fun getUser(did: String): UserEntity
+    suspend fun getUser(did: String): UserEntity?
 }
