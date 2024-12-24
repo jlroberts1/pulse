@@ -13,7 +13,6 @@ import app.bsky.video.GetJobStatusQueryParams
 import app.bsky.video.GetJobStatusResponse
 import app.bsky.video.UploadVideoResponse
 import com.atproto.repo.UploadBlobResponse
-import com.contexts.pulse.data.network.client.AccountManager
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.network.client.safeRequest
 import com.contexts.pulse.exceptions.NetworkError
@@ -23,6 +22,7 @@ import io.ktor.client.request.parameter
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
+import io.ktor.http.Url
 import io.ktor.http.content.ByteArrayContent
 import io.ktor.http.path
 import java.io.File
@@ -33,17 +33,17 @@ data class UploadParams(
 )
 
 class UploadAPI(
-    client: HttpClient,
-    accountManager: AccountManager,
-) : BaseAPI(client, accountManager) {
+    private val client: HttpClient,
+) {
     suspend fun uploadBlob(
         params: UploadParams,
         onUploadProgress: (Float) -> Unit,
     ): Response<UploadBlobResponse, NetworkError> {
+        val pdsUrl = UrlManager.getPdsUrl()
         return client.safeRequest {
-            configurePds()
             url {
                 method = HttpMethod.Post
+                host = Url(pdsUrl).host
                 path("/xrpc/com.atproto.repo.uploadBlob")
             }
             onUpload { bytesSentTotal, contentLength ->
@@ -67,10 +67,11 @@ class UploadAPI(
         params: UploadParams,
         onUploadProgress: (Float) -> Unit,
     ): Response<UploadVideoResponse, NetworkError> {
+        val pdsUrl = UrlManager.getPdsUrl()
         return client.safeRequest {
-            configurePds()
             url {
                 method = HttpMethod.Post
+                host = Url(pdsUrl).host
                 path("/xrpc/app.bsky.video.uploadVideo")
             }
             onUpload { bytesSentTotal, contentLength ->
@@ -91,10 +92,11 @@ class UploadAPI(
     }
 
     suspend fun getVideoProcessingStatus(getJobStatusQueryParams: GetJobStatusQueryParams): Response<GetJobStatusResponse, NetworkError> {
+        val pdsUrl = UrlManager.getPdsUrl()
         return client.safeRequest {
-            configurePds()
             url {
                 method = HttpMethod.Get
+                host = Url(pdsUrl).host
                 path("/xrpc/app.bsky.video.getJobStatus")
                 parameter("jobId", getJobStatusQueryParams.jobId)
             }

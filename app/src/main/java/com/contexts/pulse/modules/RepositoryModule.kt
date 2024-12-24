@@ -50,7 +50,13 @@ import org.koin.dsl.module
 
 val repositoryModule =
     module {
-        single<ActorRepository> { ActorRepositoryImpl(get<AppDispatchers>(), get<HttpClient>(), get()) }
+        single<ActorRepository> {
+            ActorRepositoryImpl(
+                get<AppDispatchers>(),
+                get<HttpClient>(),
+                get(),
+            )
+        }
         single<AuthenticateRepository> {
             AuthenticateRepositoryImpl(
                 get<AppDispatchers>(),

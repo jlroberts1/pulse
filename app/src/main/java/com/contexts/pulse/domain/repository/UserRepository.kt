@@ -16,4 +16,6 @@ interface UserRepository {
     suspend fun insertUser(user: User)
 
     fun isLoggedIn(): Flow<Boolean>
+
+    suspend fun getServiceEndpoint(did: String): String?
 }

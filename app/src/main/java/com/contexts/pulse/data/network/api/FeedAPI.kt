@@ -11,27 +11,27 @@ package com.contexts.pulse.data.network.api
 
 import app.bsky.feed.GetFeedGeneratorResponse
 import app.bsky.feed.GetFeedResponse
-import com.contexts.pulse.data.network.client.AccountManager
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.network.client.safeRequest
 import com.contexts.pulse.exceptions.NetworkError
 import io.ktor.client.HttpClient
 import io.ktor.http.HttpMethod
+import io.ktor.http.Url
 import io.ktor.http.path
 
 class FeedAPI(
-    client: HttpClient,
-    accountManager: AccountManager,
-) : BaseAPI(client, accountManager) {
+    private val client: HttpClient,
+) {
     suspend fun getFeed(
         feedUri: String,
         limit: Int = 20,
         cursor: String? = null,
     ): Response<GetFeedResponse, NetworkError> {
+        val pdsUrl = UrlManager.getPdsUrl()
         return client.safeRequest {
-            configurePds()
             url {
                 method = HttpMethod.Get
+                host = Url(pdsUrl).host
                 path("xrpc/app.bsky.feed.getFeed")
                 parameters.append("feed", feedUri)
                 parameters.append("limit", limit.toString())
@@ -41,10 +41,11 @@ class FeedAPI(
     }
 
     suspend fun getFeedGenerator(at: String): Response<GetFeedGeneratorResponse, NetworkError> {
+        val pdsUrl = UrlManager.getPdsUrl()
         return client.safeRequest<GetFeedGeneratorResponse> {
-            configurePds()
             url {
                 method = HttpMethod.Get
+                host = Url(pdsUrl).host
                 path("xrpc/app.bsky.feed.getFeedGenerator")
                 parameters.append("feed", at)
             }

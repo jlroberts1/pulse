@@ -30,4 +30,9 @@ class UserRepositoryImpl(
     override fun isLoggedIn(): Flow<Boolean> {
         return userDao.isLoggedIn().flowOn(appDispatchers.io)
     }
+
+    override suspend fun getServiceEndpoint(did: String): String? =
+        withContext(appDispatchers.io) {
+            userDao.getUser(did)?.didDoc?.service?.first()?.serviceEndpoint
+        }
 }

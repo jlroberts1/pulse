@@ -12,10 +12,8 @@ package com.contexts.pulse.modules
 import com.chuckerteam.chucker.api.ChuckerCollector
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.chuckerteam.chucker.api.RetentionManager
-import com.contexts.pulse.ApplicationScope
 import com.contexts.pulse.BuildConfig
 import com.contexts.pulse.data.local.database.dao.UserDao
-import com.contexts.pulse.data.network.client.AccountManager
 import com.contexts.pulse.data.network.client.AuthInterceptor
 import com.contexts.pulse.data.network.client.AuthManager
 import com.contexts.pulse.data.network.client.setupContentNegotiation
@@ -75,12 +73,5 @@ val networkModule =
                     preconfigured = get<OkHttpClient>()
                 }
             }
-        }
-        single {
-            AccountManager(
-                get<UserDao>(),
-                get<PreferencesRepository>(),
-                get<ApplicationScope>(),
-            )
         }
     }

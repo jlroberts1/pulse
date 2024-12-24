@@ -13,6 +13,7 @@ import com.atproto.server.CreateSessionRequest
 import com.atproto.server.CreateSessionResponse
 import com.contexts.pulse.data.local.database.entities.ProfileEntity
 import com.contexts.pulse.data.network.api.AuthenticateAPI
+import com.contexts.pulse.data.network.api.UrlManager
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.network.client.onSuccess
 import com.contexts.pulse.domain.model.toUser
@@ -36,7 +37,9 @@ class AuthenticateRepositoryImpl(
             api.createSession(createSessionRequest)
                 .onSuccess {
                     preferencesRepository.updateCurrentUser(it.did.did)
-                    userRepository.insertUser(it.toUser())
+                    val user = it.toUser()
+                    userRepository.insertUser(user)
+                    UrlManager.updatePdsUrl(user.didDoc?.service?.first()?.serviceEndpoint)
                     profileRepository.getProfile(it.did.did).onSuccess { response ->
                         profileRepository.insertProfile(
                             ProfileEntity(

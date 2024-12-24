@@ -14,6 +14,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkQuery
+import com.contexts.pulse.data.network.api.UrlManager
 import com.contexts.pulse.domain.model.Theme
 import com.contexts.pulse.domain.repository.FeedRepository
 import com.contexts.pulse.domain.repository.PreferencesRepository
@@ -37,8 +38,8 @@ data class MediaState(
 class AppViewModel(
     private val feedRepository: FeedRepository,
     profileRepository: ProfileRepository,
-    preferencesRepository: PreferencesRepository,
-    userRepository: UserRepository,
+    private val preferencesRepository: PreferencesRepository,
+    private val userRepository: UserRepository,
     private val workManager: WorkManager,
 ) : ViewModel() {
     val theme =
@@ -65,9 +66,20 @@ class AppViewModel(
     val snackbarMessages = _snackbarMessages.asStateFlow()
 
     init {
+        bindAccount()
         checkAuthState()
         refreshFeeds()
         observeWork()
+    }
+
+    private fun bindAccount() {
+        viewModelScope.launch {
+            preferencesRepository.getCurrentUserFlow().collect { current ->
+                current?.let {
+                    UrlManager.updatePdsUrl(userRepository.getServiceEndpoint(it))
+                }
+            }
+        }
     }
 
     private fun observeWork() {

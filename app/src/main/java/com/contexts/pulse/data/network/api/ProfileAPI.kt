@@ -11,23 +11,23 @@ package com.contexts.pulse.data.network.api
 
 import app.bsky.actor.GetPreferencesResponse
 import app.bsky.actor.GetProfileResponse
-import com.contexts.pulse.data.network.client.AccountManager
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.network.client.safeRequest
 import com.contexts.pulse.exceptions.NetworkError
 import io.ktor.client.HttpClient
 import io.ktor.http.HttpMethod
+import io.ktor.http.Url
 import io.ktor.http.path
 
 class ProfileAPI(
-    client: HttpClient,
-    accountManager: AccountManager,
-) : BaseAPI(client, accountManager) {
+    private val client: HttpClient,
+) {
     suspend fun getProfile(actor: String): Response<GetProfileResponse, NetworkError> {
+        val pdsUrl = UrlManager.getPdsUrl()
         return client.safeRequest {
-            configurePds()
             url {
                 method = HttpMethod.Get
+                host = Url(pdsUrl).host
                 path("xrpc/app.bsky.actor.getProfile")
                 parameters.append("actor", actor)
             }
@@ -35,10 +35,11 @@ class ProfileAPI(
     }
 
     suspend fun getPreferences(): Response<GetPreferencesResponse, NetworkError> {
+        val pdsUrl = UrlManager.getPdsUrl()
         return client.safeRequest {
-            configurePds()
             url {
                 method = HttpMethod.Get
+                host = Url(pdsUrl).host
                 path("xrpc/app.bsky.actor.getPreferences")
             }
         }

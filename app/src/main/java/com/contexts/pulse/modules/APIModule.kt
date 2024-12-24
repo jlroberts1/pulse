@@ -18,19 +18,18 @@ import com.contexts.pulse.data.network.api.PostAPI
 import com.contexts.pulse.data.network.api.ProfileAPI
 import com.contexts.pulse.data.network.api.TenorAPI
 import com.contexts.pulse.data.network.api.UploadAPI
-import com.contexts.pulse.data.network.client.AccountManager
 import io.ktor.client.HttpClient
 import org.koin.dsl.module
 
 val apiModule =
     module {
-        single { ActorAPI(get<HttpClient>(), get<AccountManager>()) }
+        single { ActorAPI(get<HttpClient>()) }
         single { AuthenticateAPI(get<HttpClient>()) }
-        single { ChatAPI(get<HttpClient>(), get<AccountManager>()) }
-        single { FeedAPI(get<HttpClient>(), get<AccountManager>()) }
-        single { NotificationsAPI(get<HttpClient>(), get<AccountManager>()) }
-        single { ProfileAPI(get<HttpClient>(), get<AccountManager>()) }
+        single { ChatAPI(get<HttpClient>()) }
+        single { FeedAPI(get<HttpClient>()) }
+        single { NotificationsAPI(get<HttpClient>()) }
+        single { ProfileAPI(get<HttpClient>()) }
         single { TenorAPI() }
-        single { PostAPI(get<HttpClient>(), get<AccountManager>()) }
-        single { UploadAPI(get<HttpClient>(), get<AccountManager>()) }
+        single { PostAPI(get<HttpClient>()) }
+        single { UploadAPI(get<HttpClient>()) }
     }

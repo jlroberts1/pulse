@@ -11,11 +11,14 @@ package com.contexts.pulse.data.repository
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.contexts.pulse.data.network.api.UrlManager
 import com.contexts.pulse.modules.AppDispatchers
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
+import io.ktor.http.Url
+import io.ktor.http.path
 import io.ktor.util.reflect.TypeInfo
 import kotlinx.coroutines.withContext
 
@@ -70,14 +73,19 @@ class NetworkPagingSource<T : Any, R : Any>(
     override suspend fun load(params: LoadParams<String>): LoadResult<String, T> =
         withContext(appDispatchers.io) {
             try {
+                val pdsUrl = UrlManager.getPdsUrl()
                 val response =
-                    client.get(request.url) {
-                        request.parameters.forEach { (key, value) ->
-                            parameter(key, value)
-                        }
+                    client.get {
+                        url {
+                            host = Url(pdsUrl).host
+                            path(request.url)
+                            request.parameters.forEach { (key, value) ->
+                                parameter(key, value)
+                            }
 
-                        params.key?.let { parameter("cursor", it) }
-                        parameter("limit", request.limit)
+                            params.key?.let { parameter("cursor", it) }
+                            parameter("limit", request.limit)
+                        }
                     }.body<R>(type)
 
                 LoadResult.Page(
