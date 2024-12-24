@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-package com.contexts.pulse.ui.composables
+package com.contexts.pulse.ui.screens.postview.composables
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -24,6 +24,13 @@ import app.bsky.feed.PostView
 import app.bsky.feed.PostViewEmbedUnion
 import com.contexts.pulse.domain.media.PlayerPoolManager
 import com.contexts.pulse.extensions.getPostText
+import com.contexts.pulse.ui.composables.EmbedExternalView
+import com.contexts.pulse.ui.composables.EmbedImageView
+import com.contexts.pulse.ui.composables.EmbedRecordView
+import com.contexts.pulse.ui.composables.EmbedVideoView
+import com.contexts.pulse.ui.composables.FeedItemInteractions
+import com.contexts.pulse.ui.composables.PostHeader
+import com.contexts.pulse.ui.composables.PostMessageText
 import io.ktor.http.encodeURLParameter
 import org.koin.compose.koinInject
 
@@ -44,8 +51,7 @@ fun PostViewReply(
                 .clickable {
                     onPostClick(post.uri.atUri)
                 }
-                .fillMaxWidth()
-                .padding(start = 32.dp, top = 8.dp, end = 8.dp),
+                .fillMaxWidth(),
     ) {
         Column(
             modifier =
