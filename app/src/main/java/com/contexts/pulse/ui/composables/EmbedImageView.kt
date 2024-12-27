@@ -13,17 +13,17 @@ import androidx.compose.runtime.Composable
 import app.bsky.embed.ImagesViewImage
 
 @Composable
-fun EmbedImageView(
+fun EmbedImagesViewImage(
     images: List<ImagesViewImage>,
     onMediaOpen: (String) -> Unit,
 ) {
     if (images.size == 1) {
-        SingleImageHolder(
+        SingleImagesViewHolder(
             images.first(),
             onClick = { onMediaOpen(it) },
         )
     } else {
-        MultiImageHolder(
+        MultiImagesViewHolder(
             images,
             onClick = { onMediaOpen(it) },
         )

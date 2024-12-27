@@ -24,7 +24,7 @@ import coil3.compose.AsyncImage
 import com.contexts.pulse.extensions.toFloat
 
 @Composable
-fun SingleImageHolder(
+fun SingleImagesViewHolder(
     image: ImagesViewImage,
     onClick: (String) -> Unit,
 ) {

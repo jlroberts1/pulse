@@ -25,7 +25,7 @@ import app.bsky.feed.PostViewEmbedUnion
 import com.contexts.pulse.domain.media.PlayerPoolManager
 import com.contexts.pulse.extensions.getPostText
 import com.contexts.pulse.ui.composables.EmbedExternalView
-import com.contexts.pulse.ui.composables.EmbedImageView
+import com.contexts.pulse.ui.composables.EmbedImagesViewImage
 import com.contexts.pulse.ui.composables.EmbedRecordView
 import com.contexts.pulse.ui.composables.EmbedVideoView
 import com.contexts.pulse.ui.composables.FeedItemInteractions
@@ -84,7 +84,7 @@ fun PostViewReply(
                     }
 
                     is PostViewEmbedUnion.ImagesView -> {
-                        EmbedImageView(
+                        EmbedImagesViewImage(
                             embed.value.images,
                             onMediaOpen = { onMediaOpen(it) },
                         )

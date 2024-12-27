@@ -77,7 +77,7 @@ fun FeedItem(
                     }
 
                     is PostViewEmbedUnion.ImagesView -> {
-                        EmbedImageView(
+                        EmbedImagesViewImage(
                             embed.value.images,
                             onMediaOpen = { onMediaOpen(it) },
                         )

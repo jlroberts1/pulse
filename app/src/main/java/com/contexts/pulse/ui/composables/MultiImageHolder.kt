@@ -27,7 +27,7 @@ import app.bsky.embed.ImagesViewImage
 import coil3.compose.AsyncImage
 
 @Composable
-fun MultiImageHolder(
+fun MultiImagesViewHolder(
     images: List<ImagesViewImage>,
     onClick: (String) -> Unit,
 ) {

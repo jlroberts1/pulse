@@ -37,41 +37,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.bsky.embed.RecordViewRecordUnion
 import coil3.compose.AsyncImage
-import com.contexts.pulse.extensions.getRecordText
 
 @Composable
 fun EmbedRecordView(record: RecordViewRecordUnion) {
     when (record) {
         is RecordViewRecordUnion.ViewRecord -> {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(8.dp),
-                border =
-                    BorderStroke(
-                        1.dp,
-                        MaterialTheme.colorScheme.outlineVariant,
-                    ),
-            ) {
-                Column(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Text(
-                        text = record.value.author.displayName ?: "",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Text(
-                        text = record.getRecordText() ?: "",
-                        style = MaterialTheme.typography.bodySmall,
-                        maxLines = 3,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-            }
+            EmbeddedRecordView(record)
         }
         is RecordViewRecordUnion.ViewBlocked -> {
             Surface(
