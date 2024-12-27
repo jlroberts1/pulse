@@ -9,11 +9,11 @@
 
 package com.contexts.pulse.data.network.client
 
-import android.util.Log
 import com.contexts.pulse.data.local.database.entities.TokenPair
 import io.ktor.http.HttpHeaders
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
+import logcat.logcat
 import okhttp3.Interceptor
 import okhttp3.Request
 typealias OkhttpResponse = okhttp3.Response
@@ -67,7 +67,7 @@ class AuthInterceptor(
                         response.data.accessJwt
                     }
                     is Response.Error -> {
-                        Log.e("AuthInterceptor", "Failed to refresh token, ${response.error.message}")
+                        logcat { "Failed to refresh token, ${response.error.message}" }
                     }
                 }
             }

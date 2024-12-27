@@ -82,6 +82,7 @@ dependencies {
     implementation(libs.paging.compose)
     implementation(libs.autofill)
     implementation(libs.work.manager)
+    implementation(libs.logcat)
 
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
@@ -112,7 +113,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     debugImplementation(libs.chucker.debug)
-    // debugImplementation(libs.leakcanary)
+    debugImplementation(libs.leakcanary)
 
     releaseImplementation(libs.chucker.noop)
 

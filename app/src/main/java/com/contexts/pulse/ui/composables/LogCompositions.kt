@@ -9,15 +9,15 @@
 
 package com.contexts.pulse.ui.composables
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentCompositionLocalContext
+import logcat.logcat
 
 @Composable
 fun LogCompositions(tag: String = "Recomposition") {
     val context = currentCompositionLocalContext
     SideEffect {
-        Log.d(tag, "Composition: $context")
+        logcat("LogCompositions") { "Composition: $context" }
     }
 }

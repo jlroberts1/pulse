@@ -10,7 +10,6 @@
 package com.contexts.pulse.ui.components
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
@@ -21,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import logcat.logcat
 
 data class PlayerUiState(
     val loading: Boolean = false,
@@ -61,7 +61,7 @@ class PlayerViewModel(
                 exoPlayer.playWhenReady = true
                 _uiState.update { it.copy(loading = false, exoPlayer = exoPlayer) }
             } catch (e: Exception) {
-                Log.e("PlayerViewModel", "Error initializing the player")
+                logcat { "Error initializing the player, ${e.message}" }
             }
         }
     }
@@ -74,7 +74,7 @@ class PlayerViewModel(
             exoPlayer.release()
             _uiState.update { it.copy(exoPlayer = null) }
         } catch (e: Exception) {
-            Log.e("PlayerViewModel", "Error releasing the player")
+            logcat { "Error releasing the player, ${e.message}" }
         }
     }
 
@@ -83,7 +83,7 @@ class PlayerViewModel(
         releasePlayer()
     }
 
-    private fun handleError(error: PlaybackException) {
-        Log.e("PlayerViewModel", "Error playing media, ${error.message}")
+    private fun handleError(e: PlaybackException) {
+        logcat { "Error playing media, ${e.message}" }
     }
 }

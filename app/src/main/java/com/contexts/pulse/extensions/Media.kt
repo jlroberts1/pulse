@@ -13,11 +13,11 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
-import android.util.Log
 import android.webkit.MimeTypeMap
 import app.bsky.embed.AspectRatio
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import java.io.File
 import java.io.IOException
 
@@ -87,8 +87,9 @@ private fun File.getVideoAspectRatio(context: Context): AspectRatio? {
 fun File.getMimeType(context: Context): String? {
     val filename = name
 
-    Log.d(
+    logcat(
         "MimeType",
+    ) {
         """
         File debug info:
         - Name: $filename
@@ -98,44 +99,44 @@ fun File.getMimeType(context: Context): String? {
         - Path: $absolutePath
         - Extension: $extension
         - First 16 bytes: ${readFirstBytes()}
-        """.trimIndent(),
-    )
+        """.trimIndent()
+    }
 
     if (extension.isBlank()) {
         detectMimeTypeFromContents()?.also { mimeType ->
-            Log.d("MimeType", "Found mime type from magic numbers: $mimeType")
+            logcat("MimeType") { "Found mime type from magic numbers: $mimeType" }
             return mimeType
         }
     }
 
     val extension = extension.lowercase()
-    Log.d("MimeType", "Attempting to get mime type for file: $filename with extension: $extension")
+    logcat("MimeType") { "Attempting to get mime type for file: $filename with extension: $extension" }
 
     return try {
         try {
             val uri = Uri.fromFile(this)
             context.contentResolver.getType(uri)?.also { mimeType ->
-                Log.d("MimeType", "Found mime type from ContentResolver: $mimeType")
+                logcat("MimeType") { "Found mime type from ContentResolver: $mimeType" }
                 return mimeType
             }
         } catch (e: Exception) {
-            Log.e("MimeType", "ContentResolver failed to get mime type", e)
+            logcat("MimeType") { "ContentResolver failed to get mime type, $e" }
         }
 
         MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)?.also { mimeType ->
-            Log.d("MimeType", "Found mime type from MimeTypeMap: $mimeType")
+            logcat("MimeType") { "Found mime type from MimeTypeMap: $mimeType" }
             return mimeType
         }
 
         commonTypesMapping(extension)?.also { mimeType ->
-            Log.d("MimeType", "Found mime type from common types mapping: $mimeType")
+            logcat("MimeType") { "Found mime type from common types mapping: $mimeType" }
             return mimeType
         }
 
-        Log.w("MimeType", "All attempts to get mime type failed for file: $filename")
+        logcat("MimeType") { "All attempts to get mime type failed for file: $filename" }
         null
     } catch (e: Exception) {
-        Log.e("MimeType", "Exception while getting mime type for file: $filename", e)
+        logcat("MimeType") { "Exception while getting mime type for file: $filename, $e" }
         null
     }
 }
@@ -165,10 +166,13 @@ private fun File.detectMimeTypeFromContents(): String? {
                 when {
                     bytes[0] == 0xFF.toByte() && bytes[1] == 0xD8.toByte() &&
                         bytes[2] == 0xFF.toByte() -> "image/jpeg"
+
                     bytes[0] == 0x89.toByte() && bytes[1] == 0x50.toByte() &&
                         bytes[2] == 0x4E.toByte() && bytes[3] == 0x47.toByte() -> "image/png"
+
                     bytes[0] == 0x47.toByte() && bytes[1] == 0x49.toByte() &&
                         bytes[2] == 0x46.toByte() && bytes[3] == 0x38.toByte() -> "image/gif"
+
                     bytes[4] == 0x66.toByte() && bytes[5] == 0x74.toByte() &&
                         bytes[6] == 0x79.toByte() && bytes[7] == 0x70.toByte() -> "video/mp4"
 
@@ -179,7 +183,7 @@ private fun File.detectMimeTypeFromContents(): String? {
             }
         }
     } catch (e: Exception) {
-        Log.e("MimeType", "Error detecting mime type from contents", e)
+        logcat("MimeType") { "Error detecting mime type from contents, $e" }
         null
     }
 }
@@ -245,20 +249,20 @@ suspend fun copyUriToTempFile(
             throw IOException("Failed to copy file or file is empty")
         }
 
-        Log.d(
+        logcat(
             "FileUpload",
+        ) {
             """
             Temporary file created:
             - Path: ${tempFile.absolutePath}
             - Size: ${tempFile.length()}
             - Mime type: $mimeType
             - Extension: $extension
-            """.trimIndent(),
-        )
-
+            """.trimIndent()
+        }
         Result.success(tempFile)
     } catch (e: Exception) {
-        Log.e("FileUpload", "Failed to copy uri to temp file", e)
+        logcat("FileUpload") { "Failed to copy uri to temp file, $e" }
         Result.failure(e)
     }
 }

@@ -9,14 +9,12 @@
 
 package com.contexts.pulse.ui.components
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -26,8 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import logcat.logcat
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -36,7 +34,7 @@ fun Media3PlayerView(videoUrl: String) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     DisposableEffect(videoUrl) {
-        Log.d("Media Player", "Video received: $videoUrl")
+        logcat("Media Player") { "Video received: $videoUrl" }
         viewModel.initializePlayer(videoUrl)
         onDispose { }
     }
@@ -72,19 +70,4 @@ fun Media3PlayerView(videoUrl: String) {
             CircularProgressIndicator()
         }
     }
-}
-
-@Composable
-fun Media3AndroidView(player: ExoPlayer?) {
-    AndroidView(
-        modifier = Modifier.fillMaxWidth(),
-        factory = { context ->
-            PlayerView(context).apply {
-                this.player = player
-            }
-        },
-        update = { playerView ->
-            playerView.player = player
-        },
-    )
 }

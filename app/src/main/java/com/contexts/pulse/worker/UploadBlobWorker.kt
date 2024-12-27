@@ -15,7 +15,6 @@ import android.content.Context
 import android.content.pm.ServiceInfo
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
@@ -30,6 +29,7 @@ import com.contexts.pulse.extensions.copyUriToTempFile
 import com.contexts.pulse.extensions.getAspectRatio
 import com.contexts.pulse.extensions.getMimeType
 import com.contexts.pulse.extensions.getRemoteLink
+import logcat.logcat
 import org.koin.core.component.KoinComponent
 
 class UploadBlobWorker(
@@ -88,10 +88,7 @@ class UploadBlobWorker(
                             }
                         when (response) {
                             is Response.Success -> {
-                                Log.d(
-                                    "UploadBlobWorker",
-                                    "Upload success: ${response.data}, ${response.data.blob.getRemoteLink()}",
-                                )
+                                logcat { "Upload success: ${response.data}, ${response.data.blob.getRemoteLink()}" }
                                 pendingUploadRepository.updateMediaAttachment(
                                     mediaAttachment.copy(
                                         remoteLink = response.data.blob.getRemoteLink(),

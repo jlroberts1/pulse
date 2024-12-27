@@ -27,6 +27,8 @@ import com.contexts.pulse.modules.networkModule
 import com.contexts.pulse.modules.repositoryModule
 import com.contexts.pulse.modules.viewModelModule
 import com.contexts.pulse.modules.workerModule
+import logcat.AndroidLogcatLogger
+import logcat.LogPriority
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.workmanager.koin.workManagerFactory
@@ -35,6 +37,7 @@ import org.koin.core.context.startKoin
 class PulseApplication : Application(), SingletonImageLoader.Factory {
     override fun onCreate() {
         super.onCreate()
+        AndroidLogcatLogger.installOnDebuggableApp(this, LogPriority.VERBOSE)
         startKoin {
             androidLogger()
             androidContext(this@PulseApplication)

@@ -16,6 +16,7 @@ import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.request
 import kotlinx.serialization.SerializationException
+import logcat.logcat
 import java.nio.channels.UnresolvedAddressException
 
 suspend inline fun <reified T> HttpClient.safeRequest(block: HttpRequestBuilder.() -> Unit): Response<T, NetworkError> =
@@ -41,7 +42,7 @@ suspend inline fun <reified T> HttpClient.safeRequest(block: HttpRequestBuilder.
             else -> Response.Error(NetworkError.Unknown(exception.message))
         }
     } catch (e: Exception) {
-        println(e)
+        logcat { e.message ?: "Unknown error" }
         Response.Error(NetworkError.Unknown(e.message ?: "Unknown error"))
     }
 

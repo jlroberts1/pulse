@@ -9,7 +9,6 @@
 
 package com.contexts.pulse.ui.screens.search
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -56,6 +55,7 @@ import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import app.bsky.actor.ProfileView
 import com.contexts.pulse.ui.composables.BorderedCircularAvatar
+import logcat.logcat
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -65,9 +65,9 @@ fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
 
     LaunchedEffect(suggestedAccounts.loadState) {
         when (suggestedAccounts.loadState.refresh) {
-            is LoadState.Loading -> Log.d("Search", "Loading")
-            is LoadState.Error -> Log.d("Search", "Error: ${(suggestedAccounts.loadState.refresh as LoadState.Error).error}")
-            is LoadState.NotLoading -> Log.d("Search", "Loaded: ${suggestedAccounts.itemCount} items")
+            is LoadState.Loading -> logcat("Search") { "Loading" }
+            is LoadState.Error -> logcat("Search") { "Error: ${(suggestedAccounts.loadState.refresh as LoadState.Error).error}" }
+            is LoadState.NotLoading -> logcat("Search") { "Loaded: ${suggestedAccounts.itemCount} items" }
         }
     }
     Column(modifier = Modifier.fillMaxSize()) {

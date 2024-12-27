@@ -16,6 +16,7 @@ import app.bsky.richtext.Facet
 import com.atproto.label.Label
 import com.contexts.pulse.domain.model.PostRecord
 import kotlinx.serialization.Serializable
+import logcat.logcat
 import sh.christian.ozone.api.model.Timestamp
 
 @Serializable
@@ -44,6 +45,7 @@ fun PostView.getPostText(): String {
     return try {
         record.decodeAs<PostRecord>().text
     } catch (e: Exception) {
+        logcat { "Unable to parse post text, ${e.message}" }
         ""
     }
 }
@@ -52,6 +54,7 @@ fun RecordViewRecordUnion.ViewRecord.getRecordText(): String {
     return try {
         value.value.decodeAs<RecordText>().text
     } catch (e: Exception) {
+        logcat { "Unable to parse record text, ${e.message}" }
         ""
     }
 }
@@ -60,6 +63,7 @@ fun ListNotificationsNotification.getRecordText(): String {
     return try {
         record.decodeAs<RecordText>().text
     } catch (e: Exception) {
+        logcat { "Unable to parse record text, ${e.message}" }
         ""
     }
 }
