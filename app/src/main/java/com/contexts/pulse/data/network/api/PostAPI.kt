@@ -10,10 +10,10 @@
 package com.contexts.pulse.data.network.api
 
 import app.bsky.feed.GetPostThreadResponse
-import com.atproto.repo.CreateRecordRequest
 import com.atproto.repo.CreateRecordResponse
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.network.client.safeRequest
+import com.contexts.pulse.domain.model.CreateRecord
 import com.contexts.pulse.exceptions.NetworkError
 import io.ktor.client.HttpClient
 import io.ktor.client.request.setBody
@@ -36,14 +36,14 @@ class PostAPI(
         }
     }
 
-    suspend fun createPost(createRecordRequest: CreateRecordRequest): Response<CreateRecordResponse, NetworkError> {
+    suspend fun createPost(createRecord: CreateRecord): Response<CreateRecordResponse, NetworkError> {
         val pdsUrl = UrlManager.getPdsUrl()
         return client.safeRequest {
             url {
                 method = HttpMethod.Post
                 host = Url(pdsUrl).host
                 path("xrpc/com.atproto.repo.createRecord")
-                setBody(createRecordRequest)
+                setBody(createRecord)
             }
         }
     }

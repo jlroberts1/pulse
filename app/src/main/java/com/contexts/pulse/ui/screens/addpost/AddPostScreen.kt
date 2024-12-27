@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
+import com.contexts.pulse.data.local.database.entities.MediaType
 import com.contexts.pulse.domain.model.getBestFormat
 import com.contexts.pulse.ui.screens.addpost.composables.AddPostBottomBar
 import com.contexts.pulse.ui.screens.addpost.composables.AddPostSuggestions
@@ -62,7 +63,15 @@ fun AddPostScreen(
         rememberGalleryManager(pickType = PickType.IMAGES) {
             scope.launch {
                 launchImageGallery = false
-                viewModel.onImagesSelected(it)
+                val mediaItems =
+                    it.map {
+                        MediaItem(
+                            uri = it,
+                            mediaType = MediaType.IMAGE,
+                            altText = "",
+                        )
+                    }
+                viewModel.onImagesSelected(mediaItems)
             }
         }
 
@@ -70,7 +79,15 @@ fun AddPostScreen(
         rememberGalleryManager(pickType = PickType.VIDEOS) {
             scope.launch {
                 launchVideoGallery = false
-                viewModel.onImagesSelected(it)
+                val mediaItems =
+                    it.map {
+                        MediaItem(
+                            uri = it,
+                            mediaType = MediaType.VIDEO,
+                            altText = "",
+                        )
+                    }
+                viewModel.onImagesSelected(mediaItems)
             }
         }
 
@@ -135,10 +152,10 @@ fun AddPostScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                uiState.imageUris.forEach {
+                uiState.mediaItems.forEach {
                     item {
                         AsyncImage(
-                            model = it,
+                            model = it.uri,
                             contentDescription = "Image",
                             modifier =
                                 Modifier

@@ -118,6 +118,7 @@ val repositoryModule =
             PostRepositoryImpl(
                 get<AppDispatchers>(),
                 get<PostAPI>(),
+                get<UploadAPI>(),
             )
         }
         single<PendingUploadRepository> {

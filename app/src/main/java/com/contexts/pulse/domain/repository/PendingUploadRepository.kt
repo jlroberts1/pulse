@@ -24,6 +24,8 @@ import com.contexts.pulse.exceptions.NetworkError
 interface PendingUploadRepository {
     suspend fun getPendingUploadsWithMedia(): List<PendingUploadWithMedia>?
 
+    suspend fun getPendingUploadsWithMediaById(id: Long): PendingUploadWithMedia?
+
     suspend fun getPendingUploadById(id: Long): PendingUploadEntity?
 
     suspend fun insertUpload(upload: PendingUploadEntity): Long

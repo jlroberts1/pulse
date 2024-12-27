@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "15e0be585e197ff8ed61b58cba96030a",
+    "identityHash": "2ed7e1859cae7e0b6be8800b67848211",
     "entities": [
       {
         "tableName": "users",
@@ -308,7 +308,7 @@
       },
       {
         "tableName": "pending_media_attachments",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `uploadId` INTEGER NOT NULL, `type` TEXT NOT NULL, `localUri` TEXT NOT NULL, `mimeType` TEXT NOT NULL, `altText` TEXT, `uploadProgress` REAL NOT NULL, `uploadState` TEXT NOT NULL, `remoteLink` TEXT, `size` INTEGER, `videoJobId` TEXT, `videoProcessingState` TEXT NOT NULL, `videoProcessingProgress` INTEGER NOT NULL, `videoProcessingError` TEXT, FOREIGN KEY(`uploadId`) REFERENCES `pending_uploads`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `uploadId` INTEGER NOT NULL, `type` TEXT NOT NULL, `localUri` TEXT NOT NULL, `mimeType` TEXT, `altText` TEXT, `uploadState` TEXT NOT NULL, `remoteLink` TEXT, `videoJobId` TEXT, `aspectRatio` TEXT, `videoProcessingState` TEXT NOT NULL, `videoProcessingProgress` INTEGER, `videoProcessingError` TEXT, FOREIGN KEY(`uploadId`) REFERENCES `pending_uploads`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -338,19 +338,13 @@
             "fieldPath": "mimeType",
             "columnName": "mimeType",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "altText",
             "columnName": "altText",
             "affinity": "TEXT",
             "notNull": false
-          },
-          {
-            "fieldPath": "uploadProgress",
-            "columnName": "uploadProgress",
-            "affinity": "REAL",
-            "notNull": true
           },
           {
             "fieldPath": "uploadState",
@@ -365,14 +359,14 @@
             "notNull": false
           },
           {
-            "fieldPath": "size",
-            "columnName": "size",
-            "affinity": "INTEGER",
+            "fieldPath": "videoJobId",
+            "columnName": "videoJobId",
+            "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "videoJobId",
-            "columnName": "videoJobId",
+            "fieldPath": "aspectRatio",
+            "columnName": "aspectRatio",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -386,7 +380,7 @@
             "fieldPath": "videoProcessingProgress",
             "columnName": "videoProcessingProgress",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "videoProcessingError",
@@ -514,7 +508,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '15e0be585e197ff8ed61b58cba96030a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2ed7e1859cae7e0b6be8800b67848211')"
     ]
   }
 }

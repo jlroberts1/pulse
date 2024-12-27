@@ -9,11 +9,14 @@
 
 package com.contexts.pulse.modules
 
+import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.contexts.pulse.domain.repository.PendingUploadRepository
 import com.contexts.pulse.domain.repository.PostRepository
 import com.contexts.pulse.worker.CreatePostWorker
 import com.contexts.pulse.worker.UploadBlobWorker
+import com.contexts.pulse.worker.UploadVideoWorker
+import com.contexts.pulse.worker.UploadWorkerManager
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.workmanager.dsl.worker
 import org.koin.dsl.module
@@ -24,6 +27,8 @@ val workerModule =
             UploadBlobWorker(
                 androidContext(),
                 get<WorkerParameters>(),
+                get<PendingUploadRepository>(),
+                get<PostRepository>(),
             )
         }
         worker {
@@ -33,5 +38,16 @@ val workerModule =
                 get<PostRepository>(),
                 get<PendingUploadRepository>(),
             )
+        }
+        worker {
+            UploadVideoWorker(
+                androidContext(),
+                get<WorkerParameters>(),
+                get<PendingUploadRepository>(),
+                get<PostRepository>(),
+            )
+        }
+        single<UploadWorkerManager> {
+            UploadWorkerManager(get<PendingUploadRepository>(), get<WorkManager>())
         }
     }

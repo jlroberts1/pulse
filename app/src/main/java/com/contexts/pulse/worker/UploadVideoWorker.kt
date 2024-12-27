@@ -12,27 +12,27 @@ package com.contexts.pulse.worker
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.content.pm.ServiceInfo
-import android.net.Uri
-import android.os.Build
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import app.bsky.video.JobStatus
+import app.bsky.video.State
 import com.contexts.pulse.R
+import com.contexts.pulse.data.local.database.entities.MediaUploadState
+import com.contexts.pulse.data.local.database.entities.VideoProcessingState
 import com.contexts.pulse.data.network.api.UploadParams
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.domain.repository.PendingUploadRepository
 import com.contexts.pulse.domain.repository.PostRepository
-import com.contexts.pulse.extensions.copyUriToTempFile
 import com.contexts.pulse.extensions.getAspectRatio
 import com.contexts.pulse.extensions.getMimeType
 import com.contexts.pulse.extensions.getRemoteLink
 import org.koin.core.component.KoinComponent
+import java.io.File
 
-class UploadBlobWorker(
+class UploadVideoWorker(
     appContext: Context,
     workerParameters: WorkerParameters,
     private val pendingUploadRepository: PendingUploadRepository,
@@ -41,25 +41,24 @@ class UploadBlobWorker(
     private val uploadId = workerParameters.inputData.getLong("uploadId", 0L)
 
     override suspend fun doWork(): Result {
-        if (uploadId == 0L) {
-            return Result.failure(
-                workDataOf(
-                    "error" to "No upload id received",
-                ),
-            )
-        }
+        if (uploadId == 0L) return Result.failure(workDataOf())
 
         val post =
             pendingUploadRepository.getPendingUploadsWithMediaById(uploadId)
-                ?: return Result.failure(
-                    workDataOf(
-                        "error" to "Unable to find upload",
-                    ),
-                )
+                ?: return Result.failure(workDataOf())
 
         var totalProgress = 0f
         val totalFiles = post.mediaAttachments.size
+        var jobStatus: JobStatus? = null
+
         try {
+            val mediaAttachment = post.mediaAttachments.first()
+            pendingUploadRepository.updateMediaAttachment(
+                mediaAttachment.copy(
+                    uploadState = MediaUploadState.UPLOADING,
+                ),
+            )
+
             suspend fun updateProgress(currentProgress: Float) {
                 totalProgress = (currentProgress / totalFiles)
                 val progressData =
@@ -70,49 +69,63 @@ class UploadBlobWorker(
                 setProgress(progressData)
                 createForegroundInfo(totalProgress.toInt())
             }
-            post.mediaAttachments.forEach { mediaAttachment ->
-                val tempFileResult =
-                    copyUriToTempFile(applicationContext, Uri.parse(mediaAttachment.localUri))
-                tempFileResult.fold(
-                    onSuccess = { tempFile ->
-                        val mimeType =
-                            tempFile.getMimeType(applicationContext) ?: return Result.failure()
-                        val uploadParams =
-                            UploadParams(
-                                file = tempFile,
-                                mimeType = mimeType,
-                            )
-                        val response =
-                            postRepository.uploadBlob(uploadParams) { progress ->
-                                updateProgress(progress)
-                            }
-                        when (response) {
-                            is Response.Success -> {
-                                Log.d(
-                                    "UploadBlobWorker",
-                                    "Upload success: ${response.data}, ${response.data.blob.getRemoteLink()}",
-                                )
-                                pendingUploadRepository.updateMediaAttachment(
-                                    mediaAttachment.copy(
-                                        remoteLink = response.data.blob.getRemoteLink(),
-                                        mimeType = mimeType,
-                                        aspectRatio = tempFile.getAspectRatio(context = applicationContext),
-                                    ),
-                                )
-                                return Result.success()
-                            }
 
-                            is Response.Error -> throw Throwable(response.error.message)
-                        }
-                    },
-                    onFailure = {
-                        return Result.failure()
-                    },
+            val file = File(mediaAttachment.localUri)
+            val mimeType = file.getMimeType(applicationContext) ?: return Result.failure()
+            val uploadParams =
+                UploadParams(
+                    file = File(mediaAttachment.localUri),
+                    mimeType = mimeType,
                 )
+
+            val response =
+                postRepository.uploadVideo(uploadParams) { progress ->
+                    updateProgress(progress)
+                }
+            when (response) {
+                is Response.Success -> {
+                    val job = response.data.jobStatus
+                    jobStatus = job
+                    val videoProcessingState =
+                        when (job.state) {
+                            is State.JOBSTATECOMPLETED -> VideoProcessingState.JOB_STATE_COMPLETED
+                            is State.JOBSTATEFAILED -> VideoProcessingState.JOB_STATE_FAILED
+                            else -> VideoProcessingState.PROCESSING
+                        }
+                    pendingUploadRepository.updateMediaAttachment(
+                        mediaAttachment.copy(
+                            uploadState = MediaUploadState.UPLOADED,
+                            videoJobId = job.jobId,
+                            videoProcessingProgress = job.progress,
+                            videoProcessingState = videoProcessingState,
+                            aspectRatio = file.getAspectRatio(context = applicationContext),
+                            mimeType = mimeType,
+                            remoteLink = job.blob.getRemoteLink(),
+                        ),
+                    )
+                }
+
+                is Response.Error -> {
+                    pendingUploadRepository.updateMediaAttachment(
+                        mediaAttachment.copy(
+                            uploadState = MediaUploadState.FAILED,
+                        ),
+                    )
+                    throw Throwable(response.error.message)
+                }
             }
-            return Result.success()
+            return Result.success(
+                workDataOf(
+                    "jobStatus" to jobStatus,
+                ),
+            )
         } catch (e: Exception) {
-            return Result.failure()
+            return Result.failure(
+                workDataOf(
+                    "error" to e.message,
+                    "uploadId" to uploadId,
+                ),
+            )
         }
     }
 
@@ -135,22 +148,7 @@ class UploadBlobWorker(
                 .setProgress(100, progress, false)
                 .build()
 
-        if (Build.VERSION.SDK_INT >= 34) {
-            setForegroundAsync(
-                ForegroundInfo(
-                    NOTIFICATION_ID,
-                    notification,
-                    ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC,
-                ),
-            )
-        } else {
-            setForegroundAsync(
-                ForegroundInfo(
-                    NOTIFICATION_ID,
-                    notification,
-                ),
-            )
-        }
+        setForegroundAsync(ForegroundInfo(NOTIFICATION_ID, notification))
     }
 
     companion object {

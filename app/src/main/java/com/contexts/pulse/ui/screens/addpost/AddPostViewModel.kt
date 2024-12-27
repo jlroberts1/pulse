@@ -12,12 +12,10 @@ package com.contexts.pulse.ui.screens.addpost
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.workDataOf
 import app.bsky.actor.ProfileViewBasic
 import app.bsky.actor.SearchActorsTypeaheadQueryParams
+import com.contexts.pulse.data.local.database.entities.MediaType
+import com.contexts.pulse.data.local.database.entities.PendingMediaAttachment
 import com.contexts.pulse.data.local.database.entities.PendingUploadEntity
 import com.contexts.pulse.data.network.client.onError
 import com.contexts.pulse.data.network.client.onSuccess
@@ -26,7 +24,7 @@ import com.contexts.pulse.domain.repository.ActorRepository
 import com.contexts.pulse.domain.repository.PendingUploadRepository
 import com.contexts.pulse.domain.repository.PreferencesRepository
 import com.contexts.pulse.domain.repository.TenorRepository
-import com.contexts.pulse.worker.CreatePostWorker
+import com.contexts.pulse.worker.UploadWorkerManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,11 +38,17 @@ data class AddPostUiState(
     val showSuggestions: Boolean = false,
     val loading: Boolean = false,
     val charactersLeft: Int = 300,
-    val imageUris: List<Uri> = emptyList(),
+    val mediaItems: List<MediaItem> = emptyList(),
     val gifSearchResults: List<TenorGif> = emptyList(),
     val selectedGif: TenorGif? = null,
     val error: String? = null,
     val uploadSent: Boolean = false,
+)
+
+data class MediaItem(
+    val uri: Uri,
+    val mediaType: MediaType,
+    val altText: String?,
 )
 
 class AddPostViewModel(
@@ -52,7 +56,7 @@ class AddPostViewModel(
     private val tenorRepository: TenorRepository,
     private val preferencesRepository: PreferencesRepository,
     private val pendingUploadRepository: PendingUploadRepository,
-    private val workManager: WorkManager,
+    private val uploadWorkerManager: UploadWorkerManager,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AddPostUiState())
     val uiState = _uiState.asStateFlow()
@@ -79,17 +83,20 @@ class AddPostViewModel(
                         text = uiState.value.text,
                     )
                 val uploadId = pendingUploadRepository.insertUpload(pendingUpload)
-                val inputData = workDataOf("uploadId" to uploadId)
-                val workRequest =
-                    OneTimeWorkRequestBuilder<CreatePostWorker>()
-                        .addTag("post_upload")
-                        .setInputData(inputData)
-                        .build()
-                workManager.enqueueUniqueWork(
-                    uploadId.toString(),
-                    ExistingWorkPolicy.REPLACE,
-                    workRequest,
-                )
+                val mediaItems = uiState.value.mediaItems
+                if (mediaItems.isNotEmpty()) {
+                    mediaItems.forEach { media ->
+                        val mediaAttachment =
+                            PendingMediaAttachment(
+                                uploadId = uploadId,
+                                type = media.mediaType,
+                                localUri = media.uri.toString(),
+                                altText = media.altText,
+                            )
+                        pendingUploadRepository.insertMediaAttachment(mediaAttachment)
+                    }
+                }
+                uploadWorkerManager.upload(uploadId)
             }
             _uiState.update { it.copy(uploadSent = true) }
         }
@@ -172,9 +179,9 @@ class AddPostViewModel(
         }
     }
 
-    fun onImagesSelected(imageUris: List<Uri>) {
+    fun onImagesSelected(mediaItems: List<MediaItem>) {
         _uiState.update {
-            it.copy(imageUris = imageUris)
+            it.copy(mediaItems = mediaItems)
         }
     }
 

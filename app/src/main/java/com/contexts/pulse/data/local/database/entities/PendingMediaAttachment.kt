@@ -13,6 +13,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import app.bsky.embed.AspectRatio
 
 @Entity(
     tableName = "pending_media_attachments",
@@ -32,15 +33,14 @@ data class PendingMediaAttachment(
     val uploadId: Long,
     val type: MediaType,
     val localUri: String,
-    val mimeType: String,
-    val altText: String?,
-    val uploadProgress: Float = 0f,
+    val mimeType: String? = null,
+    val altText: String? = null,
     val uploadState: MediaUploadState = MediaUploadState.PENDING,
     val remoteLink: String? = null,
-    val size: Long? = null,
     val videoJobId: String? = null,
+    val aspectRatio: AspectRatio? = null,
     val videoProcessingState: VideoProcessingState = VideoProcessingState.NONE,
-    val videoProcessingProgress: Int = 0,
+    val videoProcessingProgress: Long? = 0L,
     val videoProcessingError: String? = null,
 ) {
     val isFullyReady: Boolean

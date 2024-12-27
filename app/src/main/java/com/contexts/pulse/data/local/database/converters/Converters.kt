@@ -10,6 +10,7 @@
 package com.contexts.pulse.data.local.database.converters
 
 import androidx.room.TypeConverter
+import app.bsky.embed.AspectRatio
 import com.contexts.pulse.data.local.database.entities.MediaType
 import com.contexts.pulse.data.local.database.entities.MediaUploadState
 import com.contexts.pulse.data.local.database.entities.PostUploadState
@@ -29,6 +30,16 @@ class Converters {
     @TypeConverter
     fun toString(list: List<String>): String {
         return list.joinToString(",")
+    }
+
+    @TypeConverter
+    fun fromAspectRatioJson(value: String): AspectRatio {
+        return Json.decodeFromString(value)
+    }
+
+    @TypeConverter
+    fun toAspectRatioJson(aspectRatio: AspectRatio): String {
+        return Json.encodeToString(aspectRatio)
     }
 
     @TypeConverter

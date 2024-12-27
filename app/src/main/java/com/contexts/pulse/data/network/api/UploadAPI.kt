@@ -37,7 +37,7 @@ class UploadAPI(
 ) {
     suspend fun uploadBlob(
         params: UploadParams,
-        onUploadProgress: (Float) -> Unit,
+        onUploadProgress: suspend (Float) -> Unit,
     ): Response<UploadBlobResponse, NetworkError> {
         val pdsUrl = UrlManager.getPdsUrl()
         return client.safeRequest {
@@ -65,7 +65,7 @@ class UploadAPI(
 
     suspend fun uploadVideo(
         params: UploadParams,
-        onUploadProgress: (Float) -> Unit,
+        onUploadProgress: suspend (Float) -> Unit,
     ): Response<UploadVideoResponse, NetworkError> {
         val pdsUrl = UrlManager.getPdsUrl()
         return client.safeRequest {

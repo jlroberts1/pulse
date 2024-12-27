@@ -34,6 +34,7 @@ import com.contexts.pulse.ui.screens.postview.PostViewModel
 import com.contexts.pulse.ui.screens.profile.ProfileViewModel
 import com.contexts.pulse.ui.screens.search.SearchViewModel
 import com.contexts.pulse.ui.screens.settings.SettingsViewModel
+import com.contexts.pulse.worker.UploadWorkerManager
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -45,7 +46,7 @@ val viewModelModule =
                 get<TenorRepository>(),
                 get<PreferencesRepository>(),
                 get<PendingUploadRepository>(),
-                get<WorkManager>(),
+                get<UploadWorkerManager>(),
             )
         }
         viewModel {

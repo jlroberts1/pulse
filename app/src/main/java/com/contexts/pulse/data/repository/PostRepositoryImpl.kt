@@ -10,10 +10,16 @@
 package com.contexts.pulse.data.repository
 
 import app.bsky.feed.GetPostThreadResponse
-import com.atproto.repo.CreateRecordRequest
+import app.bsky.video.GetJobStatusQueryParams
+import app.bsky.video.GetJobStatusResponse
+import app.bsky.video.UploadVideoResponse
 import com.atproto.repo.CreateRecordResponse
+import com.atproto.repo.UploadBlobResponse
 import com.contexts.pulse.data.network.api.PostAPI
+import com.contexts.pulse.data.network.api.UploadAPI
+import com.contexts.pulse.data.network.api.UploadParams
 import com.contexts.pulse.data.network.client.Response
+import com.contexts.pulse.domain.model.CreateRecord
 import com.contexts.pulse.domain.repository.PostRepository
 import com.contexts.pulse.exceptions.NetworkError
 import com.contexts.pulse.modules.AppDispatchers
@@ -22,14 +28,38 @@ import kotlinx.coroutines.withContext
 class PostRepositoryImpl(
     private val appDispatchers: AppDispatchers,
     private val postAPI: PostAPI,
+    private val uploadAPI: UploadAPI,
 ) : PostRepository {
     override suspend fun getPostThread(uri: String): Response<GetPostThreadResponse, NetworkError> =
         withContext(appDispatchers.io) {
             postAPI.getPostThread(uri)
         }
 
-    override suspend fun createPost(createRecordRequest: CreateRecordRequest): Response<CreateRecordResponse, NetworkError> =
+    override suspend fun createPost(createRecord: CreateRecord): Response<CreateRecordResponse, NetworkError> =
         withContext(appDispatchers.io) {
-            postAPI.createPost(createRecordRequest)
+            postAPI.createPost(createRecord)
+        }
+
+    override suspend fun uploadBlob(
+        params: UploadParams,
+        onUploadProgress: suspend (Float) -> Unit,
+    ): Response<UploadBlobResponse, NetworkError> =
+        withContext(appDispatchers.io) {
+            uploadAPI.uploadBlob(params, onUploadProgress)
+        }
+
+    override suspend fun uploadVideo(
+        params: UploadParams,
+        onUploadProgress: suspend (Float) -> Unit,
+    ): Response<UploadVideoResponse, NetworkError> =
+        withContext(appDispatchers.io) {
+            uploadAPI.uploadVideo(params, onUploadProgress)
+        }
+
+    override suspend fun getVideoProcessingStatus(
+        getJobStatusQueryParams: GetJobStatusQueryParams,
+    ): Response<GetJobStatusResponse, NetworkError> =
+        withContext(appDispatchers.io) {
+            uploadAPI.getVideoProcessingStatus(getJobStatusQueryParams)
         }
 }

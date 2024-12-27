@@ -26,6 +26,10 @@ interface PendingUploadDao {
     @Query("SELECT * FROM pending_uploads")
     suspend fun getPendingUploadsWithMedia(): List<PendingUploadWithMedia>?
 
+    @Transaction
+    @Query("SELECT * FROM pending_uploads WHERE id = :id")
+    suspend fun getPendingUploadsWithMediaById(id: Long): PendingUploadWithMedia?
+
     @Query("SELECT * FROM pending_uploads WHERE id = :id")
     suspend fun getPendingUploadById(id: Long): PendingUploadEntity?
 

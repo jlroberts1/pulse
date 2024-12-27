@@ -36,6 +36,11 @@ class PendingUploadRepositoryImpl(
             pendingUploadDao.getPendingUploadsWithMedia()
         }
 
+    override suspend fun getPendingUploadsWithMediaById(id: Long): PendingUploadWithMedia? =
+        withContext(appDispatchers.io) {
+            pendingUploadDao.getPendingUploadsWithMediaById(id)
+        }
+
     override suspend fun getPendingUploadById(id: Long): PendingUploadEntity? =
         withContext(appDispatchers.io) {
             pendingUploadDao.getPendingUploadById(id)

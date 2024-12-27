@@ -17,7 +17,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class SettingsViewModel(private val preferencesRepository: PreferencesRepository) : ViewModel() {
+class SettingsViewModel(
+    private val preferencesRepository: PreferencesRepository,
+) : ViewModel() {
     val theme =
         preferencesRepository.getTheme()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), Theme.SYSTEM)

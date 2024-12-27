@@ -20,20 +20,29 @@ import app.bsky.richtext.Facet
 import app.bsky.richtext.FacetByteSlice
 import app.bsky.richtext.FacetLink
 import app.bsky.richtext.FacetMention
-import com.atproto.repo.CreateRecordRequest
 import com.contexts.pulse.R
+import com.contexts.pulse.data.local.database.entities.MediaType
 import com.contexts.pulse.data.local.database.entities.PendingUploadEntity
 import com.contexts.pulse.data.network.client.Response
+import com.contexts.pulse.domain.model.CreateRecord
+import com.contexts.pulse.domain.model.ImageEmbed
+import com.contexts.pulse.domain.model.ImageRef
+import com.contexts.pulse.domain.model.PostEmbed
 import com.contexts.pulse.domain.model.PostRecord
+import com.contexts.pulse.domain.model.VideoEmbed
+import com.contexts.pulse.domain.model.VideoRef
 import com.contexts.pulse.domain.repository.PendingUploadRepository
 import com.contexts.pulse.domain.repository.PostRepository
 import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
 import org.koin.core.component.KoinComponent
+import sh.christian.ozone.api.Cid
 import sh.christian.ozone.api.Did
 import sh.christian.ozone.api.Nsid
-import sh.christian.ozone.api.model.JsonContent
+import sh.christian.ozone.api.model.Blob
+import sh.christian.ozone.api.model.BlobRef
 
 class CreatePostWorker(
     appContext: Context,
@@ -47,30 +56,90 @@ class CreatePostWorker(
         if (uploadId == 0L) return Result.failure(workDataOf())
 
         val post =
-            pendingUploadRepository.getPendingUploadById(uploadId)
+            pendingUploadRepository.getPendingUploadsWithMediaById(uploadId)
                 ?: return Result.failure(workDataOf())
 
-        val facets = extractFacets(post.text)
+        val facets = extractFacets(post.upload.text)
+        val embed: PostEmbed =
+            when {
+                post.mediaAttachments.all { it.type == MediaType.IMAGE } -> {
+                    ImageEmbed(
+                        images =
+                            post.mediaAttachments.map { media ->
+                                ImageRef(
+                                    alt = media.altText ?: "",
+                                    image =
+                                        Blob.StandardBlob(
+                                            ref = BlobRef(Cid(media.remoteLink ?: "")),
+                                            mimeType = media.mimeType ?: "",
+                                            size = 0L,
+                                        ),
+                                    aspectRatio = media.aspectRatio,
+                                )
+                            },
+                    )
+                }
+
+                post.mediaAttachments.all { it.type == MediaType.VIDEO } -> {
+                    val video = post.mediaAttachments.first()
+                    VideoEmbed(
+                        video =
+                            VideoRef(
+                                video =
+                                    Blob.StandardBlob(
+                                        ref = BlobRef(Cid(video.remoteLink ?: "")),
+                                        mimeType = video.mimeType ?: "",
+                                        size = 0L,
+                                    ),
+                                aspectRatio = video.aspectRatio,
+                            ),
+                    )
+                }
+
+                else -> {
+                    return Result.failure(
+                        workDataOf(
+                            "error" to "Unsupported media combination",
+                            "uploadId" to uploadId,
+                        ),
+                    )
+                }
+            }
+
+        val embedJson =
+            Json {
+                classDiscriminator = "\$type"
+                serializersModule =
+                    SerializersModule {
+                        polymorphic(PostEmbed::class) {
+                            subclass(ImageEmbed::class, ImageEmbed.serializer())
+                            subclass(VideoEmbed::class, VideoEmbed.serializer())
+                        }
+                    }
+                isLenient = true
+                ignoreUnknownKeys = true
+            }
+
+        val embedElement = embedJson.encodeToJsonElement(PostEmbed.serializer(), embed)
+
         val postRecord =
             PostRecord(
-                text = post.text,
+                text = post.upload.text,
                 createdAt = Clock.System.now(),
                 facets = facets,
+                embed = embedElement,
             )
 
-        val jsonElement = Json.encodeToJsonElement(postRecord)
-        val jsonContent = JsonContent(value = jsonElement, format = Json)
-
         val createPostRequest =
-            CreateRecordRequest(
-                repo = Did(post.userDid),
+            CreateRecord(
+                repo = Did(post.upload.userDid),
                 collection = Nsid("app.bsky.feed.post"),
-                record = jsonContent,
+                record = postRecord,
             )
 
         return when (postRepository.createPost(createPostRequest)) {
             is Response.Success -> {
-                cleanup(post)
+                cleanup(post.upload)
             }
 
             is Response.Error -> {
