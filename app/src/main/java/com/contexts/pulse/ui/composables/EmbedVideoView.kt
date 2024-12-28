@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,13 +28,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
-import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import app.bsky.embed.AspectRatio
 import coil3.compose.AsyncImage
+import com.contexts.pulse.domain.media.PlayerPoolManager
 import com.contexts.pulse.extensions.toFloat
-import kotlinx.coroutines.flow.StateFlow
+import org.koin.compose.koinInject
 import sh.christian.ozone.api.Uri
 
 @Composable
@@ -42,10 +44,21 @@ fun EmbedVideoView(
     playlist: Uri,
     aspectRatio: AspectRatio?,
     onMediaOpen: (String) -> Unit,
-    player: ExoPlayer?,
-    playerState: StateFlow<Boolean>,
+    playerPoolManager: PlayerPoolManager = koinInject(),
 ) {
-    val noPlayersAvailable by playerState.collectAsStateWithLifecycle()
+    val player =
+        remember(playlist) { playerPoolManager.getPlayer() }?.apply {
+            setMediaItem(MediaItem.fromUri(playlist.uri))
+            prepare()
+            playWhenReady = true
+        }
+
+    val noPlayersAvailable by playerPoolManager.noPlayersAvailable.collectAsStateWithLifecycle()
+    DisposableEffect(player) {
+        onDispose {
+            player?.let { playerPoolManager.releasePlayer(it) }
+        }
+    }
     var playerPlaying by remember { mutableStateOf(false) }
     player?.addListener(
         object : Player.Listener {

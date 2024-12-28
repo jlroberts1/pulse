@@ -13,31 +13,53 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import app.cash.turbine.test
+import com.contexts.pulse.BaseTest
 import com.contexts.pulse.domain.model.Theme
+import com.contexts.pulse.modules.AppDispatchers
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.koin.java.KoinJavaComponent.inject
+import org.koin.test.inject
 
-class PreferencesRepositoryImplTest {
+@OptIn(ExperimentalCoroutinesApi::class)
+class PreferencesRepositoryImplTest : BaseTest() {
     private lateinit var dataStore: DataStore<Preferences>
     private lateinit var repository: PreferencesRepositoryImpl
     private val testPreferences = mockk<Preferences>()
 
+    private val appDispatchers: AppDispatchers by inject()
+
     @Before
     fun setup() {
+        Dispatchers.setMain(appDispatchers.io)
         dataStore = mockk()
-        repository = PreferencesRepositoryImpl(dataStore)
+        repository =
+            PreferencesRepositoryImpl(
+                dataStore = dataStore,
+                appDispatchers = appDispatchers,
+            )
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
     fun `getCurrentUserFlow returns correct value`() =
-        runTest {
+        runTest(appDispatchers.io) {
             val expectedDid = "test-did"
             every { testPreferences[PreferencesRepositoryImpl.CURRENT_USER] } returns expectedDid
             every { dataStore.data } returns flowOf(testPreferences)
@@ -50,18 +72,18 @@ class PreferencesRepositoryImplTest {
 
     @Test
     fun `getCurrentUserFlow handles IOException`() =
-        runTest {
+        runTest(appDispatchers.io) {
             every { dataStore.data } returns flowOf(emptyPreferences())
 
             repository.getCurrentUserFlow().test {
-                assertEquals("", awaitItem())
+                assertEquals(null, awaitItem())
                 awaitComplete()
             }
         }
 
     @Test
     fun `updateCurrentUser updates preference`() =
-        runTest {
+        runTest(appDispatchers.io) {
             val testDid = "test-did"
             coEvery { dataStore.updateData(any()) } returns mockk()
 
@@ -72,7 +94,7 @@ class PreferencesRepositoryImplTest {
 
     @Test
     fun `getTheme returns correct theme`() =
-        runTest {
+        runTest(appDispatchers.io) {
             val expectedTheme = Theme.DARK
             every { testPreferences[PreferencesRepositoryImpl.THEME] } returns expectedTheme.name
             every { dataStore.data } returns flowOf(testPreferences)
@@ -85,7 +107,7 @@ class PreferencesRepositoryImplTest {
 
     @Test
     fun `updateTheme updates preference`() =
-        runTest {
+        runTest(appDispatchers.io) {
             coEvery { dataStore.updateData(any()) } returns testPreferences
 
             repository.updateTheme(Theme.DARK)
@@ -95,7 +117,7 @@ class PreferencesRepositoryImplTest {
 
     @Test
     fun `getUnreadCount returns correct count`() =
-        runTest {
+        runTest(appDispatchers.io) {
             val expectedCount = 5L
             every { testPreferences[PreferencesRepositoryImpl.UNREAD_COUNT] } returns expectedCount
             every { dataStore.data } returns flowOf(testPreferences)
@@ -108,7 +130,7 @@ class PreferencesRepositoryImplTest {
 
     @Test
     fun `getUnreadCount returns 0 when no value set`() =
-        runTest {
+        runTest(appDispatchers.io) {
             every { testPreferences[PreferencesRepositoryImpl.UNREAD_COUNT] } returns null
             every { dataStore.data } returns flowOf(testPreferences)
 

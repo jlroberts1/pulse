@@ -28,6 +28,7 @@ import com.contexts.pulse.extensions.getRecordText
 fun EmbeddedRecordView(
     record: RecordViewRecordUnion.ViewRecord,
     modifier: Modifier = Modifier,
+    onMediaOpen: (String) -> Unit,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -57,19 +58,39 @@ fun EmbeddedRecordView(
                 onClick = { },
             )
 
-            record.value.embeds.forEach {
-                when (it) {
-                    is RecordViewRecordEmbedUnion.ExternalView -> {}
-                    is RecordViewRecordEmbedUnion.ImagesView -> {
-                        EmbedImagesViewImage(
-                            images = it.value.images,
-                            onMediaOpen = {},
+            record.value.embeds.forEach { embed ->
+                when (embed) {
+                    is RecordViewRecordEmbedUnion.ExternalView -> {
+                        EmbedExternalView(
+                            uri = embed.value.external.uri,
+                            thumb = embed.value.external.thumb,
+                            title = embed.value.external.title,
+                            description = embed.value.external.description,
+                            onMediaOpen = { onMediaOpen(it) },
                         )
                     }
-                    is RecordViewRecordEmbedUnion.RecordView -> {}
+                    is RecordViewRecordEmbedUnion.ImagesView -> {
+                        EmbedImagesViewImage(
+                            images = embed.value.images,
+                            onMediaOpen = { onMediaOpen(it) },
+                        )
+                    }
+                    is RecordViewRecordEmbedUnion.RecordView -> {
+                        EmbedRecordView(
+                            record = embed.value.record,
+                            onMediaOpen = { onMediaOpen(it) },
+                        )
+                    }
                     is RecordViewRecordEmbedUnion.RecordWithMediaView -> {}
                     is RecordViewRecordEmbedUnion.Unknown -> {}
-                    is RecordViewRecordEmbedUnion.VideoView -> {}
+                    is RecordViewRecordEmbedUnion.VideoView -> {
+                        EmbedVideoView(
+                            thumbnail = embed.value.thumbnail,
+                            playlist = embed.value.playlist,
+                            aspectRatio = embed.value.aspectRatio,
+                            onMediaOpen = { onMediaOpen(it) },
+                        )
+                    }
                 }
             }
         }

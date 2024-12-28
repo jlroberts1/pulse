@@ -15,16 +15,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.media3.common.MediaItem
 import app.bsky.feed.FeedViewPost
 import app.bsky.feed.PostViewEmbedUnion
-import com.contexts.pulse.domain.media.PlayerPoolManager
 import com.contexts.pulse.extensions.getPostText
-import org.koin.compose.koinInject
 
 @Composable
 fun FeedItem(
@@ -34,7 +29,6 @@ fun FeedItem(
     onRepostClick: () -> Unit,
     onLikeClick: () -> Unit,
     onMenuClick: () -> Unit,
-    playerPoolManager: PlayerPoolManager = koinInject(),
     onMediaOpen: (String) -> Unit,
 ) {
     ElevatedCard(
@@ -84,33 +78,21 @@ fun FeedItem(
                     }
 
                     is PostViewEmbedUnion.RecordView -> {
-                        EmbedRecordView(embed.value.record)
+                        EmbedRecordView(
+                            record = embed.value.record,
+                            onMediaOpen = { onMediaOpen(it) },
+                        )
                     }
 
                     is PostViewEmbedUnion.RecordWithMediaView -> Unit
 
                     is PostViewEmbedUnion.VideoView -> {
-                        with(embed.value) {
-                            val player =
-                                remember(playlist) { playerPoolManager.getPlayer() }?.apply {
-                                    setMediaItem(MediaItem.fromUri(playlist.uri))
-                                    prepare()
-                                    playWhenReady = true
-                                }
-                            DisposableEffect(player) {
-                                onDispose {
-                                    player?.let { playerPoolManager.releasePlayer(it) }
-                                }
-                            }
-                            EmbedVideoView(
-                                thumbnail = thumbnail,
-                                playlist = playlist,
-                                aspectRatio = aspectRatio,
-                                onMediaOpen = { onMediaOpen(it) },
-                                player = player,
-                                playerState = playerPoolManager.noPlayersAvailable,
-                            )
-                        }
+                        EmbedVideoView(
+                            thumbnail = embed.value.thumbnail,
+                            playlist = embed.value.playlist,
+                            aspectRatio = embed.value.aspectRatio,
+                            onMediaOpen = { onMediaOpen(it) },
+                        )
                     }
 
                     is PostViewEmbedUnion.Unknown -> Unit

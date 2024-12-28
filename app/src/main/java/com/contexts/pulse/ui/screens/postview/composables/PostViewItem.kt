@@ -109,7 +109,10 @@ fun PostViewItem(
                         }
 
                         is PostViewEmbedUnion.RecordView -> {
-                            EmbedRecordView(embed.value.record)
+                            EmbedRecordView(
+                                record = embed.value.record,
+                                onMediaOpen = { onMediaOpen(it) },
+                            )
                         }
 
                         is PostViewEmbedUnion.RecordWithMediaView -> Unit
@@ -132,8 +135,6 @@ fun PostViewItem(
                                     playlist = playlist,
                                     aspectRatio = aspectRatio,
                                     onMediaOpen = { onMediaOpen(it) },
-                                    player = player,
-                                    playerState = playerPoolManager.noPlayersAvailable,
                                 )
                             }
                         }

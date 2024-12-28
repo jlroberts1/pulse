@@ -39,10 +39,16 @@ import app.bsky.embed.RecordViewRecordUnion
 import coil3.compose.AsyncImage
 
 @Composable
-fun EmbedRecordView(record: RecordViewRecordUnion) {
+fun EmbedRecordView(
+    record: RecordViewRecordUnion,
+    onMediaOpen: (String) -> Unit,
+) {
     when (record) {
         is RecordViewRecordUnion.ViewRecord -> {
-            EmbeddedRecordView(record)
+            EmbeddedRecordView(
+                record = record,
+                onMediaOpen = { onMediaOpen(it) },
+            )
         }
         is RecordViewRecordUnion.ViewBlocked -> {
             Surface(
