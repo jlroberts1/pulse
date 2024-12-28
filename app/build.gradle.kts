@@ -131,12 +131,17 @@ lexicons {
     outputDirectory.set(project.layout.buildDirectory.dir("out"))
 }
 
-fun getLocalProperty(key: String): String? {
-    val props = Properties()
-    props.load(File(rootDir.absolutePath + "/local.properties").inputStream())
-    val property = props.getProperty(key, "")
-    if (property.isNullOrEmpty()) {
-        throw GradleException("No value found for the key: $key")
+fun getLocalProperty(key: String): String {
+    return try {
+        val localPropsFile = File(rootDir.absolutePath + "/local.properties")
+        if (localPropsFile.exists()) {
+            val props = Properties()
+            props.load(localPropsFile.inputStream())
+            props.getProperty(key) ?: System.getenv(key)
+        } else {
+            System.getenv(key)
+        } ?: throw GradleException("No value found for key '$key' in either local.properties or environment variables")
+    } catch (e: Exception) {
+        throw GradleException("Failed to read property '$key': ${e.message}")
     }
-    return property
 }

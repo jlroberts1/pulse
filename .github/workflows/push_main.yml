@@ -12,6 +12,8 @@ jobs:
   test_and_build:
     name: Run tests
     runs-on: ubuntu-latest
+    env:
+      TENOR_API_KEY: ${{ secrets.TENOR_API_KEY }}
     steps:
       - name: checkout
         uses: actions/checkout@v4
