@@ -1,0 +1,30 @@
+on:
+  workflow_dispatch:
+    inputs:
+      git_ref:
+        description: Git Ref (Optional)
+        required: false
+        default: main
+  push:
+    branches:
+      - 'main'
+jobs:
+  test_and_build:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.git-ref }}
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+      - name: Run Ktlint
+        run: ./gradlew ktlintCheck
+      - name: Run tests
+        run: ./gradlew test
