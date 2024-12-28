@@ -82,7 +82,6 @@ fun EmbeddedRecordView(
                         )
                     }
                     is RecordViewRecordEmbedUnion.RecordWithMediaView -> {}
-                    is RecordViewRecordEmbedUnion.Unknown -> {}
                     is RecordViewRecordEmbedUnion.VideoView -> {
                         EmbedVideoView(
                             thumbnail = embed.value.thumbnail,

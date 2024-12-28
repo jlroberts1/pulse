@@ -39,15 +39,6 @@ fun LastMessageView(conversation: ConvoView) {
                     fontStyle = FontStyle.Italic,
                 )
             }
-
-            is ConvoViewLastMessageUnion.Unknown -> {
-                Text(
-                    text = "Unknown error",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontStyle = FontStyle.Italic,
-                )
-            }
         }
     }
 }

@@ -56,7 +56,6 @@ class PostViewModel(
                     }
                     is GetPostThreadResponseThreadUnion.BlockedPost,
                     is GetPostThreadResponseThreadUnion.NotFoundPost,
-                    is GetPostThreadResponseThreadUnion.Unknown,
                     -> Unit
                 }
             }.onError { error ->

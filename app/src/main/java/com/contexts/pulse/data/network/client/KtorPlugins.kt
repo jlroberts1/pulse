@@ -22,14 +22,12 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
-import sh.christian.ozone.api.xrpc.XrpcSerializersModule
 
 fun HttpClientConfig<*>.setupContentNegotiation() {
     install(ContentNegotiation) {
         json(
             Json {
                 classDiscriminator = "\$type"
-                serializersModule = XrpcSerializersModule
                 prettyPrint = true
                 isLenient = true
                 ignoreUnknownKeys = true

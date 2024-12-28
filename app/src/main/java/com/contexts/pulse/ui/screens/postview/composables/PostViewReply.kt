@@ -120,8 +120,6 @@ fun PostViewReply(
                             )
                         }
                     }
-
-                    is PostViewEmbedUnion.Unknown -> Unit
                 }
             }
 

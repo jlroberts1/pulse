@@ -31,7 +31,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "TENOR_API_KEY", getLocalProperty("TENOR_API_KEY") ?: "no_tenor_key")
+        buildConfigField("String", "TENOR_API_KEY", getLocalProperty("TENOR_API_KEY"))
     }
     packaging {
         resources {
@@ -117,8 +117,7 @@ dependencies {
 
     releaseImplementation(libs.chucker.noop)
 
-    api(libs.ozone)
-    lexicons(libs.ozone)
+    lexicons(fileTree("lexicons") { include("**/*.json") })
     ksp(libs.room.compiler)
 }
 

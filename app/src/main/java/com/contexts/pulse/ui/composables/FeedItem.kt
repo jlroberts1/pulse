@@ -94,8 +94,6 @@ fun FeedItem(
                             onMediaOpen = { onMediaOpen(it) },
                         )
                     }
-
-                    is PostViewEmbedUnion.Unknown -> Unit
                 }
             }
 

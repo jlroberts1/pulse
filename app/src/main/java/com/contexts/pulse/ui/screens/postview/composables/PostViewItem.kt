@@ -138,8 +138,6 @@ fun PostViewItem(
                                 )
                             }
                         }
-
-                        is PostViewEmbedUnion.Unknown -> Unit
                     }
                 }
 

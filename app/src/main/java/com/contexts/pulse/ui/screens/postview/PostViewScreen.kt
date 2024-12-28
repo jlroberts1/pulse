@@ -90,7 +90,6 @@ fun ThreadView(
 
                     is ThreadViewPostParentUnion.BlockedPost,
                     is ThreadViewPostParentUnion.NotFoundPost,
-                    is ThreadViewPostParentUnion.Unknown,
                     -> Unit
                 }
             }
@@ -147,7 +146,6 @@ fun ThreadView(
 
                         is ThreadViewPostReplieUnion.BlockedPost,
                         is ThreadViewPostReplieUnion.NotFoundPost,
-                        is ThreadViewPostReplieUnion.Unknown,
                         -> Unit
                     }
                 }
