@@ -35,7 +35,6 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
 import com.contexts.pulse.data.local.database.entities.MediaType
 import com.contexts.pulse.domain.model.getBestFormat
@@ -44,11 +43,13 @@ import com.contexts.pulse.ui.screens.addpost.composables.AddPostSuggestions
 import com.contexts.pulse.ui.screens.addpost.composables.PickType
 import com.contexts.pulse.ui.screens.addpost.composables.TenorSearch
 import com.contexts.pulse.ui.screens.addpost.composables.rememberGalleryManager
+import com.contexts.pulse.ui.screens.postview.composables.PostViewItem
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun AddPostScreen(
+    replyPost: String?,
     viewModel: AddPostViewModel = koinViewModel(),
     onPostSent: () -> Unit,
 ) {
@@ -57,7 +58,6 @@ fun AddPostScreen(
     var launchImageGallery by remember { mutableStateOf(value = false) }
     var launchVideoGallery by remember { mutableStateOf(value = false) }
     var launchGif by remember { mutableStateOf(value = false) }
-    val navController = rememberNavController()
 
     val imagePicker =
         rememberGalleryManager(pickType = PickType.IMAGES) {
@@ -114,6 +114,17 @@ fun AddPostScreen(
                     .fillMaxWidth()
                     .padding(16.dp),
         ) {
+            uiState.replyPost?.let { post ->
+                PostViewItem(
+                    post = post,
+                    onPostClick = {},
+                    onReplyClick = {},
+                    onLikeClick = {},
+                    onMediaOpen = {},
+                    onRepostClick = {},
+                    onMenuClick = {},
+                )
+            }
             OutlinedTextField(
                 value =
                     TextFieldValue(

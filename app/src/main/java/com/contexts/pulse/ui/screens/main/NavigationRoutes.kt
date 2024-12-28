@@ -67,7 +67,11 @@ sealed class NavigationRoutes {
 
         data object Settings : Authenticated("settings")
 
-        data object AddPost : Authenticated("add_post")
+        data object AddPost : Authenticated("add_post/{replyPost}") {
+            const val ARG_REPLY_POST = "replyPost"
+
+            fun createRoute(replyPost: String?) = "add_post/$replyPost"
+        }
 
         data object PostView : Authenticated("post_view/{postId}") {
             const val ARG_POST_ID = "postId"
@@ -125,8 +129,19 @@ fun NavGraphBuilder.authenticatedGraph(
         composable(route = NavigationRoutes.Authenticated.Settings.route) {
             SettingsScreen()
         }
-        composable(route = NavigationRoutes.Authenticated.AddPost.route) {
+        composable(
+            route = NavigationRoutes.Authenticated.AddPost.route,
+            arguments =
+                listOf(
+                    navArgument(NavigationRoutes.Authenticated.AddPost.ARG_REPLY_POST) {
+                        type = NavType.StringType
+                        nullable = true
+                    },
+                ),
+        ) { backStackEntry ->
+            val replyPost = backStackEntry.arguments?.getString(NavigationRoutes.Authenticated.AddPost.ARG_REPLY_POST)
             AddPostScreen(
+                replyPost = replyPost,
                 onPostSent = { navController.navigateUp() },
             )
         }

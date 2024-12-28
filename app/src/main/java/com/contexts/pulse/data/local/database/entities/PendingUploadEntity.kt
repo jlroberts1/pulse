@@ -13,6 +13,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
 @Entity(tableName = "pending_uploads")
 data class PendingUploadEntity(
@@ -20,6 +21,7 @@ data class PendingUploadEntity(
     val id: Long = 0,
     val userDid: String,
     val text: String,
+    val replyReference: ReplyReference? = null,
     val createdAt: Instant = Clock.System.now(),
     val uploadState: PostUploadState = PostUploadState.PENDING,
     val errorMessage: String? = null,
@@ -30,3 +32,15 @@ enum class PostUploadState {
     UPLOADING,
     FAILED,
 }
+
+@Serializable
+data class ReplyReference(
+    val root: ReplyLink,
+    val parent: ReplyLink,
+)
+
+@Serializable
+data class ReplyLink(
+    val uri: String?,
+    val cid: String?,
+)

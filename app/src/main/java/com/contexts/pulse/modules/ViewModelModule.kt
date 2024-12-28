@@ -47,6 +47,8 @@ val viewModelModule =
                 get<PreferencesRepository>(),
                 get<PendingUploadRepository>(),
                 get<UploadWorkerManager>(),
+                get<PostRepository>(),
+                get(),
             )
         }
         viewModel {

@@ -10,9 +10,9 @@
 package com.contexts.pulse.domain.model
 
 import app.bsky.embed.AspectRatio
-import app.bsky.feed.ReplyRef
 import app.bsky.richtext.Facet
 import com.atproto.label.Label
+import com.contexts.pulse.data.local.database.entities.ReplyReference
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
@@ -25,7 +25,7 @@ import sh.christian.ozone.api.model.Timestamp
 data class PostRecord(
     val text: String,
     val facets: List<Facet>? = null,
-    val reply: ReplyRef? = null,
+    val reply: ReplyReference? = null,
     val embed: JsonElement? = null,
     val langs: List<String>? = null,
     val labels: List<Label>? = null,

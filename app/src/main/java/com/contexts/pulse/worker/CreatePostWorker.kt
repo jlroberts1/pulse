@@ -128,6 +128,7 @@ class CreatePostWorker(
                 createdAt = Clock.System.now(),
                 facets = facets,
                 embed = embedElement,
+                reply = post.upload.replyReference,
             )
 
         val createPostRequest =

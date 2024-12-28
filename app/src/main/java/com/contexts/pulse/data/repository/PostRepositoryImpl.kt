@@ -10,6 +10,7 @@
 package com.contexts.pulse.data.repository
 
 import app.bsky.feed.GetPostThreadResponse
+import app.bsky.feed.GetPostsResponse
 import app.bsky.video.GetJobStatusQueryParams
 import app.bsky.video.GetJobStatusResponse
 import app.bsky.video.UploadVideoResponse
@@ -24,6 +25,7 @@ import com.contexts.pulse.domain.repository.PostRepository
 import com.contexts.pulse.exceptions.NetworkError
 import com.contexts.pulse.modules.AppDispatchers
 import kotlinx.coroutines.withContext
+import sh.christian.ozone.api.AtUri
 
 class PostRepositoryImpl(
     private val appDispatchers: AppDispatchers,
@@ -61,5 +63,10 @@ class PostRepositoryImpl(
     ): Response<GetJobStatusResponse, NetworkError> =
         withContext(appDispatchers.io) {
             uploadAPI.getVideoProcessingStatus(getJobStatusQueryParams)
+        }
+
+    override suspend fun getPosts(uris: List<AtUri>): Response<GetPostsResponse, NetworkError> =
+        withContext(appDispatchers.io) {
+            postAPI.getPosts(uris)
         }
 }

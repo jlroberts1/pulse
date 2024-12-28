@@ -361,7 +361,11 @@ private fun FeedContent(
                                 NavigationRoutes.Authenticated.PostView.createRoute(postId.encodeURLParameter()),
                             )
                         },
-                        onReplyClick = {},
+                        onReplyClick = { replyUri ->
+                            navController.navigate(
+                                NavigationRoutes.Authenticated.AddPost.createRoute(replyUri.encodeURLParameter()),
+                            )
+                        },
                         onRepostClick = {},
                         onLikeClick = {},
                         onMenuClick = {},

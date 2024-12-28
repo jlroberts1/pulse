@@ -10,16 +10,19 @@
 package com.contexts.pulse.data.network.api
 
 import app.bsky.feed.GetPostThreadResponse
+import app.bsky.feed.GetPostsResponse
 import com.atproto.repo.CreateRecordResponse
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.network.client.safeRequest
 import com.contexts.pulse.domain.model.CreateRecord
 import com.contexts.pulse.exceptions.NetworkError
 import io.ktor.client.HttpClient
+import io.ktor.client.request.parameter
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpMethod
 import io.ktor.http.Url
 import io.ktor.http.path
+import sh.christian.ozone.api.AtUri
 
 class PostAPI(
     private val client: HttpClient,
@@ -44,6 +47,18 @@ class PostAPI(
                 host = Url(pdsUrl).host
                 path("xrpc/com.atproto.repo.createRecord")
                 setBody(createRecord)
+            }
+        }
+    }
+
+    suspend fun getPosts(uris: List<AtUri>): Response<GetPostsResponse, NetworkError> {
+        val pdsUrl = UrlManager.getPdsUrl()
+        return client.safeRequest {
+            url {
+                method = HttpMethod.Get
+                host = Url(pdsUrl).host
+                path("xrpc/app.bsky.feed.getPosts")
+                parameter("uris", uris.joinToString(","))
             }
         }
     }

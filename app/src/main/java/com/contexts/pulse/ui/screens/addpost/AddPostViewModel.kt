@@ -10,26 +10,38 @@
 package com.contexts.pulse.ui.screens.addpost
 
 import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.bsky.actor.ProfileViewBasic
 import app.bsky.actor.SearchActorsTypeaheadQueryParams
+import app.bsky.feed.PostView
+import app.bsky.feed.ReplyRefParentUnion
+import app.bsky.feed.ReplyRefRootUnion
 import com.contexts.pulse.data.local.database.entities.MediaType
 import com.contexts.pulse.data.local.database.entities.PendingMediaAttachment
 import com.contexts.pulse.data.local.database.entities.PendingUploadEntity
+import com.contexts.pulse.data.local.database.entities.ReplyLink
+import com.contexts.pulse.data.local.database.entities.ReplyReference
 import com.contexts.pulse.data.network.client.onError
 import com.contexts.pulse.data.network.client.onSuccess
+import com.contexts.pulse.domain.model.PostRecord
 import com.contexts.pulse.domain.model.TenorGif
 import com.contexts.pulse.domain.repository.ActorRepository
 import com.contexts.pulse.domain.repository.PendingUploadRepository
+import com.contexts.pulse.domain.repository.PostRepository
 import com.contexts.pulse.domain.repository.PreferencesRepository
 import com.contexts.pulse.domain.repository.TenorRepository
+import com.contexts.pulse.ui.screens.main.NavigationRoutes
 import com.contexts.pulse.worker.UploadWorkerManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import sh.christian.ozone.api.AtUri
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 
 data class AddPostUiState(
     val text: String = "",
@@ -43,6 +55,7 @@ data class AddPostUiState(
     val selectedGif: TenorGif? = null,
     val error: String? = null,
     val uploadSent: Boolean = false,
+    val replyPost: PostView? = null,
 )
 
 data class MediaItem(
@@ -57,11 +70,32 @@ class AddPostViewModel(
     private val preferencesRepository: PreferencesRepository,
     private val pendingUploadRepository: PendingUploadRepository,
     private val uploadWorkerManager: UploadWorkerManager,
+    private val postRepository: PostRepository,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AddPostUiState())
     val uiState = _uiState.asStateFlow()
 
     private var searchJob: kotlinx.coroutines.Job? = null
+
+    private val replyPost: String? =
+        savedStateHandle[NavigationRoutes.Authenticated.AddPost.ARG_REPLY_POST]
+
+    init {
+        replyPost?.let { getReplyPost(it) }
+    }
+
+    private fun getReplyPost(replyPost: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(loading = true, error = null) }
+            val uri = AtUri(URLDecoder.decode(replyPost, StandardCharsets.UTF_8.name()))
+            postRepository.getPosts(listOf(uri)).onSuccess { response ->
+                _uiState.update { it.copy(replyPost = response.posts.first(), loading = false) }
+            }.onError { error ->
+                _uiState.update { it.copy(error = error.message, loading = false) }
+            }
+        }
+    }
 
     suspend fun onGifSearchQueryChanged(newText: String) {
         delay(300)
@@ -77,10 +111,31 @@ class AddPostViewModel(
         viewModelScope.launch {
             val currentUser = preferencesRepository.getCurrentUser()
             currentUser?.let {
+                val replyPost = uiState.value.replyPost
+                val record = uiState.value.replyPost?.record?.decodeAs<PostRecord>()
+                val parent = record?.reply?.parent as? ReplyRefParentUnion.PostView
+                val rootReplyLink =
+                    if (parent != null) {
+                        val root = record.reply.root as? ReplyRefRootUnion.PostView
+                        ReplyLink(root?.value?.uri?.atUri, root?.value?.cid?.cid)
+                    } else {
+                        ReplyLink(replyPost?.uri?.atUri, replyPost?.cid?.cid)
+                    }
                 val pendingUpload =
                     PendingUploadEntity(
                         userDid = currentUser,
                         text = uiState.value.text,
+                        replyReference =
+                            replyPost?.let {
+                                ReplyReference(
+                                    parent =
+                                        ReplyLink(
+                                            uiState.value.replyPost?.uri?.atUri,
+                                            uiState.value.replyPost?.cid?.cid,
+                                        ),
+                                    root = rootReplyLink,
+                                )
+                            },
                     )
                 val uploadId = pendingUploadRepository.insertUpload(pendingUpload)
                 val mediaItems = uiState.value.mediaItems

@@ -14,6 +14,7 @@ import app.bsky.embed.AspectRatio
 import com.contexts.pulse.data.local.database.entities.MediaType
 import com.contexts.pulse.data.local.database.entities.MediaUploadState
 import com.contexts.pulse.data.local.database.entities.PostUploadState
+import com.contexts.pulse.data.local.database.entities.ReplyReference
 import com.contexts.pulse.data.local.database.entities.VideoProcessingState
 import com.contexts.pulse.domain.model.Service
 import com.contexts.pulse.domain.model.VerificationMethod
@@ -110,5 +111,15 @@ class Converters {
     @TypeConverter
     fun fromVideoProcessingState(state: VideoProcessingState): String {
         return state.name
+    }
+
+    @TypeConverter
+    fun toReplyReference(value: String): ReplyReference {
+        return Json.decodeFromString(value)
+    }
+
+    @TypeConverter
+    fun fromReplyReference(reference: ReplyReference): String {
+        return Json.encodeToString(reference)
     }
 }

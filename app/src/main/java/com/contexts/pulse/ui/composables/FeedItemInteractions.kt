@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun FeedItemInteractions(
     replyCount: Long? = 0,
-    onReplyClick: () -> Unit = {},
+    onReplyClick: () -> Unit,
     repostCount: Long? = 0,
     onRepostClick: () -> Unit = {},
     likeCount: Long? = 0,
@@ -45,7 +45,7 @@ fun FeedItemInteractions(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         IconButton(
-            onClick = onReplyClick,
+            onClick = { onReplyClick() },
             modifier = Modifier.weight(1f),
         ) {
             Row(

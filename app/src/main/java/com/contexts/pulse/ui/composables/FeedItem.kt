@@ -30,7 +30,7 @@ import org.koin.compose.koinInject
 fun FeedItem(
     post: FeedViewPost,
     onPostClick: (String) -> Unit,
-    onReplyClick: () -> Unit,
+    onReplyClick: (String) -> Unit,
     onRepostClick: () -> Unit,
     onLikeClick: () -> Unit,
     onMenuClick: () -> Unit,
@@ -118,6 +118,7 @@ fun FeedItem(
             }
 
             FeedItemInteractions(
+                onReplyClick = { onReplyClick(post.post.uri.atUri) },
                 replyCount = post.post.replyCount,
                 repostCount = post.post.repostCount,
                 likeCount = post.post.likeCount,

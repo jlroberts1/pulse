@@ -10,6 +10,7 @@
 package com.contexts.pulse.domain.repository
 
 import app.bsky.feed.GetPostThreadResponse
+import app.bsky.feed.GetPostsResponse
 import app.bsky.video.GetJobStatusQueryParams
 import app.bsky.video.GetJobStatusResponse
 import app.bsky.video.UploadVideoResponse
@@ -19,6 +20,7 @@ import com.contexts.pulse.data.network.api.UploadParams
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.domain.model.CreateRecord
 import com.contexts.pulse.exceptions.NetworkError
+import sh.christian.ozone.api.AtUri
 
 interface PostRepository {
     suspend fun getPostThread(uri: String): Response<GetPostThreadResponse, NetworkError>
@@ -36,4 +38,6 @@ interface PostRepository {
     ): Response<UploadVideoResponse, NetworkError>
 
     suspend fun getVideoProcessingStatus(getJobStatusQueryParams: GetJobStatusQueryParams): Response<GetJobStatusResponse, NetworkError>
+
+    suspend fun getPosts(uris: List<AtUri>): Response<GetPostsResponse, NetworkError>
 }
