@@ -19,17 +19,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import app.bsky.embed.ImagesViewImage
 import coil3.compose.AsyncImage
+import com.contexts.pulse.domain.model.EmbedImage
 import com.contexts.pulse.extensions.toFloat
 
 @Composable
 fun SingleImagesViewHolder(
-    image: ImagesViewImage,
+    image: EmbedImage,
     onClick: (String) -> Unit,
 ) {
     AsyncImage(
-        model = image.fullsize.uri,
+        model = image.fullsize,
         contentDescription = image.alt,
         modifier =
             Modifier
@@ -37,7 +37,7 @@ fun SingleImagesViewHolder(
                 .fillMaxWidth()
                 .aspectRatio(image.aspectRatio.toFloat())
                 .clip(RoundedCornerShape(8.dp))
-                .clickable { onClick(image.fullsize.uri) },
+                .clickable { onClick(image.fullsize) },
         contentScale = ContentScale.Crop,
     )
 }

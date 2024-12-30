@@ -9,12 +9,9 @@
 
 package com.contexts.pulse.extensions
 
-import app.bsky.embed.RecordViewRecordUnion
-import app.bsky.feed.PostView
 import app.bsky.notification.ListNotificationsNotification
 import app.bsky.richtext.Facet
 import com.atproto.label.Label
-import com.contexts.pulse.domain.model.PostRecord
 import kotlinx.serialization.Serializable
 import logcat.logcat
 import sh.christian.ozone.api.model.Timestamp
@@ -39,24 +36,6 @@ fun String.isGifEmbed(): Boolean {
 
     val uriLower = this.lowercase()
     return (gifHosts.any { uriLower.contains(it) } && uriLower.contains("gif"))
-}
-
-fun PostView.getPostText(): String {
-    return try {
-        record.decodeAs<PostRecord>().text
-    } catch (e: Exception) {
-        logcat { "Unable to parse post text, ${e.message}" }
-        ""
-    }
-}
-
-fun RecordViewRecordUnion.ViewRecord.getRecordText(): String {
-    return try {
-        value.value.decodeAs<RecordText>().text
-    } catch (e: Exception) {
-        logcat { "Unable to parse record text, ${e.message}" }
-        ""
-    }
 }
 
 fun ListNotificationsNotification.getRecordText(): String {

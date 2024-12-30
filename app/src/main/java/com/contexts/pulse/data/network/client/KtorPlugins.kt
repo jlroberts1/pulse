@@ -9,9 +9,6 @@
 
 package com.contexts.pulse.data.network.client
 
-import com.contexts.pulse.domain.model.ImageEmbed
-import com.contexts.pulse.domain.model.PostEmbed
-import com.contexts.pulse.domain.model.VideoEmbed
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -19,27 +16,10 @@ import io.ktor.client.request.accept
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.polymorphic
 
 fun HttpClientConfig<*>.setupContentNegotiation() {
     install(ContentNegotiation) {
-        json(
-            Json {
-                classDiscriminator = "\$type"
-                prettyPrint = true
-                isLenient = true
-                ignoreUnknownKeys = true
-                serializersModule =
-                    SerializersModule {
-                        polymorphic(PostEmbed::class) {
-                            subclass(ImageEmbed::class, ImageEmbed.serializer())
-                            subclass(VideoEmbed::class, VideoEmbed.serializer())
-                        }
-                    }
-            },
-        )
+        json(OzoneJsonConfig.json)
     }
 }
 

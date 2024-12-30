@@ -15,6 +15,8 @@ import androidx.lifecycle.viewModelScope
 import app.bsky.feed.GetPostThreadResponseThreadUnion
 import com.contexts.pulse.data.network.client.onError
 import com.contexts.pulse.data.network.client.onSuccess
+import com.contexts.pulse.domain.model.Thread
+import com.contexts.pulse.domain.model.toThread
 import com.contexts.pulse.domain.repository.PostRepository
 import com.contexts.pulse.ui.screens.main.NavigationRoutes
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +25,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class PostViewUiState(
-    val threadViewPost: GetPostThreadResponseThreadUnion.ThreadViewPost? = null,
+    val thread: Thread? = null,
     val loading: Boolean = false,
     val error: String? = null,
 )
@@ -50,7 +52,7 @@ class PostViewModel(
                         _uiState.update {
                             it.copy(
                                 loading = false,
-                                threadViewPost = response.thread as GetPostThreadResponseThreadUnion.ThreadViewPost,
+                                thread = response.thread.value.toThread(),
                             )
                         }
                     }

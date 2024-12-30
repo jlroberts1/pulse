@@ -13,8 +13,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import app.bsky.feed.FeedViewPost
 import com.contexts.pulse.data.repository.RequestResult
+import com.contexts.pulse.domain.model.TimelinePost
 import com.contexts.pulse.domain.repository.ProfileRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -31,7 +31,7 @@ data class ProfileUiState(
 class ProfileViewModel(
     private val profileRepository: ProfileRepository,
 ) : ViewModel() {
-    private val _feedState = MutableStateFlow<PagingData<FeedViewPost>>(PagingData.empty())
+    private val _feedState = MutableStateFlow<PagingData<TimelinePost>>(PagingData.empty())
     val feedState = _feedState.asStateFlow()
 
     private val _uiState = MutableStateFlow(ProfileUiState())

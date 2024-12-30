@@ -17,13 +17,12 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import app.bsky.feed.FeedViewPost
-import app.bsky.feed.PostViewEmbedUnion
-import com.contexts.pulse.extensions.getPostText
+import com.contexts.pulse.domain.model.TimelinePost
+import com.contexts.pulse.domain.model.TimelinePostFeature
 
 @Composable
 fun FeedItem(
-    post: FeedViewPost,
+    post: TimelinePost,
     onPostClick: (String) -> Unit,
     onReplyClick: (String) -> Unit,
     onRepostClick: () -> Unit,
@@ -35,7 +34,7 @@ fun FeedItem(
         modifier =
             Modifier
                 .clickable {
-                    onPostClick(post.post.uri.atUri)
+                    onPostClick(post.uri.atUri)
                 }
                 .fillMaxWidth()
                 .padding(top = 8.dp),
@@ -47,50 +46,41 @@ fun FeedItem(
                     .padding(top = 8.dp, start = 8.dp, end = 8.dp),
         ) {
             PostHeader(
-                avatar = post.post.author.avatar?.uri,
-                displayName = post.post.author.displayName,
-                handle = post.post.author.handle.handle,
-                indexedAt = post.post.indexedAt,
+                avatar = post.author.avatar,
+                displayName = post.author.displayName,
+                handle = post.author.handle.handle,
+                indexedAt = post.indexedAt,
             )
             PostMessageText(
-                text = post.post.getPostText(),
-                onClick = { onPostClick(post.post.uri.atUri) },
+                text = post.text,
+                onClick = { onPostClick(post.uri.atUri) },
             )
 
-            post.post.embed?.let { embed ->
-                when (embed) {
-                    is PostViewEmbedUnion.ExternalView -> {
-                        with(embed.value.external) {
-                            EmbedExternalView(
-                                uri = uri,
-                                thumb = thumb,
-                                onMediaOpen = { onMediaOpen(it) },
-                                title = title,
-                            )
-                        }
+            post.feature?.let { feature ->
+                when (feature) {
+                    is TimelinePostFeature.ExternalFeature -> {
+                        EmbedExternalView(
+                            uri = feature.uri,
+                            thumb = feature.thumb,
+                            title = feature.title,
+                            onMediaOpen = { onMediaOpen(it) },
+                        )
                     }
-
-                    is PostViewEmbedUnion.ImagesView -> {
+                    is TimelinePostFeature.ImagesFeature -> {
                         EmbedImagesViewImage(
-                            embed.value.images,
+                            images = feature.images,
                             onMediaOpen = { onMediaOpen(it) },
                         )
                     }
-
-                    is PostViewEmbedUnion.RecordView -> {
-                        EmbedRecordView(
-                            record = embed.value.record,
-                            onMediaOpen = { onMediaOpen(it) },
-                        )
+                    is TimelinePostFeature.MediaPostFeature -> Unit
+                    is TimelinePostFeature.PostFeature -> {
+                        EmbedRecordView(embedPost = feature.post)
                     }
-
-                    is PostViewEmbedUnion.RecordWithMediaView -> Unit
-
-                    is PostViewEmbedUnion.VideoView -> {
+                    is TimelinePostFeature.VideoFeature -> {
                         EmbedVideoView(
-                            thumbnail = embed.value.thumbnail,
-                            playlist = embed.value.playlist,
-                            aspectRatio = embed.value.aspectRatio,
+                            thumbnail = feature.video.thumb,
+                            playlist = feature.video.playlist,
+                            aspectRatio = feature.video.aspectRatio,
                             onMediaOpen = { onMediaOpen(it) },
                         )
                     }
@@ -98,10 +88,10 @@ fun FeedItem(
             }
 
             FeedItemInteractions(
-                onReplyClick = { onReplyClick(post.post.uri.atUri) },
-                replyCount = post.post.replyCount,
-                repostCount = post.post.repostCount,
-                likeCount = post.post.likeCount,
+                onReplyClick = { onReplyClick(post.uri.atUri) },
+                replyCount = post.replyCount,
+                repostCount = post.repostCount,
+                likeCount = post.likeCount,
             )
         }
     }

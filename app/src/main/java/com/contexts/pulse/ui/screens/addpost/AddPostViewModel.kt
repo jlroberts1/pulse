@@ -15,9 +15,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.bsky.actor.ProfileViewBasic
 import app.bsky.actor.SearchActorsTypeaheadQueryParams
-import app.bsky.feed.PostView
-import app.bsky.feed.ReplyRefParentUnion
-import app.bsky.feed.ReplyRefRootUnion
 import com.contexts.pulse.data.local.database.entities.MediaType
 import com.contexts.pulse.data.local.database.entities.PendingMediaAttachment
 import com.contexts.pulse.data.local.database.entities.PendingUploadEntity
@@ -25,8 +22,9 @@ import com.contexts.pulse.data.local.database.entities.ReplyLink
 import com.contexts.pulse.data.local.database.entities.ReplyReference
 import com.contexts.pulse.data.network.client.onError
 import com.contexts.pulse.data.network.client.onSuccess
-import com.contexts.pulse.domain.model.PostRecord
 import com.contexts.pulse.domain.model.TenorGif
+import com.contexts.pulse.domain.model.TimelinePost
+import com.contexts.pulse.domain.model.toPost
 import com.contexts.pulse.domain.repository.ActorRepository
 import com.contexts.pulse.domain.repository.PendingUploadRepository
 import com.contexts.pulse.domain.repository.PostRepository
@@ -55,7 +53,7 @@ data class AddPostUiState(
     val selectedGif: TenorGif? = null,
     val error: String? = null,
     val uploadSent: Boolean = false,
-    val replyPost: PostView? = null,
+    val replyPost: TimelinePost? = null,
 )
 
 data class MediaItem(
@@ -90,7 +88,7 @@ class AddPostViewModel(
             _uiState.update { it.copy(loading = true, error = null) }
             val uri = AtUri(URLDecoder.decode(replyPost, StandardCharsets.UTF_8.name()))
             postRepository.getPosts(listOf(uri)).onSuccess { response ->
-                _uiState.update { it.copy(replyPost = response.posts.first(), loading = false) }
+                _uiState.update { it.copy(replyPost = response.posts.first().toPost(), loading = false) }
             }.onError { error ->
                 _uiState.update { it.copy(error = error.message, loading = false) }
             }
@@ -112,12 +110,10 @@ class AddPostViewModel(
             val currentUser = preferencesRepository.getCurrentUser()
             currentUser?.let {
                 val replyPost = uiState.value.replyPost
-                val record = uiState.value.replyPost?.record?.decodeAs<PostRecord>()
-                val parent = record?.reply?.parent as? ReplyRefParentUnion.PostView
+                val parent = replyPost?.reply?.parent
                 val rootReplyLink =
                     if (parent != null) {
-                        val root = record.reply.root as? ReplyRefRootUnion.PostView
-                        ReplyLink(root?.value?.uri?.atUri, root?.value?.cid?.cid)
+                        ReplyLink(parent.uri.atUri, parent.cid.cid)
                     } else {
                         ReplyLink(replyPost?.uri?.atUri, replyPost?.cid?.cid)
                     }

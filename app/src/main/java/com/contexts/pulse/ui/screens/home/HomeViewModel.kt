@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import app.bsky.feed.FeedViewPost
+import com.contexts.pulse.domain.model.TimelinePost
 import com.contexts.pulse.domain.repository.FeedRepository
 import com.contexts.pulse.domain.repository.PreferencesRepository
 import com.contexts.pulse.domain.repository.UserRepository
@@ -51,7 +51,7 @@ class HomeViewModel(
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), null)
 
     private val _feedStates =
-        MutableStateFlow<Map<String, Flow<PagingData<FeedViewPost>>>>(emptyMap())
+        MutableStateFlow<Map<String, Flow<PagingData<TimelinePost>>>>(emptyMap())
     val feedStates = _feedStates.asStateFlow()
 
     init {

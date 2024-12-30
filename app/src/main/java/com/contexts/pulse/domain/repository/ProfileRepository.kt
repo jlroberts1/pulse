@@ -11,10 +11,10 @@ package com.contexts.pulse.domain.repository
 
 import androidx.paging.PagingData
 import app.bsky.actor.GetProfileResponse
-import app.bsky.feed.FeedViewPost
 import com.contexts.pulse.data.local.database.entities.ProfileEntity
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.repository.RequestResult
+import com.contexts.pulse.domain.model.TimelinePost
 import com.contexts.pulse.exceptions.NetworkError
 import kotlinx.coroutines.flow.Flow
 
@@ -23,7 +23,7 @@ interface ProfileRepository {
 
     fun getMyProfile(): Flow<ProfileEntity?>
 
-    suspend fun getProfileFeed(): RequestResult<Flow<PagingData<FeedViewPost>>>
+    suspend fun getProfileFeed(): RequestResult<Flow<PagingData<TimelinePost>>>
 
     suspend fun insertProfile(profile: ProfileEntity)
 }

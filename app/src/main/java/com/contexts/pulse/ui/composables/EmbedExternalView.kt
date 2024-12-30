@@ -39,7 +39,7 @@ import sh.christian.ozone.api.Uri
 @Composable
 fun EmbedExternalView(
     uri: Uri,
-    thumb: Uri? = null,
+    thumb: String? = null,
     title: String,
     description: String? = null,
     onMediaOpen: (String) -> Unit,
@@ -72,7 +72,7 @@ fun EmbedExternalView(
                         .clickable { uriHandler.openUri(uri.uri) },
             ) {
                 AsyncImage(
-                    model = thumb?.uri,
+                    model = thumb,
                     contentDescription = null,
                     modifier =
                         Modifier

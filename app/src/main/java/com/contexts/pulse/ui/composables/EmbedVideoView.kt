@@ -36,19 +36,18 @@ import coil3.compose.AsyncImage
 import com.contexts.pulse.domain.media.PlayerPoolManager
 import com.contexts.pulse.extensions.toFloat
 import org.koin.compose.koinInject
-import sh.christian.ozone.api.Uri
 
 @Composable
 fun EmbedVideoView(
-    thumbnail: Uri?,
-    playlist: Uri,
+    thumbnail: String?,
+    playlist: String,
     aspectRatio: AspectRatio?,
     onMediaOpen: (String) -> Unit,
     playerPoolManager: PlayerPoolManager = koinInject(),
 ) {
     val player =
         remember(playlist) { playerPoolManager.getPlayer() }?.apply {
-            setMediaItem(MediaItem.fromUri(playlist.uri))
+            setMediaItem(MediaItem.fromUri(playlist))
             prepare()
             playWhenReady = true
         }
@@ -69,7 +68,7 @@ fun EmbedVideoView(
         },
     )
     Surface(
-        onClick = { onMediaOpen(playlist.uri) },
+        onClick = { onMediaOpen(playlist) },
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
         border =
@@ -79,19 +78,19 @@ fun EmbedVideoView(
             ),
     ) {
         Crossfade(
-            label = playlist.uri,
+            label = playlist,
             targetState = player != null && !noPlayersAvailable && playerPlaying,
             animationSpec = tween(300),
         ) { isPlaying ->
             if (!isPlaying) {
                 AsyncImage(
-                    model = thumbnail?.uri,
+                    model = thumbnail,
                     contentDescription = null,
                     modifier =
                         Modifier
                             .fillMaxWidth()
                             .aspectRatio(aspectRatio.toFloat())
-                            .clickable { onMediaOpen(playlist.uri) },
+                            .clickable { onMediaOpen(playlist) },
                 )
             } else {
                 AndroidView(

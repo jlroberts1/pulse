@@ -14,7 +14,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import app.bsky.actor.PreferencesUnion
 import app.bsky.actor.Type
-import app.bsky.feed.FeedViewPost
 import app.bsky.feed.GeneratorView
 import app.bsky.feed.GetFeedResponse
 import app.bsky.feed.GetSuggestedFeedsResponse
@@ -24,6 +23,8 @@ import com.contexts.pulse.data.network.api.FeedAPI
 import com.contexts.pulse.data.network.api.ProfileAPI
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.network.client.onSuccess
+import com.contexts.pulse.domain.model.TimelinePost
+import com.contexts.pulse.domain.model.toPost
 import com.contexts.pulse.domain.repository.FeedRepository
 import com.contexts.pulse.exceptions.NetworkError
 import com.contexts.pulse.modules.AppDispatchers
@@ -69,7 +70,7 @@ class FeedRepositoryImpl(
         ).flow.flowOn(appDispatchers.io)
     }
 
-    override fun getFeed(feedUri: String): Flow<PagingData<FeedViewPost>> {
+    override fun getFeed(feedUri: String): Flow<PagingData<TimelinePost>> {
         val request = PagedRequest.GetFeed(feedUri)
         return Pager(
             config =
@@ -78,12 +79,12 @@ class FeedRepositoryImpl(
                     enablePlaceholders = false,
                 ),
             pagingSourceFactory = {
-                NetworkPagingSource<FeedViewPost, GetFeedResponse>(
+                NetworkPagingSource<TimelinePost, GetFeedResponse>(
                     appDispatchers = appDispatchers,
                     client = client,
                     request = request,
                     typeInfo<GetFeedResponse>(),
-                    getItems = { it.feed },
+                    getItems = { it.feed.map { it.toPost() } },
                     getCursor = { it.cursor },
                 )
             },

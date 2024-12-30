@@ -18,11 +18,13 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import app.bsky.richtext.Facet
 import app.bsky.richtext.FacetByteSlice
+import app.bsky.richtext.FacetFeatureUnion
 import app.bsky.richtext.FacetLink
 import app.bsky.richtext.FacetMention
 import com.contexts.pulse.R
 import com.contexts.pulse.data.local.database.entities.MediaType
 import com.contexts.pulse.data.local.database.entities.PendingUploadEntity
+import com.contexts.pulse.data.network.client.OzoneJsonConfig
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.domain.model.CreateRecord
 import com.contexts.pulse.domain.model.ImageEmbed
@@ -34,13 +36,11 @@ import com.contexts.pulse.domain.model.VideoRef
 import com.contexts.pulse.domain.repository.PendingUploadRepository
 import com.contexts.pulse.domain.repository.PostRepository
 import kotlinx.datetime.Clock
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.polymorphic
 import org.koin.core.component.KoinComponent
 import sh.christian.ozone.api.Cid
 import sh.christian.ozone.api.Did
 import sh.christian.ozone.api.Nsid
+import sh.christian.ozone.api.Uri
 import sh.christian.ozone.api.model.Blob
 import sh.christian.ozone.api.model.BlobRef
 
@@ -106,21 +106,7 @@ class CreatePostWorker(
                 }
             }
 
-        val embedJson =
-            Json {
-                classDiscriminator = "\$type"
-                serializersModule =
-                    SerializersModule {
-                        polymorphic(PostEmbed::class) {
-                            subclass(ImageEmbed::class, ImageEmbed.serializer())
-                            subclass(VideoEmbed::class, VideoEmbed.serializer())
-                        }
-                    }
-                isLenient = true
-                ignoreUnknownKeys = true
-            }
-
-        val embedElement = embedJson.encodeToJsonElement(PostEmbed.serializer(), embed)
+        val embedElement = OzoneJsonConfig.json.encodeToJsonElement(PostEmbed.serializer(), embed)
 
         val postRecord =
             PostRecord(
@@ -207,14 +193,14 @@ class CreatePostWorker(
                         ),
                     features =
                         listOf(
-                            app.bsky.richtext.FacetFeatureUnion.Mention(
+                            FacetFeatureUnion.Mention(
                                 value = FacetMention(Did(matchResult.value.substring(1))),
                             ),
                         ),
                 ),
             )
         }
-        val urlRegex = "https?://[^\\s]+".toRegex()
+        val urlRegex = "https?://\\S+".toRegex()
         urlRegex.findAll(text).forEach { matchResult ->
             facets.add(
                 Facet(
@@ -225,8 +211,8 @@ class CreatePostWorker(
                         ),
                     features =
                         listOf(
-                            app.bsky.richtext.FacetFeatureUnion.Link(
-                                value = FacetLink(sh.christian.ozone.api.Uri(matchResult.value)),
+                            FacetFeatureUnion.Link(
+                                value = FacetLink(Uri(matchResult.value)),
                             ),
                         ),
                 ),

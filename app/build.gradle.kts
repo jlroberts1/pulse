@@ -118,6 +118,7 @@ dependencies {
 
     releaseImplementation(libs.chucker.noop)
 
+    api(libs.bluesky)
     lexicons(fileTree("lexicons") { include("**/*.json") })
     ksp(libs.room.compiler)
 }

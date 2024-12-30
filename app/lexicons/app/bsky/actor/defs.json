@@ -165,6 +165,7 @@
         "refs": [
           "#adultContentPref",
           "#contentLabelPref",
+          "#skyfeedBuilderFeedsPref",
           "#savedFeedsPref",
           "#savedFeedsPrefV2",
           "#personalDetailsPref",
@@ -200,6 +201,9 @@
           "knownValues": ["ignore", "show", "warn", "hide"]
         }
       }
+    },
+    "skyfeedBuilderFeedsPref": {
+      "type": "object"
     },
     "savedFeed": {
       "type": "object",

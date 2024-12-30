@@ -23,12 +23,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import app.bsky.embed.ImagesViewImage
 import coil3.compose.AsyncImage
+import com.contexts.pulse.domain.model.EmbedImage
 
 @Composable
 fun MultiImagesViewHolder(
-    images: List<ImagesViewImage>,
+    images: List<EmbedImage>,
     onClick: (String) -> Unit,
 ) {
     HorizontalPager(
@@ -40,14 +40,14 @@ fun MultiImagesViewHolder(
                 .fillMaxWidth(),
     ) { page ->
         AsyncImage(
-            model = images[page].fullsize.uri,
+            model = images[page].fullsize,
             contentDescription = images[page].alt,
             modifier =
                 Modifier
                     .padding(end = 4.dp)
                     .fillMaxSize()
                     .clip(RoundedCornerShape(8.dp))
-                    .clickable { onClick(images[page].fullsize.uri) },
+                    .clickable { onClick(images[page].fullsize) },
             contentScale = ContentScale.Crop,
         )
     }

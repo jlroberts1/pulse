@@ -10,11 +10,11 @@
 package com.contexts.pulse.ui.composables
 
 import androidx.compose.runtime.Composable
-import app.bsky.embed.ImagesViewImage
+import com.contexts.pulse.domain.model.EmbedImage
 
 @Composable
 fun EmbedImagesViewImage(
-    images: List<ImagesViewImage>,
+    images: List<EmbedImage>,
     onMediaOpen: (String) -> Unit,
 ) {
     if (images.size == 1) {

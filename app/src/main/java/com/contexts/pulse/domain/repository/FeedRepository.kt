@@ -10,11 +10,11 @@
 package com.contexts.pulse.domain.repository
 
 import androidx.paging.PagingData
-import app.bsky.feed.FeedViewPost
 import app.bsky.feed.GeneratorView
 import app.bsky.feed.GetFeedResponse
 import com.contexts.pulse.data.local.database.entities.FeedEntity
 import com.contexts.pulse.data.network.client.Response
+import com.contexts.pulse.domain.model.TimelinePost
 import com.contexts.pulse.exceptions.NetworkError
 import kotlinx.coroutines.flow.Flow
 
@@ -26,7 +26,7 @@ interface FeedRepository {
 
     fun getSuggestions(): Flow<PagingData<GeneratorView>>
 
-    fun getFeed(feedUri: String): Flow<PagingData<FeedViewPost>>
+    fun getFeed(feedUri: String): Flow<PagingData<TimelinePost>>
 
     suspend fun refreshFeeds(did: String)
 

@@ -13,7 +13,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import app.bsky.actor.GetProfileResponse
-import app.bsky.feed.FeedViewPost
 import app.bsky.feed.GetAuthorFeedResponse
 import com.contexts.pulse.data.local.database.dao.ProfileDao
 import com.contexts.pulse.data.local.database.entities.ProfileEntity
@@ -21,6 +20,8 @@ import com.contexts.pulse.data.local.database.entities.toProfileEntity
 import com.contexts.pulse.data.network.api.ProfileAPI
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.network.client.onSuccess
+import com.contexts.pulse.domain.model.TimelinePost
+import com.contexts.pulse.domain.model.toPost
 import com.contexts.pulse.domain.repository.PreferencesRepository
 import com.contexts.pulse.domain.repository.ProfileRepository
 import com.contexts.pulse.exceptions.NetworkError
@@ -56,7 +57,7 @@ class ProfileRepositoryImpl(
             profileDao.getProfileByDid(it)
         }.flowOn(appDispatchers.io)
 
-    override suspend fun getProfileFeed(): RequestResult<Flow<PagingData<FeedViewPost>>> {
+    override suspend fun getProfileFeed(): RequestResult<Flow<PagingData<TimelinePost>>> {
         val current = preferencesRepository.getCurrentUser() ?: return RequestResult.NoCurrentUser
         val request = PagedRequest.AuthorFeed(current)
         return RequestResult.Success(
@@ -67,12 +68,12 @@ class ProfileRepositoryImpl(
                         enablePlaceholders = false,
                     ),
                 pagingSourceFactory = {
-                    NetworkPagingSource<FeedViewPost, GetAuthorFeedResponse>(
+                    NetworkPagingSource<TimelinePost, GetAuthorFeedResponse>(
                         appDispatchers = appDispatchers,
                         client = client,
                         request = request,
                         type = typeInfo<GetAuthorFeedResponse>(),
-                        getItems = { it.feed },
+                        getItems = { items -> items.feed.map { it.toPost() } },
                         getCursor = { it.cursor },
                     )
                 },

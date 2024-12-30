@@ -25,9 +25,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import app.bsky.feed.GetPostThreadResponseThreadUnion
-import app.bsky.feed.ThreadViewPostParentUnion
-import app.bsky.feed.ThreadViewPostReplieUnion
+import com.contexts.pulse.domain.model.Thread
+import com.contexts.pulse.domain.model.ThreadPost
 import com.contexts.pulse.ui.composables.PullToRefreshBox
 import com.contexts.pulse.ui.screens.postview.composables.PostViewItem
 import com.contexts.pulse.ui.screens.postview.composables.PostViewReply
@@ -47,7 +46,7 @@ fun PostViewScreen(
         onRefresh = { viewModel.getThread() },
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            ThreadView(uiState.threadViewPost)
+            ThreadView(uiState.thread)
             ReplyField(
                 modifier =
                     Modifier
@@ -60,48 +59,27 @@ fun PostViewScreen(
 
 @Composable
 fun ThreadView(
-    threadViewPost: GetPostThreadResponseThreadUnion.ThreadViewPost?,
+    thread: Thread?,
     onPostClick: (String) -> Unit = {},
     onReplyClick: () -> Unit = {},
     onMediaOpen: (String) -> Unit = {},
 ) {
-    if (threadViewPost == null) return
+    if (thread == null) return
     LazyColumn(
         modifier =
-            Modifier.fillMaxWidth()
+            Modifier
+                .fillMaxWidth()
                 .padding(bottom = 56.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(8.dp),
     ) {
-        threadViewPost.value.parent?.let { parent ->
-            item {
-                when (parent) {
-                    is ThreadViewPostParentUnion.ThreadViewPost -> {
-                        PostViewItem(
-                            post = parent.value.post,
-                            onPostClick = {},
-                            onReplyClick = {},
-                            onMediaOpen = {},
-                            onRepostClick = {},
-                            onLikeClick = {},
-                            onMenuClick = {},
-                        )
-                    }
-
-                    is ThreadViewPostParentUnion.BlockedPost,
-                    is ThreadViewPostParentUnion.NotFoundPost,
-                    -> Unit
-                }
-            }
-            item {
-                ElevatedCard(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(start = 40.dp),
-                ) {
+        items(thread.parents) { parent ->
+            when (parent) {
+                ThreadPost.BlockedPost -> TODO()
+                ThreadPost.NotFoundPost -> TODO()
+                is ThreadPost.ViewablePost -> {
                     PostViewItem(
-                        post = threadViewPost.value.post,
+                        post = parent.post,
                         onPostClick = {},
                         onReplyClick = {},
                         onMediaOpen = {},
@@ -111,43 +89,41 @@ fun ThreadView(
                     )
                 }
             }
-        } ?: run {
-            item {
-                PostViewItem(
-                    post = threadViewPost.value.post,
-                    onPostClick = {},
-                    onReplyClick = {},
-                    onMediaOpen = {},
-                    onRepostClick = {},
-                    onLikeClick = {},
-                    onMenuClick = {},
-                )
-            }
-
-            items(threadViewPost.value.replies) { reply ->
-                ElevatedCard(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(start = 40.dp),
-                ) {
-                    when (reply) {
-                        is ThreadViewPostReplieUnion.ThreadViewPost -> {
-                            PostViewReply(
-                                post = reply.value.post,
-                                onPostClick = {},
-                                onReplyClick = {},
-                                onMediaOpen = {},
-                                onRepostClick = {},
-                                onLikeClick = {},
-                                onMenuClick = {},
-                            )
-                        }
-
-                        is ThreadViewPostReplieUnion.BlockedPost,
-                        is ThreadViewPostReplieUnion.NotFoundPost,
-                        -> Unit
+        }
+        item {
+            PostViewItem(
+                post = thread.post,
+                onPostClick = {},
+                onReplyClick = {},
+                onMediaOpen = {},
+                onRepostClick = {},
+                onLikeClick = {},
+                onMenuClick = {},
+            )
+        }
+        items(thread.replies) { reply ->
+            ElevatedCard(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = 40.dp),
+            ) {
+                when (reply) {
+                    is ThreadPost.ViewablePost -> {
+                        PostViewReply(
+                            post = reply.post,
+                            onPostClick = {},
+                            onReplyClick = {},
+                            onMediaOpen = {},
+                            onRepostClick = {},
+                            onLikeClick = {},
+                            onMenuClick = {},
+                        )
                     }
+
+                    ThreadPost.BlockedPost,
+                    ThreadPost.NotFoundPost,
+                    -> Unit
                 }
             }
         }

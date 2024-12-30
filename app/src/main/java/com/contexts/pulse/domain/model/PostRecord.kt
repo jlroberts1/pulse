@@ -8,10 +8,8 @@
  */
 
 package com.contexts.pulse.domain.model
-
 import app.bsky.embed.AspectRatio
 import app.bsky.richtext.Facet
-import com.atproto.label.Label
 import com.contexts.pulse.data.local.database.entities.ReplyReference
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

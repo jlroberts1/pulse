@@ -61,8 +61,8 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.window.core.layout.WindowWidthSizeClass
-import app.bsky.feed.FeedViewPost
 import com.contexts.pulse.data.local.database.entities.FeedEntity
+import com.contexts.pulse.domain.model.TimelinePost
 import com.contexts.pulse.ui.composables.FeedItem
 import com.contexts.pulse.ui.composables.PullToRefreshBox
 import com.contexts.pulse.ui.screens.main.NavigationRoutes
@@ -224,7 +224,7 @@ fun FeedConfigurationDialog(
 fun TabletRow(
     navController: NavController,
     feeds: List<FeedEntity>,
-    feedStates: Map<String, Flow<PagingData<FeedViewPost>>>,
+    feedStates: Map<String, Flow<PagingData<TimelinePost>>>,
     onMediaOpen: (String) -> Unit,
 ) {
     Row(
@@ -267,7 +267,7 @@ fun TabletRow(
 fun TabPagerFeeds(
     navController: NavController,
     feeds: List<FeedEntity>,
-    feedStates: Map<String, Flow<PagingData<FeedViewPost>>>,
+    feedStates: Map<String, Flow<PagingData<TimelinePost>>>,
     onMediaOpen: (String) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
@@ -292,7 +292,7 @@ fun TabPagerFeeds(
 
     val feedId = feeds[pagerState.currentPage].id
     val feed = feedStates[feedId] ?: return
-    val feedData: LazyPagingItems<FeedViewPost> = feed.collectAsLazyPagingItems()
+    val feedData: LazyPagingItems<TimelinePost> = feed.collectAsLazyPagingItems()
 
     PullToRefreshBox(
         modifier = Modifier.fillMaxSize(),
@@ -325,7 +325,7 @@ fun TabPagerFeeds(
 @Composable
 private fun FeedContent(
     navController: NavController,
-    pagingFlow: Flow<PagingData<FeedViewPost>>,
+    pagingFlow: Flow<PagingData<TimelinePost>>,
     onMediaOpen: (String) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
@@ -350,7 +350,7 @@ private fun FeedContent(
         ) {
             items(
                 count = posts.itemCount,
-                key = { index -> "${index}_${posts[index]?.post?.uri?.atUri}" },
+                key = { index -> "${index}_${posts[index]?.uri?.atUri}" },
                 contentType = posts.itemContentType(),
             ) { item ->
                 posts[item]?.let {
