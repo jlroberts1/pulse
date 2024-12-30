@@ -13,7 +13,6 @@ import app.bsky.notification.GetUnreadCountResponse
 import app.bsky.notification.ListNotificationsResponse
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.network.client.safeRequest
-import com.contexts.pulse.data.network.response.GenericResponse
 import com.contexts.pulse.exceptions.NetworkError
 import io.ktor.client.HttpClient
 import io.ktor.client.request.setBody
@@ -43,7 +42,7 @@ class NotificationsAPI(
         }
     }
 
-    suspend fun updateSeen(seenAt: Timestamp): Response<GenericResponse, NetworkError> {
+    suspend fun updateSeen(seenAt: Timestamp): Response<Unit, NetworkError> {
         val pdsUrl = UrlManager.getPdsUrl()
         return client.safeRequest {
             url {

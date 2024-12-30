@@ -30,6 +30,7 @@ fun App(viewModel: AppViewModel = koinViewModel()) {
     val profile by viewModel.profile.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val snackbarMessage by viewModel.snackbarMessages.collectAsStateWithLifecycle()
+    val unreadNotificationCount by viewModel.unreadNotificationCount.collectAsStateWithLifecycle()
 
     LaunchedEffect(viewModel.navigationEvent) {
         viewModel.navigationEvent.collect { route ->
@@ -58,11 +59,13 @@ fun App(viewModel: AppViewModel = koinViewModel()) {
         NavigationDrawer(
             profile = profile,
             navController = navController,
+            unreadNotificationCount = unreadNotificationCount,
             drawerState = drawerState,
         ) {
             NavigationScaffold(
                 viewModel = viewModel,
                 navController = navController,
+                unreadNotificationCount = unreadNotificationCount,
                 mediaState = mediaState,
                 drawerState = drawerState,
                 snackbarHostState = snackbarHostState,

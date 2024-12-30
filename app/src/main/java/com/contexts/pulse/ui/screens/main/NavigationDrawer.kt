@@ -30,6 +30,7 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.Badge
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -73,6 +74,7 @@ fun NavigationDrawer(
     profile: ProfileEntity?,
     accounts: List<String>? = listOf(""),
     navController: NavController,
+    unreadNotificationCount: Long,
     drawerState: DrawerState,
     content: @Composable () -> Unit,
 ) {
@@ -93,7 +95,7 @@ fun NavigationDrawer(
         )
 
     val items =
-        remember {
+        remember(unreadNotificationCount) {
             listOf(
                 NavigationItems(
                     title = "Home",
@@ -118,6 +120,7 @@ fun NavigationDrawer(
                     route = NavigationRoutes.Authenticated.Notifications.route,
                     selectedIcon = Icons.Filled.Notifications,
                     unselectedIcon = Icons.Outlined.Notifications,
+                    badgeCount = unreadNotificationCount.toInt(),
                 ),
                 NavigationItems(
                     title = "Profile",
@@ -229,7 +232,14 @@ fun NavigationDrawer(
                                 },
                                 badge = {
                                     item.badgeCount?.let {
-                                        Text(text = item.badgeCount.toString())
+                                        if (it > 0) {
+                                            Badge {
+                                                Text(
+                                                    text = if (it > 99) "99+" else it.toString(),
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                )
+                                            }
+                                        }
                                     }
                                 },
                                 modifier =

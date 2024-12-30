@@ -56,6 +56,7 @@ val viewModelModule =
                 get<FeedRepository>(),
                 get<ProfileRepository>(),
                 get<PreferencesRepository>(),
+                get<NotificationsRepository>(),
                 get<UserRepository>(),
                 get<WorkManager>(),
             )

@@ -12,7 +12,6 @@ package com.contexts.pulse.domain.repository
 import app.bsky.notification.GetUnreadCountResponse
 import app.bsky.notification.ListNotificationsResponse
 import com.contexts.pulse.data.network.client.Response
-import com.contexts.pulse.data.network.response.GenericResponse
 import com.contexts.pulse.exceptions.NetworkError
 import sh.christian.ozone.api.model.Timestamp
 
@@ -21,5 +20,5 @@ interface NotificationsRepository {
 
     suspend fun getUnreadCount(): Response<GetUnreadCountResponse, NetworkError>
 
-    suspend fun updateSeen(seenAt: Timestamp): Response<GenericResponse, NetworkError>
+    suspend fun updateSeen(seenAt: Timestamp): Response<Unit, NetworkError>
 }

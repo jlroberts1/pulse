@@ -13,7 +13,6 @@ import app.bsky.notification.GetUnreadCountResponse
 import app.bsky.notification.ListNotificationsResponse
 import com.contexts.pulse.data.network.api.NotificationsAPI
 import com.contexts.pulse.data.network.client.Response
-import com.contexts.pulse.data.network.response.GenericResponse
 import com.contexts.pulse.domain.repository.NotificationsRepository
 import com.contexts.pulse.exceptions.NetworkError
 import com.contexts.pulse.modules.AppDispatchers
@@ -34,7 +33,7 @@ class NotificationsRepositoryImpl(
             notificationsAPI.getUnreadCount()
         }
 
-    override suspend fun updateSeen(seenAt: Timestamp): Response<GenericResponse, NetworkError> =
+    override suspend fun updateSeen(seenAt: Timestamp): Response<Unit, NetworkError> =
         withContext(appDispatchers.io) {
             notificationsAPI.updateSeen(seenAt)
         }

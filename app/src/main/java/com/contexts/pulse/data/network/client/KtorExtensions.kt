@@ -22,12 +22,22 @@ import java.nio.channels.UnresolvedAddressException
 suspend inline fun <reified T> HttpClient.safeRequest(block: HttpRequestBuilder.() -> Unit): Response<T, NetworkError> =
     try {
         val response = request { block() }
-        Response.Success<T>(response.body())
+        if (T::class == Unit::class) {
+            @Suppress("UNCHECKED_CAST")
+            Response.Success(Unit) as Response<T, NetworkError>
+        } else {
+            Response.Success<T>(response.body())
+        }
     } catch (exception: UnresolvedAddressException) {
         Response.Error(NetworkError.Network.NO_INTERNET_CONNECTION)
     } catch (exception: SerializationException) {
-        println(exception)
-        Response.Error(NetworkError.Network.SERIALIZATION)
+        if (T::class == Unit::class) {
+            @Suppress("UNCHECKED_CAST")
+            Response.Success(Unit) as Response<T, NetworkError>
+        } else {
+            println(exception)
+            Response.Error(NetworkError.Network.SERIALIZATION)
+        }
     } catch (exception: ClientRequestException) {
         println(exception)
         when (exception.response.status.value) {

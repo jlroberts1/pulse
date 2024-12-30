@@ -15,8 +15,10 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkQuery
 import com.contexts.pulse.data.network.api.UrlManager
+import com.contexts.pulse.data.network.client.onSuccess
 import com.contexts.pulse.domain.model.Theme
 import com.contexts.pulse.domain.repository.FeedRepository
+import com.contexts.pulse.domain.repository.NotificationsRepository
 import com.contexts.pulse.domain.repository.PreferencesRepository
 import com.contexts.pulse.domain.repository.ProfileRepository
 import com.contexts.pulse.domain.repository.UserRepository
@@ -39,6 +41,7 @@ class AppViewModel(
     private val feedRepository: FeedRepository,
     profileRepository: ProfileRepository,
     private val preferencesRepository: PreferencesRepository,
+    private val notificationsRepository: NotificationsRepository,
     private val userRepository: UserRepository,
     private val workManager: WorkManager,
 ) : ViewModel() {
@@ -58,6 +61,10 @@ class AppViewModel(
 
     private val currentUser = preferencesRepository.getCurrentUserFlow()
 
+    val unreadNotificationCount =
+        preferencesRepository.getUnreadCount()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), 0L)
+
     val profile =
         profileRepository.getMyProfile()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), null)
@@ -67,6 +74,7 @@ class AppViewModel(
 
     init {
         bindAccount()
+        updateUnread()
         checkAuthState()
         refreshFeeds()
         observeWork()
@@ -78,6 +86,14 @@ class AppViewModel(
                 current?.let {
                     UrlManager.updatePdsUrl(userRepository.getServiceEndpoint(it))
                 }
+            }
+        }
+    }
+
+    private fun updateUnread() {
+        viewModelScope.launch {
+            notificationsRepository.getUnreadCount().onSuccess { response ->
+                preferencesRepository.updateUnreadCount(response.count)
             }
         }
     }
