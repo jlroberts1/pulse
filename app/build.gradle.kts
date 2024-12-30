@@ -31,7 +31,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "TENOR_API_KEY", getLocalProperty("TENOR_API_KEY"))
+        buildConfigField("String", "TENOR_API_KEY", "\"${getLocalProperty("TENOR_API_KEY")}\"")
     }
     packaging {
         resources {
