@@ -9,6 +9,7 @@
 
 package com.contexts.pulse.extensions
 
+import androidx.compose.ui.text.intl.Locale
 import app.bsky.notification.ListNotificationsNotification
 import app.bsky.richtext.Facet
 import com.atproto.label.Label
@@ -46,3 +47,16 @@ fun ListNotificationsNotification.getRecordText(): String {
         ""
     }
 }
+
+fun Long.toKFormat(): String =
+    when {
+        this < 1000 -> this.toString()
+        this < 1_000_000 ->
+            String.format(
+                locale = Locale.current.platformLocale,
+                format = "%.1fk",
+                this / 1000.0,
+            )
+                .replace(".0k", "k")
+        else -> this.toString()
+    }

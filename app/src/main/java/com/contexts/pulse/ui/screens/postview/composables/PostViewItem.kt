@@ -119,6 +119,8 @@ fun PostViewItem(
                     replyCount = post.replyCount,
                     repostCount = post.repostCount,
                     likeCount = post.likeCount,
+                    liked = post.liked,
+                    reposted = post.reposted,
                 )
             }
         }
