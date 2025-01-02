@@ -16,9 +16,17 @@ import com.contexts.pulse.data.local.database.entities.MediaUploadState
 import com.contexts.pulse.data.local.database.entities.PostUploadState
 import com.contexts.pulse.data.local.database.entities.ReplyReference
 import com.contexts.pulse.data.local.database.entities.VideoProcessingState
+import com.contexts.pulse.data.network.client.OzoneJsonConfig
+import com.contexts.pulse.domain.model.Label
+import com.contexts.pulse.domain.model.Profile
 import com.contexts.pulse.domain.model.Service
+import com.contexts.pulse.domain.model.TimelinePostFeature
+import com.contexts.pulse.domain.model.TimelinePostLink
+import com.contexts.pulse.domain.model.TimelinePostReason
+import com.contexts.pulse.domain.model.TimelinePostReply
 import com.contexts.pulse.domain.model.VerificationMethod
 import kotlinx.datetime.Instant
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -121,5 +129,69 @@ class Converters {
     @TypeConverter
     fun fromReplyReference(reference: ReplyReference): String {
         return Json.encodeToString(reference)
+    }
+
+    @TypeConverter
+    fun fromProfile(profile: Profile): String {
+        return Json.encodeToString(Profile.serializer(), profile)
+    }
+
+    @TypeConverter
+    fun toProfile(json: String): Profile {
+        return Json.decodeFromString(Profile.serializer(), json)
+    }
+
+    @TypeConverter
+    fun fromTimelinePostLinks(links: List<TimelinePostLink>): String {
+        return Json.encodeToString(ListSerializer(TimelinePostLink.serializer()), links)
+    }
+
+    @TypeConverter
+    fun toTimelinePostLinks(json: String): List<TimelinePostLink> {
+        return Json.decodeFromString(ListSerializer(TimelinePostLink.serializer()), json)
+    }
+
+    @TypeConverter
+    fun fromLabels(labels: List<Label>): String {
+        return Json.encodeToString(ListSerializer(Label.serializer()), labels)
+    }
+
+    @TypeConverter
+    fun toLabels(json: String): List<Label> {
+        return Json.decodeFromString(ListSerializer(Label.serializer()), json)
+    }
+
+    @TypeConverter
+    fun fromTimelinePostReply(reply: TimelinePostReply): String {
+        return Json.encodeToString(TimelinePostReply.serializer(), reply)
+    }
+
+    @TypeConverter
+    fun toTimelinePostReply(value: String): TimelinePostReply {
+        return Json.decodeFromString(TimelinePostReply.serializer(), value)
+    }
+
+    @TypeConverter
+    fun fromTimelinePostReason(reason: TimelinePostReason): String {
+        return Json.encodeToString(TimelinePostReason.serializer(), reason)
+    }
+
+    @TypeConverter
+    fun toTimelinePostReason(value: String): TimelinePostReason {
+        return Json.decodeFromString(TimelinePostReason.serializer(), value)
+    }
+
+    @TypeConverter
+    fun fromTimelinePostFeature(feature: TimelinePostFeature): String {
+        return Json.encodeToString(TimelinePostFeature.serializer(), feature)
+    }
+
+    @TypeConverter
+    fun toTimelinePostFeature(value: String): TimelinePostFeature {
+        return Json.decodeFromString(TimelinePostFeature.serializer(), value)
+    }
+
+    companion object {
+        private val Json = OzoneJsonConfig.json
     }
 }

@@ -66,6 +66,7 @@ val viewModelModule =
             HomeViewModel(
                 get<FeedRepository>(),
                 get<PreferencesRepository>(),
+                get<PostRepository>(),
                 get<UserRepository>(),
             )
         }

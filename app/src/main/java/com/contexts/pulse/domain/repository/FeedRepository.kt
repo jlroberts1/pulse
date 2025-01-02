@@ -31,4 +31,16 @@ interface FeedRepository {
     suspend fun refreshFeeds(did: String)
 
     fun getAvailableFeeds(did: String): Flow<List<FeedEntity>>
+
+    fun getFeedPagingFlow(
+        feedId: String,
+        feedUri: String,
+    ): Flow<PagingData<TimelinePost>>
+
+    suspend fun likePost(
+        postUri: String,
+        likeUri: String,
+    )
+
+    suspend fun unlikePost(postUri: String)
 }

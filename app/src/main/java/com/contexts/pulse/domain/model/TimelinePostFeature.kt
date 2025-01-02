@@ -18,19 +18,24 @@ import app.bsky.embed.VideoView
 import app.bsky.feed.Post
 import app.bsky.feed.PostViewEmbedUnion
 import com.contexts.pulse.utils.deserialize
+import kotlinx.serialization.Serializable
 import sh.christian.ozone.api.AtUri
 import sh.christian.ozone.api.Cid
 import sh.christian.ozone.api.Uri
 
+@Serializable
 sealed interface TimelinePostFeature {
+    @Serializable
     data class ImagesFeature(
         val images: List<EmbedImage>,
     ) : TimelinePostFeature, TimelinePostMedia
 
+    @Serializable
     data class VideoFeature(
         val video: EmbedVideo,
     ) : TimelinePostFeature, TimelinePostMedia
 
+    @Serializable
     data class ExternalFeature(
         val uri: Uri,
         val title: String,
@@ -38,18 +43,22 @@ sealed interface TimelinePostFeature {
         val thumb: String?,
     ) : TimelinePostFeature, TimelinePostMedia
 
+    @Serializable
     data class PostFeature(
         val post: EmbedPost,
     ) : TimelinePostFeature
 
+    @Serializable
     data class MediaPostFeature(
         val post: EmbedPost,
         val media: TimelinePostMedia,
     ) : TimelinePostFeature
 }
 
+@Serializable
 sealed interface TimelinePostMedia
 
+@Serializable
 data class EmbedImage(
     val thumb: String,
     val fullsize: String,
@@ -57,13 +66,16 @@ data class EmbedImage(
     val alt: String,
 )
 
+@Serializable
 data class EmbedVideo(
     val thumb: String?,
     val playlist: String,
     val aspectRatio: AspectRatio?,
 )
 
+@Serializable
 sealed interface EmbedPost {
+    @Serializable
     data class VisibleEmbedPost(
         val uri: AtUri,
         val cid: Cid,
@@ -73,6 +85,7 @@ sealed interface EmbedPost {
         val reference: Reference = Reference(uri, cid)
     }
 
+    @Serializable
     data class FeedGeneratorEmbed(
         val displayName: String,
         val avatar: String?,
@@ -80,16 +93,18 @@ sealed interface EmbedPost {
         val likeCount: Long?,
     ) : EmbedPost
 
+    @Serializable
     data class InvisibleEmbedPost(
         val uri: AtUri,
     ) : EmbedPost
 
+    @Serializable
     data class BlockedEmbedPost(
         val uri: AtUri,
     ) : EmbedPost
 }
 
-fun PostViewEmbedUnion.toFeature(): TimelinePostFeature? {
+fun PostViewEmbedUnion.toFeature(): TimelinePostFeature {
     return when (this) {
         is PostViewEmbedUnion.ImagesView -> {
             value.toImagesFeature()

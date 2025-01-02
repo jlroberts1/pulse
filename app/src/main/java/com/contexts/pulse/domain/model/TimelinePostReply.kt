@@ -12,7 +12,9 @@ package com.contexts.pulse.domain.model
 import app.bsky.feed.ReplyRef
 import app.bsky.feed.ReplyRefParentUnion
 import app.bsky.feed.ReplyRefRootUnion
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class TimelinePostReply(
     val root: TimelinePost?,
     val parent: TimelinePost?,

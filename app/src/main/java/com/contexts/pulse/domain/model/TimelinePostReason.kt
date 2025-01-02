@@ -10,18 +10,21 @@
 package com.contexts.pulse.domain.model
 
 import app.bsky.feed.FeedViewPostReasonUnion
+import kotlinx.serialization.Serializable
 import sh.christian.ozone.api.model.Timestamp
 
+@Serializable
 sealed interface TimelinePostReason {
     data class TimelinePostRepost(
         val repostAuthor: Profile,
         val indexedAt: Timestamp,
     ) : TimelinePostReason
 
+    @Serializable
     data object TimelinePostPin : TimelinePostReason
 }
 
-fun FeedViewPostReasonUnion.toReasonOrNull(): TimelinePostReason? {
+fun FeedViewPostReasonUnion.toReasonOrNull(): TimelinePostReason {
     return when (this) {
         is FeedViewPostReasonUnion.ReasonRepost -> {
             TimelinePostReason.TimelinePostRepost(

@@ -20,7 +20,10 @@ import com.contexts.pulse.data.network.api.PostAPI
 import com.contexts.pulse.data.network.api.UploadAPI
 import com.contexts.pulse.data.network.api.UploadParams
 import com.contexts.pulse.data.network.client.Response
+import com.contexts.pulse.domain.model.CreateLikeRecordRequest
+import com.contexts.pulse.domain.model.CreateLikeRecordResponse
 import com.contexts.pulse.domain.model.CreateRecord
+import com.contexts.pulse.domain.model.UnlikeRecordRequest
 import com.contexts.pulse.domain.repository.PostRepository
 import com.contexts.pulse.exceptions.NetworkError
 import com.contexts.pulse.modules.AppDispatchers
@@ -68,5 +71,15 @@ class PostRepositoryImpl(
     override suspend fun getPosts(uris: List<AtUri>): Response<GetPostsResponse, NetworkError> =
         withContext(appDispatchers.io) {
             postAPI.getPosts(uris)
+        }
+
+    override suspend fun likePost(createLikeRecordRequest: CreateLikeRecordRequest): Response<CreateLikeRecordResponse, NetworkError> =
+        withContext(appDispatchers.io) {
+            postAPI.likePost(createLikeRecordRequest)
+        }
+
+    override suspend fun unlikePost(unlikeRecordRequest: UnlikeRecordRequest): Response<Unit, NetworkError> =
+        withContext(appDispatchers.io) {
+            postAPI.unlikePost(unlikeRecordRequest)
         }
 }

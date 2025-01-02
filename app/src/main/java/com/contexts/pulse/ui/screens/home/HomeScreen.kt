@@ -136,6 +136,7 @@ fun HomeScreen(
                 feeds = visibleFeeds,
                 feedStates = feedStates,
                 onMediaOpen = { onMediaOpen(it) },
+                onLikeClick = { viewModel.onLikeClicked(it.first) },
             )
         } else {
             TabPagerFeeds(
@@ -143,6 +144,7 @@ fun HomeScreen(
                 feeds = visibleFeeds,
                 feedStates = feedStates,
                 onMediaOpen = { onMediaOpen(it) },
+                onLikeClick = { viewModel.onLikeClicked(it.first) },
             )
         }
 
@@ -226,6 +228,7 @@ fun TabletRow(
     feeds: List<FeedEntity>,
     feedStates: Map<String, Flow<PagingData<TimelinePost>>>,
     onMediaOpen: (String) -> Unit,
+    onLikeClick: (Pair<TimelinePost, String>) -> Unit,
 ) {
     Row(
         modifier =
@@ -252,8 +255,9 @@ fun TabletRow(
                     feedStates[feed.id]?.let { pagingFlow ->
                         FeedContent(
                             navController = navController,
-                            pagingFlow = pagingFlow,
-                            onMediaOpen = onMediaOpen,
+                            feedData = feedData,
+                            onMediaOpen = { onMediaOpen(it) },
+                            onLikeClick = { onLikeClick(Pair(it, feed.id)) },
                         )
                     }
                 }
@@ -269,6 +273,7 @@ fun TabPagerFeeds(
     feeds: List<FeedEntity>,
     feedStates: Map<String, Flow<PagingData<TimelinePost>>>,
     onMediaOpen: (String) -> Unit,
+    onLikeClick: (Pair<TimelinePost, String>) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState { feeds.size }
@@ -310,13 +315,12 @@ fun TabPagerFeeds(
                         .widthIn(max = 840.dp)
                         .fillMaxSize(),
             ) { page ->
-                feedStates[feedId]?.let { pagingFlow ->
-                    FeedContent(
-                        navController = navController,
-                        pagingFlow = pagingFlow,
-                        onMediaOpen = { onMediaOpen(it) },
-                    )
-                }
+                FeedContent(
+                    navController = navController,
+                    feedData = feedData,
+                    onMediaOpen = { onMediaOpen(it) },
+                    onLikeClick = { onLikeClick(Pair(it, feedId)) },
+                )
             }
         }
     }
@@ -325,8 +329,9 @@ fun TabPagerFeeds(
 @Composable
 private fun FeedContent(
     navController: NavController,
-    pagingFlow: Flow<PagingData<TimelinePost>>,
+    feedData: LazyPagingItems<TimelinePost>,
     onMediaOpen: (String) -> Unit,
+    onLikeClick: (TimelinePost) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
@@ -338,8 +343,6 @@ private fun FeedContent(
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val isExpandedScreen =
         adaptiveInfo.windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED
-
-    val posts = pagingFlow.collectAsLazyPagingItems()
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             modifier =
@@ -349,13 +352,13 @@ private fun FeedContent(
             state = listState,
         ) {
             items(
-                count = posts.itemCount,
-                key = { index -> "${index}_${posts[index]?.uri?.atUri}" },
-                contentType = posts.itemContentType(),
+                count = feedData.itemCount,
+                key = { index -> "${index}_${feedData[index]?.uri?.atUri}" },
+                contentType = feedData.itemContentType(),
             ) { item ->
-                posts[item]?.let {
+                feedData[item]?.let { post ->
                     FeedItem(
-                        post = it,
+                        post = post,
                         onPostClick = { postId ->
                             navController.navigate(
                                 NavigationRoutes.Authenticated.PostView.createRoute(postId.encodeURLParameter()),
@@ -367,7 +370,7 @@ private fun FeedContent(
                             )
                         },
                         onRepostClick = {},
-                        onLikeClick = {},
+                        onLikeClick = { onLikeClick(it) },
                         onMenuClick = {},
                         onMediaOpen = { onMediaOpen(it) },
                     )

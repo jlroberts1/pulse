@@ -18,7 +18,10 @@ import com.atproto.repo.CreateRecordResponse
 import com.atproto.repo.UploadBlobResponse
 import com.contexts.pulse.data.network.api.UploadParams
 import com.contexts.pulse.data.network.client.Response
+import com.contexts.pulse.domain.model.CreateLikeRecordRequest
+import com.contexts.pulse.domain.model.CreateLikeRecordResponse
 import com.contexts.pulse.domain.model.CreateRecord
+import com.contexts.pulse.domain.model.UnlikeRecordRequest
 import com.contexts.pulse.exceptions.NetworkError
 import sh.christian.ozone.api.AtUri
 
@@ -40,4 +43,8 @@ interface PostRepository {
     suspend fun getVideoProcessingStatus(getJobStatusQueryParams: GetJobStatusQueryParams): Response<GetJobStatusResponse, NetworkError>
 
     suspend fun getPosts(uris: List<AtUri>): Response<GetPostsResponse, NetworkError>
+
+    suspend fun likePost(createLikeRecordRequest: CreateLikeRecordRequest): Response<CreateLikeRecordResponse, NetworkError>
+
+    suspend fun unlikePost(unlikeRecordRequest: UnlikeRecordRequest): Response<Unit, NetworkError>
 }

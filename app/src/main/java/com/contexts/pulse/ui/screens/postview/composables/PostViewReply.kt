@@ -36,7 +36,7 @@ fun PostViewReply(
     onPostClick: (String) -> Unit,
     onReplyClick: (String) -> Unit,
     onRepostClick: () -> Unit,
-    onLikeClick: () -> Unit,
+    onLikeClick: (TimelinePost) -> Unit,
     onMenuClick: () -> Unit,
     playerPoolManager: PlayerPoolManager = koinInject(),
     onMediaOpen: (String) -> Unit,
@@ -105,6 +105,7 @@ fun PostViewReply(
                 repostCount = post.repostCount,
                 likeCount = post.likeCount,
                 liked = post.liked,
+                onLikeClick = { onLikeClick(post) },
                 reposted = post.reposted,
             )
         }

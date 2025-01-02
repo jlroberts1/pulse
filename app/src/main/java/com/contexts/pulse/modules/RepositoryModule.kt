@@ -11,9 +11,11 @@ package com.contexts.pulse.modules
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import com.contexts.pulse.data.local.database.PulseDatabase
 import com.contexts.pulse.data.local.database.dao.FeedDao
 import com.contexts.pulse.data.local.database.dao.PendingUploadDao
 import com.contexts.pulse.data.local.database.dao.ProfileDao
+import com.contexts.pulse.data.local.database.dao.RemoteKeysDao
 import com.contexts.pulse.data.local.database.dao.UserDao
 import com.contexts.pulse.data.network.api.AuthenticateAPI
 import com.contexts.pulse.data.network.api.ChatAPI
@@ -78,6 +80,8 @@ val repositoryModule =
                 get<HttpClient>(),
                 get<FeedAPI>(),
                 get<FeedDao>(),
+                get<RemoteKeysDao>(),
+                get<PulseDatabase>(),
                 get<ProfileAPI>(),
             )
         }

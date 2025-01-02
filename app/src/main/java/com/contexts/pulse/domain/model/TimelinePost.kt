@@ -13,10 +13,12 @@ import app.bsky.feed.FeedViewPost
 import app.bsky.feed.Post
 import app.bsky.feed.PostView
 import com.contexts.pulse.utils.deserialize
+import kotlinx.serialization.Serializable
 import sh.christian.ozone.api.AtUri
 import sh.christian.ozone.api.Cid
 import sh.christian.ozone.api.model.Timestamp
 
+@Serializable
 data class TimelinePost(
     val uri: AtUri,
     val cid: Cid,
@@ -29,8 +31,10 @@ data class TimelinePost(
     val repostCount: Long,
     val likeCount: Long,
     val indexedAt: Timestamp,
-    val reposted: Boolean,
-    val liked: Boolean,
+    val reposted: Boolean = false,
+    val liked: Boolean = false,
+    val repostedUri: AtUri?,
+    val likedUri: AtUri?,
     val labels: List<Label>,
     val reply: TimelinePostReply?,
     val reason: TimelinePostReason?,
@@ -71,6 +75,8 @@ fun PostView.toPost(
         indexedAt = indexedAt,
         reposted = viewer?.repost != null,
         liked = viewer?.like != null,
+        repostedUri = viewer?.repost,
+        likedUri = viewer?.like,
         labels = labels.map { it.toLabel() },
         reply = reply,
         reason = reason,

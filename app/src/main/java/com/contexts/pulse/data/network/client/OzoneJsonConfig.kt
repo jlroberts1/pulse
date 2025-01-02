@@ -9,12 +9,16 @@
 
 package com.contexts.pulse.data.network.client
 
+import com.contexts.pulse.domain.model.FullProfile
 import com.contexts.pulse.domain.model.ImageEmbed
+import com.contexts.pulse.domain.model.LiteProfile
 import com.contexts.pulse.domain.model.PostEmbed
+import com.contexts.pulse.domain.model.Profile
 import com.contexts.pulse.domain.model.VideoEmbed
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
+import kotlinx.serialization.modules.subclass
 import sh.christian.ozone.api.xrpc.XrpcSerializersModule
 
 object OzoneJsonConfig {
@@ -30,6 +34,10 @@ object OzoneJsonConfig {
                     polymorphic(PostEmbed::class) {
                         subclass(ImageEmbed::class, ImageEmbed.serializer())
                         subclass(VideoEmbed::class, VideoEmbed.serializer())
+                    }
+                    polymorphic(Profile::class) {
+                        subclass(LiteProfile::class, LiteProfile.serializer())
+                        subclass(FullProfile::class, FullProfile.serializer())
                     }
                 }
         }

@@ -41,7 +41,7 @@ fun PostViewItem(
     onPostClick: (String) -> Unit,
     onReplyClick: (String) -> Unit,
     onRepostClick: () -> Unit,
-    onLikeClick: () -> Unit,
+    onLikeClick: (TimelinePost) -> Unit,
     onMenuClick: () -> Unit,
     onMediaOpen: (String) -> Unit,
 ) {
@@ -120,6 +120,7 @@ fun PostViewItem(
                     repostCount = post.repostCount,
                     likeCount = post.likeCount,
                     liked = post.liked,
+                    onLikeClick = { onLikeClick(post) },
                     reposted = post.reposted,
                 )
             }

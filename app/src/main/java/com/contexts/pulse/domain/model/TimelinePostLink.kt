@@ -11,35 +11,42 @@ package com.contexts.pulse.domain.model
 
 import app.bsky.richtext.Facet
 import app.bsky.richtext.FacetFeatureUnion
+import kotlinx.serialization.Serializable
 import sh.christian.ozone.api.Did
 import sh.christian.ozone.api.Handle
 import sh.christian.ozone.api.Uri
 
+@Serializable
 data class TimelinePostLink(
     val start: Int,
     val end: Int,
     val target: LinkTarget,
 )
 
+@Serializable
 sealed interface LinkTarget {
+    @Serializable
     data class UserHandleMention(
         val handle: Handle,
     ) : LinkTarget
 
+    @Serializable
     data class UserDidMention(
         val did: Did,
     ) : LinkTarget
 
+    @Serializable
     data class ExternalLink(
         val uri: Uri,
     ) : LinkTarget
 
+    @Serializable
     data class Hashtag(
         val tag: String,
     ) : LinkTarget
 }
 
-fun Facet.toLinkOrNull(): TimelinePostLink? {
+fun Facet.toLinkOrNull(): TimelinePostLink {
     return TimelinePostLink(
         start = index.byteStart.toInt(),
         end = index.byteEnd.toInt(),

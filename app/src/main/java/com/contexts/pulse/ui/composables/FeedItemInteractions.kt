@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.contexts.pulse.extensions.toKFormat
 
@@ -43,7 +44,7 @@ fun FeedItemInteractions(
     likeCount: Long? = 0,
     liked: Boolean,
     reposted: Boolean,
-    onLikeClick: () -> Unit = {},
+    onLikeClick: () -> Unit,
     onMenuClick: () -> Unit = {},
 ) {
     Row(
@@ -90,7 +91,7 @@ fun FeedItemInteractions(
                         modifier = Modifier.size(16.dp),
                         imageVector = Icons.Filled.Repeat,
                         contentDescription = "Reposted",
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = Color.Green,
                     )
                 } else {
                     Icon(
@@ -125,7 +126,7 @@ fun FeedItemInteractions(
                         modifier = Modifier.size(16.dp),
                         imageVector = Icons.Filled.Favorite,
                         contentDescription = "Liked",
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = Color.Red,
                     )
                 } else {
                     Icon(

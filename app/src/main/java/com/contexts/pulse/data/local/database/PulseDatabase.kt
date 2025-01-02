@@ -16,12 +16,15 @@ import com.contexts.pulse.data.local.database.converters.Converters
 import com.contexts.pulse.data.local.database.dao.FeedDao
 import com.contexts.pulse.data.local.database.dao.PendingUploadDao
 import com.contexts.pulse.data.local.database.dao.ProfileDao
+import com.contexts.pulse.data.local.database.dao.RemoteKeysDao
 import com.contexts.pulse.data.local.database.dao.UserDao
 import com.contexts.pulse.data.local.database.entities.FeedEntity
 import com.contexts.pulse.data.local.database.entities.PendingExternalEmbed
 import com.contexts.pulse.data.local.database.entities.PendingMediaAttachment
 import com.contexts.pulse.data.local.database.entities.PendingUploadEntity
 import com.contexts.pulse.data.local.database.entities.ProfileEntity
+import com.contexts.pulse.data.local.database.entities.RemoteKeysEntity
+import com.contexts.pulse.data.local.database.entities.TimelinePostEntity
 import com.contexts.pulse.data.local.database.entities.UserEntity
 
 @Database(
@@ -32,6 +35,8 @@ import com.contexts.pulse.data.local.database.entities.UserEntity
         PendingUploadEntity::class,
         PendingMediaAttachment::class,
         PendingExternalEmbed::class,
+        RemoteKeysEntity::class,
+        TimelinePostEntity::class,
     ],
     version = 1,
 )
@@ -44,4 +49,6 @@ abstract class PulseDatabase : RoomDatabase() {
     abstract fun profileDao(): ProfileDao
 
     abstract fun pendingUploadDao(): PendingUploadDao
+
+    abstract fun remoteKeysDao(): RemoteKeysDao
 }

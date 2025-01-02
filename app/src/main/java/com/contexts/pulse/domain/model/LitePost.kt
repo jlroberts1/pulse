@@ -10,8 +10,10 @@
 package com.contexts.pulse.domain.model
 
 import app.bsky.feed.Post
+import kotlinx.serialization.Serializable
 import sh.christian.ozone.api.model.Timestamp
 
+@Serializable
 data class LitePost(
     val text: String,
     val links: List<TimelinePostLink>,
