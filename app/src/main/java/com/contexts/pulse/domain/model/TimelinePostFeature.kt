@@ -9,7 +9,6 @@
 
 package com.contexts.pulse.domain.model
 
-import app.bsky.embed.AspectRatio
 import app.bsky.embed.ExternalView
 import app.bsky.embed.ImagesView
 import app.bsky.embed.RecordViewRecordUnion
@@ -19,8 +18,6 @@ import app.bsky.feed.Post
 import app.bsky.feed.PostViewEmbedUnion
 import com.contexts.pulse.utils.deserialize
 import kotlinx.serialization.Serializable
-import sh.christian.ozone.api.AtUri
-import sh.christian.ozone.api.Cid
 import sh.christian.ozone.api.Uri
 
 @Serializable
@@ -53,55 +50,6 @@ sealed interface TimelinePostFeature {
         val post: EmbedPost,
         val media: TimelinePostMedia,
     ) : TimelinePostFeature
-}
-
-@Serializable
-sealed interface TimelinePostMedia
-
-@Serializable
-data class EmbedImage(
-    val thumb: String,
-    val fullsize: String,
-    val aspectRatio: AspectRatio?,
-    val alt: String,
-)
-
-@Serializable
-data class EmbedVideo(
-    val thumb: String?,
-    val playlist: String,
-    val aspectRatio: AspectRatio?,
-)
-
-@Serializable
-sealed interface EmbedPost {
-    @Serializable
-    data class VisibleEmbedPost(
-        val uri: AtUri,
-        val cid: Cid,
-        val author: Profile,
-        val post: LitePost,
-    ) : EmbedPost {
-        val reference: Reference = Reference(uri, cid)
-    }
-
-    @Serializable
-    data class FeedGeneratorEmbed(
-        val displayName: String,
-        val avatar: String?,
-        val creator: Profile,
-        val likeCount: Long?,
-    ) : EmbedPost
-
-    @Serializable
-    data class InvisibleEmbedPost(
-        val uri: AtUri,
-    ) : EmbedPost
-
-    @Serializable
-    data class BlockedEmbedPost(
-        val uri: AtUri,
-    ) : EmbedPost
 }
 
 fun PostViewEmbedUnion.toFeature(): TimelinePostFeature {

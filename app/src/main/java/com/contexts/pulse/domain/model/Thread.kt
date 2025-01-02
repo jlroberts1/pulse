@@ -25,9 +25,9 @@ sealed interface ThreadPost {
         val replies: List<ThreadPost>,
     ) : ThreadPost
 
-    object NotFoundPost : ThreadPost
+    data object NotFoundPost : ThreadPost
 
-    object BlockedPost : ThreadPost
+    data object BlockedPost : ThreadPost
 }
 
 fun ThreadViewPost.toThread(): Thread {

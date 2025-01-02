@@ -38,7 +38,6 @@ class AuthInterceptor(
                 .build()
 
         var response = chain.proceed(initialRequest)
-
         if (response.code == 400) {
             val responseBody = response.body?.string()
             if (responseBody?.contains("ExpiredToken") == true) {

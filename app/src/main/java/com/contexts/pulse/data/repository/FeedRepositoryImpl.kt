@@ -81,27 +81,6 @@ class FeedRepositoryImpl(
         ).flow.flowOn(appDispatchers.io)
     }
 
-    override fun getFeed(feedUri: String): Flow<PagingData<TimelinePost>> {
-        val request = PagedRequest.GetFeed(feedUri)
-        return Pager(
-            config =
-                PagingConfig(
-                    pageSize = request.limit,
-                    enablePlaceholders = false,
-                ),
-            pagingSourceFactory = {
-                NetworkPagingSource<TimelinePost, GetFeedResponse>(
-                    appDispatchers = appDispatchers,
-                    client = client,
-                    request = request,
-                    typeInfo<GetFeedResponse>(),
-                    getItems = { it.feed.map { it.toPost() } },
-                    getCursor = { it.cursor },
-                )
-            },
-        ).flow.flowOn(appDispatchers.io)
-    }
-
     override suspend fun refreshFeeds(did: String): Unit =
         withContext(appDispatchers.io) {
             profileAPI.getPreferences().onSuccess { response ->

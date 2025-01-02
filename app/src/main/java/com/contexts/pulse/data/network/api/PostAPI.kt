@@ -14,10 +14,10 @@ import app.bsky.feed.GetPostsResponse
 import com.atproto.repo.CreateRecordResponse
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.network.client.safeRequest
-import com.contexts.pulse.domain.model.CreateLikeRecordRequest
-import com.contexts.pulse.domain.model.CreateLikeRecordResponse
+import com.contexts.pulse.data.network.request.CreateLikeRecordRequest
+import com.contexts.pulse.data.network.request.UnlikeRecordRequest
+import com.contexts.pulse.data.network.response.CreateLikeRecordResponse
 import com.contexts.pulse.domain.model.CreateRecord
-import com.contexts.pulse.domain.model.UnlikeRecordRequest
 import com.contexts.pulse.exceptions.NetworkError
 import io.ktor.client.HttpClient
 import io.ktor.client.request.parameter

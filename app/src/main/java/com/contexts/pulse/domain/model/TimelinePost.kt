@@ -66,7 +66,7 @@ fun PostView.toPost(
         cid = cid,
         author = author.toProfile(),
         text = postRecord.text,
-        textLinks = postRecord.facets.mapNotNull { it.toLinkOrNull() },
+        textLinks = postRecord.facets.map { it.toLinkOrNull() },
         createdAt = postRecord.createdAt,
         feature = embed?.toFeature(),
         replyCount = replyCount ?: 0,

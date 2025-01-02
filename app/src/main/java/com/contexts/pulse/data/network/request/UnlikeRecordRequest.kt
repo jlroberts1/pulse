@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024. James Roberts
+ * Copyright (c) 2025. James Roberts
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -7,19 +7,13 @@
  * (at your option) any later version.
  */
 
-package com.contexts.pulse.domain.model
+package com.contexts.pulse.data.network.request
 
-import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LikeSubject(
-    val uri: String,
-    val cid: String,
-)
-
-@Serializable
-data class LikeRecord(
-    val subject: LikeSubject,
-    val createdAt: String = Clock.System.now().toString(),
+data class UnlikeRecordRequest(
+    val repo: String,
+    val collection: String,
+    val rkey: String,
 )

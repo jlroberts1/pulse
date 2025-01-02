@@ -41,14 +41,6 @@ sealed class PagedRequest {
         override val parameters: Map<String, String> = mapOf("actor" to actorId)
     }
 
-    data class GetFeed(
-        val feedUri: String,
-        override val url: String = "xrpc/app.bsky.feed.getFeed",
-        override val limit: Int = 15,
-    ) : PagedRequest() {
-        override val parameters: Map<String, String> = mapOf("feed" to feedUri)
-    }
-
     data class SuggestedFeed(
         override val url: String = "xrpc/app.bsky.feed.getSuggestedFeeds",
         override val limit: Int = 15,

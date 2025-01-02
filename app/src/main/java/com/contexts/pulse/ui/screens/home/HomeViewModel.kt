@@ -15,11 +15,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.contexts.pulse.data.network.client.onSuccess
-import com.contexts.pulse.domain.model.CreateLikeRecordRequest
+import com.contexts.pulse.data.network.request.CreateLikeRecordRequest
+import com.contexts.pulse.data.network.request.UnlikeRecordRequest
 import com.contexts.pulse.domain.model.LikeRecord
 import com.contexts.pulse.domain.model.LikeSubject
 import com.contexts.pulse.domain.model.TimelinePost
-import com.contexts.pulse.domain.model.UnlikeRecordRequest
 import com.contexts.pulse.domain.repository.FeedRepository
 import com.contexts.pulse.domain.repository.PostRepository
 import com.contexts.pulse.domain.repository.PreferencesRepository

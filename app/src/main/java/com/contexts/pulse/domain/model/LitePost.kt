@@ -23,7 +23,7 @@ data class LitePost(
 fun Post.toLitePost(): LitePost {
     return LitePost(
         text = text,
-        links = facets.mapNotNull { it.toLinkOrNull() },
+        links = facets.map { it.toLinkOrNull() },
         createdAt = createdAt,
     )
 }

@@ -9,25 +9,32 @@
 
 package com.contexts.pulse.domain.model
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class TenorGif(
     val id: String,
     val title: String,
-    val media_formats: MediaFormats,
-    val content_description: String,
-    val itemurl: String,
+    @SerialName("media_formats")
+    val mediaFormats: MediaFormats,
+    @SerialName("content_description")
+    val contentDescription: String,
+    @SerialName("itemurl")
+    val itemUrl: String,
     val url: String,
     val tags: List<String>,
-    val hasaudio: Boolean,
+    @SerialName("hasaudio")
+    val hasAudio: Boolean,
 )
 
 @Serializable
 data class MediaFormats(
     val gif: MediaFormat?,
-    val mediumgif: MediaFormat?,
-    val tinygif: MediaFormat?,
+    @SerialName("mediumgif")
+    val mediumGif: MediaFormat?,
+    @SerialName("tinygif")
+    val tinyGif: MediaFormat?,
     val mp4: MediaFormat?,
     val webp: MediaFormat?,
 )
@@ -41,12 +48,12 @@ data class MediaFormat(
 )
 
 fun TenorGif.getBestFormat(): String {
-    return media_formats.run {
-        mediumgif?.url
+    return mediaFormats.run {
+        mediumGif?.url
             ?: gif?.url
             ?: mp4?.url
             ?: webp?.url
-            ?: tinygif?.url
+            ?: tinyGif?.url
             ?: ""
     }
 }

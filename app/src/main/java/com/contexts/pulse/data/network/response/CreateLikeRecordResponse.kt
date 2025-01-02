@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024. James Roberts
+ * Copyright (c) 2025. James Roberts
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -9,6 +9,10 @@
 
 package com.contexts.pulse.data.network.response
 
-data class GenericResponse(
-    val status: String? = null,
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class CreateLikeRecordResponse(
+    val uri: String,
+    val cid: String,
 )
