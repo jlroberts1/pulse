@@ -30,7 +30,9 @@ import kotlinx.coroutines.launch
 fun TopBar(
     navController: NavController,
     title: String,
-    actions: @Composable () -> Unit,
+    actions:
+        @Composable()
+        (() -> Unit?)? = null,
     scrollBehavior: TopAppBarScrollBehavior,
     drawerState: DrawerState,
 ) {
@@ -40,13 +42,23 @@ fun TopBar(
             TopAppBarDefaults.topAppBarColors(),
         scrollBehavior = scrollBehavior,
         title = { Text(title) },
-        actions = { actions() },
+        actions = {
+            if (actions != null) {
+                actions()
+            }
+        },
         navigationIcon = {
             val topLevelRoutes = TopDestinations.entries.map { it.route }
             if (navController.previousBackStackEntry != null &&
                 !topLevelRoutes.contains(navController.currentDestination?.route)
             ) {
-                IconButton(onClick = { navController.navigateUp() }) {
+                IconButton(onClick = {
+                    scope.launch {
+                        if (!navController.popBackStack()) {
+                            navController.navigateUp()
+                        }
+                    }
+                }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",

@@ -37,6 +37,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -70,29 +71,31 @@ fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
             is LoadState.NotLoading -> logcat("Search") { "Loaded: ${suggestedAccounts.itemCount} items" }
         }
     }
-    Column(modifier = Modifier.fillMaxSize()) {
-        SearchBox(
-            query = "",
-            onQueryChange = {},
-            onSearch = { },
-        )
-        LazyColumn {
-            item { SuggestedAccountHeader() }
-            item { SuggestedAccountCarousel(pagingItems = suggestedAccounts) }
-            item { SuggestedFeedHeader() }
-            items(
-                count = suggestedFeeds.itemCount,
-                key = suggestedFeeds.itemKey { it.uri.atUri },
-                contentType = suggestedAccounts.itemContentType(),
-            ) { index ->
-                suggestedFeeds[index]?.let {
-                    SuggestedFeedItem(
-                        it.avatar?.uri,
-                        it.displayName,
-                        it.creator.handle.handle,
-                        it.description,
-                        it.likeCount,
-                    )
+    Scaffold { padding ->
+        Column(modifier = Modifier.padding(padding).fillMaxSize()) {
+            SearchBox(
+                query = "",
+                onQueryChange = {},
+                onSearch = { },
+            )
+            LazyColumn {
+                item { SuggestedAccountHeader() }
+                item { SuggestedAccountCarousel(pagingItems = suggestedAccounts) }
+                item { SuggestedFeedHeader() }
+                items(
+                    count = suggestedFeeds.itemCount,
+                    key = suggestedFeeds.itemKey { it.uri.atUri },
+                    contentType = suggestedAccounts.itemContentType(),
+                ) { index ->
+                    suggestedFeeds[index]?.let {
+                        SuggestedFeedItem(
+                            it.avatar?.uri,
+                            it.displayName,
+                            it.creator.handle.handle,
+                            it.description,
+                            it.likeCount,
+                        )
+                    }
                 }
             }
         }

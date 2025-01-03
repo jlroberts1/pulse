@@ -20,6 +20,7 @@ import sh.christian.ozone.api.model.Timestamp
 
 @Serializable
 data class TimelinePost(
+    val id: Long = 0,
     val uri: AtUri,
     val cid: Cid,
     val author: Profile,

@@ -40,7 +40,7 @@ import sh.christian.ozone.api.Cid
 )
 data class TimelinePostEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Long? = null,
+    val id: Long = 0,
     val feedId: String,
     val uri: String,
     val cid: String,
@@ -65,6 +65,7 @@ data class TimelinePostEntity(
 
 fun TimelinePostEntity.toPost(): TimelinePost {
     return TimelinePost(
+        id = id,
         uri = AtUri(uri),
         cid = Cid(cid),
         author = author,

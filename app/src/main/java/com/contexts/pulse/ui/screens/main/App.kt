@@ -67,8 +67,8 @@ fun App(viewModel: AppViewModel = koinViewModel()) {
                 navController = navController,
                 unreadNotificationCount = unreadNotificationCount,
                 mediaState = mediaState,
-                drawerState = drawerState,
                 snackbarHostState = snackbarHostState,
+                drawerState = drawerState,
             )
         }
     }

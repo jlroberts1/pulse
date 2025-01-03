@@ -31,11 +31,14 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DragIndicator
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Tab
@@ -60,11 +63,13 @@ import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.contexts.pulse.data.local.database.entities.FeedEntity
 import com.contexts.pulse.domain.model.TimelinePost
 import com.contexts.pulse.ui.composables.FeedItem
 import com.contexts.pulse.ui.composables.PullToRefreshBox
+import com.contexts.pulse.ui.composables.ScaffoldedScreen
 import com.contexts.pulse.ui.screens.main.NavigationRoutes
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -72,15 +77,21 @@ import com.google.accompanist.permissions.rememberPermissionState
 import io.ktor.http.encodeURLParameter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import logcat.logcat
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
     navController: NavController,
     onMediaOpen: (String) -> Unit,
+    drawerState: DrawerState,
 ) {
+    logcat("Navigation") { "Feed composing" }
+    val scope = rememberCoroutineScope()
+    var showFeedConfig by remember { mutableStateOf(false) }
+    val availableFeeds by viewModel.allFeedsFlow.collectAsStateWithLifecycle()
     val visibleFeeds by viewModel.visibleFeeds.collectAsStateWithLifecycle()
     val feedStates by viewModel.feedStates.collectAsStateWithLifecycle()
     val adaptiveInfo = currentWindowAdaptiveInfo()
@@ -110,55 +121,74 @@ fun HomeScreen(
             }
         }
     }
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        if (isExpandedScreen) {
-            if (feedStates.isEmpty()) return
-            ScrollableTabRow(
-                selectedTabIndex = -1,
-                modifier = Modifier.fillMaxWidth(),
-                indicator = @Composable { _ -> },
-                divider = @Composable { },
+    ScaffoldedScreen(
+        navController = navController,
+        title = "Home",
+        drawerState = drawerState,
+        actions = {
+            IconButton(
+                onClick = {
+                    scope.launch {
+                        showFeedConfig = true
+                    }
+                },
             ) {
-                visibleFeeds.forEach { feedType ->
-                    Tab(
-                        selected = true,
-                        onClick = { },
-                        text = { Text(feedType.displayName) },
-                        modifier = Modifier.weight(1f),
-                    )
-                }
+                Icon(Icons.Default.Settings, "Feed settings")
             }
-            TabletRow(
-                navController = navController,
-                feeds = visibleFeeds,
-                feedStates = feedStates,
-                onMediaOpen = { onMediaOpen(it) },
-                onLikeClick = { viewModel.onLikeClicked(it.first) },
-            )
-        } else {
-            TabPagerFeeds(
-                navController = navController,
-                feeds = visibleFeeds,
-                feedStates = feedStates,
-                onMediaOpen = { onMediaOpen(it) },
-                onLikeClick = { viewModel.onLikeClicked(it.first) },
-            )
-        }
+        },
+    ) { padding ->
+        Column(
+            modifier =
+                Modifier
+                    .padding(padding)
+                    .fillMaxSize(),
+        ) {
+            if (isExpandedScreen) {
+                if (feedStates.isEmpty()) return@Column
+                ScrollableTabRow(
+                    selectedTabIndex = -1,
+                    modifier = Modifier.fillMaxWidth(),
+                    indicator = @Composable { _ -> },
+                    divider = @Composable { },
+                ) {
+                    visibleFeeds.forEach { feedType ->
+                        Tab(
+                            selected = true,
+                            onClick = { },
+                            text = { Text(feedType.displayName) },
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                }
+                TabletRow(
+                    navController = navController,
+                    feeds = visibleFeeds,
+                    feedStates = feedStates,
+                    onMediaOpen = { onMediaOpen(it) },
+                    onLikeClick = { viewModel.onLikeClicked(it.first) },
+                )
+            } else {
+                TabPagerFeeds(
+                    navController = navController,
+                    feeds = visibleFeeds,
+                    feedStates = feedStates,
+                    onMediaOpen = { onMediaOpen(it) },
+                    onLikeClick = { viewModel.onLikeClicked(it.first) },
+                )
+            }
 
-//        if (showFeedConfig) {
-//            FeedConfigurationDialog(
-//                visibleFeeds = visibleFeeds,
-//                availableFeeds = availableFeeds,
-//                onDismiss = { onDismissFeedConfig() },
-//                onSaveConfiguration = { newVisibleFeeds ->
-//                    //viewModel.updateVisibleFeeds(newVisibleFeeds)
-//                    onDismissFeedConfig()
-//                }
-//            )
-//        }
+            if (showFeedConfig) {
+                FeedConfigurationDialog(
+                    visibleFeeds = visibleFeeds,
+                    availableFeeds = availableFeeds,
+                    onDismiss = { showFeedConfig = false },
+                    onSaveConfiguration = { newVisibleFeeds ->
+                        // viewModel.updateVisibleFeeds(newVisibleFeeds)
+                        showFeedConfig = false
+                    },
+                )
+            }
+        }
     }
 }
 
@@ -353,7 +383,7 @@ private fun FeedContent(
         ) {
             items(
                 count = feedData.itemCount,
-                key = { index -> "${index}_${feedData[index]?.uri?.atUri}" },
+                key = { feedData.itemKey { it.id } },
                 contentType = feedData.itemContentType(),
             ) { item ->
                 feedData[item]?.let { post ->

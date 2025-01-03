@@ -45,7 +45,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -87,12 +86,6 @@ fun NavigationScaffold(
             navController.currentBackStackEntryAsState().value?.destination?.route
                 ?: TopDestinations.HOME.route,
         )
-    val topAppBarScrollBehavior =
-        if (isExpandedScreen) {
-            TopAppBarDefaults.pinnedScrollBehavior()
-        } else {
-            TopAppBarDefaults.enterAlwaysScrollBehavior()
-        }
     val nestedScrollConnection =
         remember {
             object : NestedScrollConnection {
@@ -111,11 +104,13 @@ fun NavigationScaffold(
         }
     val onNavigate = { destination: TopDestinations ->
         navController.navigate(destination.route) {
+            // Only save state for top-level destinations
             popUpTo(navController.graph.findStartDestination().id) {
-                saveState = true
+                saveState = destination.route in TopDestinations.entries.map { it.route }
             }
             launchSingleTop = true
-            restoreState = true
+            // Only restore state for top-level destinations
+            restoreState = destination.route in TopDestinations.entries.map { it.route }
         }
     }
 
@@ -131,19 +126,7 @@ fun NavigationScaffold(
     Scaffold(
         modifier =
             modifier
-                .nestedScroll(nestedScrollConnection)
-                .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
-        topBar = {
-            if (routeUiState.showTopAppBar && mediaState.url == null) {
-                TopBar(
-                    navController = navController,
-                    title = routeUiState.topAppBarTitle,
-                    scrollBehavior = topAppBarScrollBehavior,
-                    actions = routeUiState.topBarActions,
-                    drawerState = drawerState,
-                )
-            }
-        },
+                .nestedScroll(nestedScrollConnection),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             AnimatedVisibility(
@@ -211,8 +194,6 @@ fun NavigationScaffold(
     ) { innerPadding ->
         val newPadding =
             PaddingValues(
-                top = innerPadding.calculateTopPadding(),
-                bottom = 0.dp,
                 start = innerPadding.calculateStartPadding(LocalLayoutDirection.current),
                 end = innerPadding.calculateEndPadding(LocalLayoutDirection.current),
             )
@@ -273,6 +254,7 @@ fun NavigationScaffold(
                     RootNav(
                         navController,
                         onMediaOpen = { viewModel.onMediaOpen(it) },
+                        drawerState = drawerState,
                     )
                 }
             }

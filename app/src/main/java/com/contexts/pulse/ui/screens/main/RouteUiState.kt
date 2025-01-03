@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 data class RouteUiState(
     val topAppBarTitle: String = "Pulse",
-    val topBarActions: @Composable () -> Unit = {},
+    val topBarActions: @Composable ((RouteAction) -> Unit) -> Unit? = {},
     val fabIcon: ImageVector = Icons.Sharp.Add,
     val fabDesc: String? = "Add new post",
     val fabAction: () -> Unit = {},
@@ -24,3 +24,7 @@ data class RouteUiState(
     val showFab: Boolean = false,
     val showBottomBar: Boolean = false,
 )
+
+sealed interface RouteAction {
+    data object FeedConfig : RouteAction
+}

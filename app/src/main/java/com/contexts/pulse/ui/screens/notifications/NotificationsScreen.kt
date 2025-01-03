@@ -12,10 +12,12 @@ package com.contexts.pulse.ui.screens.notifications
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,36 +25,49 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.contexts.pulse.ui.composables.PullToRefreshBox
+import com.contexts.pulse.ui.composables.ScaffoldedScreen
 import com.contexts.pulse.ui.screens.notifications.composables.NotificationItem
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationsScreen(viewModel: NotificationViewModel = koinViewModel()) {
+fun NotificationsScreen(
+    viewModel: NotificationViewModel = koinViewModel(),
+    navController: NavController,
+    drawerState: DrawerState,
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
-    PullToRefreshBox(
-        isRefreshing = uiState.loading,
-        onRefresh = { viewModel.refreshNotifications() },
-    ) {
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
+    ScaffoldedScreen(
+        navController = navController,
+        title = "Notifications",
+        drawerState = drawerState,
+    ) { padding ->
+        PullToRefreshBox(
+            modifier = Modifier.padding(padding),
+            isRefreshing = uiState.loading,
+            onRefresh = { viewModel.refreshNotifications() },
         ) {
-            LazyColumn(
-                state = listState,
+            Column(
                 modifier =
                     Modifier
-                        .widthIn(max = 840.dp)
-                        .fillMaxSize()
-                        .weight(1f, fill = false),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+                        .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                items(uiState.notifications, key = { it.uri.atUri }) { notification ->
-                    NotificationItem(notification)
+                LazyColumn(
+                    state = listState,
+                    modifier =
+                        Modifier
+                            .widthIn(max = 840.dp)
+                            .fillMaxSize()
+                            .weight(1f, fill = false),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    items(uiState.notifications, key = { it.uri.atUri }) { notification ->
+                        NotificationItem(notification)
+                    }
                 }
             }
         }

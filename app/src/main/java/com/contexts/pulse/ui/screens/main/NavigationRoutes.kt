@@ -9,6 +9,11 @@
 
 package com.contexts.pulse.ui.screens.main
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.material3.DrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
@@ -33,6 +38,7 @@ import com.contexts.pulse.ui.screens.settings.SettingsScreen
 fun RootNav(
     navController: NavHostController,
     onMediaOpen: (String) -> Unit,
+    drawerState: DrawerState,
     modifier: Modifier = Modifier,
 ) {
     NavHost(
@@ -40,7 +46,7 @@ fun RootNav(
         startDestination = NavigationRoutes.Authenticated.NavigationRoute.route,
         modifier = modifier,
     ) {
-        authenticatedGraph(navController, onMediaOpen)
+        authenticatedGraph(navController, onMediaOpen, drawerState)
         unauthenticatedGraph(navController)
     }
 }
@@ -101,33 +107,72 @@ fun NavGraphBuilder.unauthenticatedGraph(navController: NavController) {
 fun NavGraphBuilder.authenticatedGraph(
     navController: NavController,
     onMediaOpen: (String) -> Unit,
+    drawerState: DrawerState,
 ) {
     navigation(
         route = NavigationRoutes.Authenticated.NavigationRoute.route,
         startDestination = NavigationRoutes.Authenticated.Home.route,
     ) {
-        composable(route = NavigationRoutes.Authenticated.Home.route) {
+        val topLevelTransitionSpec = tween<Float>(300)
+
+        composable(
+            route = NavigationRoutes.Authenticated.Home.route,
+            enterTransition = { fadeIn(topLevelTransitionSpec) },
+            exitTransition = { fadeOut(topLevelTransitionSpec) },
+        ) {
             HomeScreen(
                 navController = navController,
                 onMediaOpen = { onMediaOpen(it) },
+                drawerState = drawerState,
             )
         }
-        composable(route = NavigationRoutes.Authenticated.Search.route) {
-            SearchScreen()
+        composable(
+            route = NavigationRoutes.Authenticated.Search.route,
+            enterTransition = { fadeIn(topLevelTransitionSpec) },
+            exitTransition = { fadeOut(topLevelTransitionSpec) },
+        ) { SearchScreen() }
+        composable(
+            route = NavigationRoutes.Authenticated.Chat.route,
+            enterTransition = { fadeIn(topLevelTransitionSpec) },
+            exitTransition = { fadeOut(topLevelTransitionSpec) },
+        ) {
+            ChatScreen(navController = navController, drawerState = drawerState)
         }
-        composable(route = NavigationRoutes.Authenticated.Chat.route) {
-            ChatScreen()
+        composable(
+            route = NavigationRoutes.Authenticated.Notifications.route,
+            enterTransition = { fadeIn(topLevelTransitionSpec) },
+            exitTransition = { fadeOut(topLevelTransitionSpec) },
+        ) {
+            NotificationsScreen(navController = navController, drawerState = drawerState)
         }
-        composable(route = NavigationRoutes.Authenticated.Notifications.route) {
-            NotificationsScreen()
-        }
-        composable(route = NavigationRoutes.Authenticated.Profile.route) {
+        composable(
+            route = NavigationRoutes.Authenticated.Profile.route,
+            enterTransition = { fadeIn(topLevelTransitionSpec) },
+            exitTransition = { fadeOut(topLevelTransitionSpec) },
+        ) {
             ProfileScreen(
                 onMediaOpen = { onMediaOpen(it) },
             )
         }
-        composable(route = NavigationRoutes.Authenticated.Settings.route) {
-            SettingsScreen()
+        composable(
+            route = NavigationRoutes.Authenticated.Settings.route,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(300),
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(300),
+                )
+            },
+        ) {
+            SettingsScreen(
+                navController = navController,
+                drawerState = drawerState,
+            )
         }
         composable(
             route = NavigationRoutes.Authenticated.AddPost.route,
@@ -138,10 +183,25 @@ fun NavGraphBuilder.authenticatedGraph(
                         nullable = true
                     },
                 ),
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(300),
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(300),
+                )
+            },
         ) { backStackEntry ->
-            val replyPost = backStackEntry.arguments?.getString(NavigationRoutes.Authenticated.AddPost.ARG_REPLY_POST)
+            val replyPost =
+                backStackEntry.arguments?.getString(NavigationRoutes.Authenticated.AddPost.ARG_REPLY_POST)
             AddPostScreen(
                 replyPost = replyPost,
+                navController = navController,
+                drawerState = drawerState,
                 onPostSent = { navController.navigateUp() },
             )
         }
@@ -153,12 +213,28 @@ fun NavGraphBuilder.authenticatedGraph(
                         type = NavType.StringType
                     },
                 ),
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(300),
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(300),
+                )
+            },
         ) { backStackEntry ->
             val postId =
                 backStackEntry.arguments?.getString(NavigationRoutes.Authenticated.PostView.ARG_POST_ID)
                     ?: return@composable
 
-            PostViewScreen(postId = postId)
+            PostViewScreen(
+                postId = postId,
+                navController = navController,
+                drawerState = drawerState,
+            )
         }
     }
 }

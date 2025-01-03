@@ -46,7 +46,7 @@ class HomeViewModel(
     userRepository: UserRepository,
 ) : ViewModel() {
     private val currentUser = preferencesRepository.getCurrentUserFlow()
-    private val allFeedsFlow =
+    val allFeedsFlow =
         currentUser
             .mapNotNull { it }
             .flatMapLatest { user -> feedRepository.getAvailableFeeds(user) }
@@ -63,6 +63,9 @@ class HomeViewModel(
     private val _feedStates =
         MutableStateFlow<Map<String, Flow<PagingData<TimelinePost>>>>(emptyMap())
     val feedStates = _feedStates.asStateFlow()
+
+    private val _showFeedConfig = MutableStateFlow(false)
+    val showFeedConfig = _showFeedConfig.asStateFlow()
 
     init {
         getFeeds()
@@ -84,6 +87,10 @@ class HomeViewModel(
                 }
             }
         }
+    }
+
+    fun showFeedConfig() {
+        _showFeedConfig.update { true }
     }
 
     fun onLikeClicked(post: TimelinePost) {

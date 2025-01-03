@@ -31,7 +31,6 @@ fun getRouteUiState(
             )
         NavigationRoutes.Authenticated.Profile.route ->
             RouteUiState(
-                showTopAppBar = false,
                 showBottomBar = true,
             )
         NavigationRoutes.Authenticated.Chat.route ->
@@ -53,13 +52,9 @@ fun getRouteUiState(
                 showBottomBar = true,
             )
         NavigationRoutes.Authenticated.AddPost.route ->
-            RouteUiState(
-                topAppBarTitle = "Add new post",
-            )
+            RouteUiState()
         NavigationRoutes.Authenticated.PostView.route ->
-            RouteUiState(
-                topAppBarTitle = "Post",
-            )
+            RouteUiState()
         NavigationRoutes.Unauthenticated.Login.route ->
             RouteUiState(
                 showTopAppBar = false,
