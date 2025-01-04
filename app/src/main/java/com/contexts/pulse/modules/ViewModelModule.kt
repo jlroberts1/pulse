@@ -53,10 +53,9 @@ val viewModelModule =
         }
         viewModel {
             AppViewModel(
-                get<FeedRepository>(),
-                get<ProfileRepository>(),
-                get<PreferencesRepository>(),
                 get<NotificationsRepository>(),
+                get<PreferencesRepository>(),
+                get<ProfileRepository>(),
                 get<UserRepository>(),
                 get<WorkManager>(),
             )
@@ -67,6 +66,7 @@ val viewModelModule =
                 get<FeedRepository>(),
                 get<PreferencesRepository>(),
                 get<PostRepository>(),
+                get<ProfileRepository>(),
                 get<UserRepository>(),
             )
         }

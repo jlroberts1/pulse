@@ -14,7 +14,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -30,7 +32,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.DrawerState
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
@@ -66,7 +67,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.contexts.pulse.ui.composables.ViewMedia
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavigationScaffold(
     modifier: Modifier = Modifier,
@@ -104,12 +104,10 @@ fun NavigationScaffold(
         }
     val onNavigate = { destination: TopDestinations ->
         navController.navigate(destination.route) {
-            // Only save state for top-level destinations
             popUpTo(navController.graph.findStartDestination().id) {
                 saveState = destination.route in TopDestinations.entries.map { it.route }
             }
             launchSingleTop = true
-            // Only restore state for top-level destinations
             restoreState = destination.route in TopDestinations.entries.map { it.route }
         }
     }
@@ -207,41 +205,47 @@ fun NavigationScaffold(
         ) {
             Row {
                 if (isExpandedScreen) {
-                    NavigationRail {
-                        TopDestinations.entries.forEach {
-                            NavigationRailItem(
-                                icon = {
-                                    Box {
-                                        Icon(
-                                            imageVector =
-                                                if (currentRoute.value == it.route) {
-                                                    it.selectedIcon
-                                                } else {
-                                                    it.unselectedIcon
-                                                },
-                                            contentDescription = it.contentDescription,
-                                        )
-                                        it.unreadCount?.let {
-                                            if (it > 0) {
-                                                Badge(
-                                                    modifier =
-                                                        Modifier
-                                                            .align(Alignment.TopEnd)
-                                                            .offset(x = 6.dp, y = (-6).dp),
-                                                ) {
-                                                    Text(
-                                                        text = if (it > 99) "99+" else it.toString(),
-                                                        style = MaterialTheme.typography.labelSmall,
-                                                    )
+                    AnimatedVisibility(
+                        visible = routeUiState.showBottomBar && mediaState.url == null,
+                        enter = slideInHorizontally(initialOffsetX = { -it }) + fadeIn(),
+                        exit = slideOutHorizontally(targetOffsetX = { -it }) + fadeOut(),
+                    ) {
+                        NavigationRail {
+                            TopDestinations.entries.forEach {
+                                NavigationRailItem(
+                                    icon = {
+                                        Box {
+                                            Icon(
+                                                imageVector =
+                                                    if (currentRoute.value == it.route) {
+                                                        it.selectedIcon
+                                                    } else {
+                                                        it.unselectedIcon
+                                                    },
+                                                contentDescription = it.contentDescription,
+                                            )
+                                            it.unreadCount?.let {
+                                                if (it > 0) {
+                                                    Badge(
+                                                        modifier =
+                                                            Modifier
+                                                                .align(Alignment.TopEnd)
+                                                                .offset(x = 6.dp, y = (-6).dp),
+                                                    ) {
+                                                        Text(
+                                                            text = if (it > 99) "99+" else it.toString(),
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                        )
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
-                                },
-                                selected = currentRoute.value == it.route,
-                                onClick = { onNavigate(it) },
-                                colors = NavigationRailItemDefaults.colors(),
-                            )
+                                    },
+                                    selected = currentRoute.value == it.route,
+                                    onClick = { onNavigate(it) },
+                                    colors = NavigationRailItemDefaults.colors(),
+                                )
+                            }
                         }
                     }
                 }

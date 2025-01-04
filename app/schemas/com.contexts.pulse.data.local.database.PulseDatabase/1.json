@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "ed4fc9e996ad8f2d454c5fe7072fe4cb",
+    "identityHash": "ebeea7a9bfd651681590bbc0cd1cd35b",
     "entities": [
       {
         "tableName": "users",
@@ -314,7 +314,7 @@
       },
       {
         "tableName": "pending_media_attachments",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `uploadId` INTEGER NOT NULL, `type` TEXT NOT NULL, `localUri` TEXT NOT NULL, `mimeType` TEXT, `altText` TEXT, `uploadState` TEXT NOT NULL, `remoteLink` TEXT, `videoJobId` TEXT, `aspectRatio` TEXT, `videoProcessingState` TEXT NOT NULL, `videoProcessingProgress` INTEGER, `videoProcessingError` TEXT, FOREIGN KEY(`uploadId`) REFERENCES `pending_uploads`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `uploadId` INTEGER NOT NULL, `type` TEXT NOT NULL, `localUri` TEXT NOT NULL, `mimeType` TEXT, `altText` TEXT, `size` INTEGER, `uploadState` TEXT NOT NULL, `remoteLink` TEXT, `videoJobId` TEXT, `aspectRatio` TEXT, `videoProcessingState` TEXT NOT NULL, `videoProcessingProgress` INTEGER, `videoProcessingError` TEXT, FOREIGN KEY(`uploadId`) REFERENCES `pending_uploads`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -350,6 +350,12 @@
             "fieldPath": "altText",
             "columnName": "altText",
             "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "size",
+            "columnName": "size",
+            "affinity": "INTEGER",
             "notNull": false
           },
           {
@@ -718,7 +724,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ed4fc9e996ad8f2d454c5fe7072fe4cb')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ebeea7a9bfd651681590bbc0cd1cd35b')"
     ]
   }
 }

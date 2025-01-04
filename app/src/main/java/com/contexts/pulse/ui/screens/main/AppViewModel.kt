@@ -17,7 +17,6 @@ import androidx.work.WorkQuery
 import com.contexts.pulse.data.network.api.UrlManager
 import com.contexts.pulse.data.network.client.onSuccess
 import com.contexts.pulse.domain.model.Theme
-import com.contexts.pulse.domain.repository.FeedRepository
 import com.contexts.pulse.domain.repository.NotificationsRepository
 import com.contexts.pulse.domain.repository.PreferencesRepository
 import com.contexts.pulse.domain.repository.ProfileRepository
@@ -38,10 +37,9 @@ data class MediaState(
 )
 
 class AppViewModel(
-    private val feedRepository: FeedRepository,
-    profileRepository: ProfileRepository,
-    private val preferencesRepository: PreferencesRepository,
     private val notificationsRepository: NotificationsRepository,
+    private val preferencesRepository: PreferencesRepository,
+    private val profileRepository: ProfileRepository,
     private val userRepository: UserRepository,
     private val workManager: WorkManager,
 ) : ViewModel() {
@@ -147,7 +145,7 @@ class AppViewModel(
 
     private fun refreshFeeds() {
         viewModelScope.launch {
-            currentUser.collect { it?.let { feedRepository.refreshFeeds(it) } }
+            currentUser.collect { it?.let { profileRepository.refreshFeeds(it) } }
         }
     }
 

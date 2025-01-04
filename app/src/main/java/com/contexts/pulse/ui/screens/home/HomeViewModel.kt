@@ -14,6 +14,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import app.bsky.actor.PreferencesUnion
+import app.bsky.actor.PutPreferencesRequest
+import app.bsky.actor.SavedFeed
+import app.bsky.actor.SavedFeedsPrefV2
+import app.bsky.actor.Type
+import com.contexts.pulse.data.local.database.entities.FeedEntity
 import com.contexts.pulse.data.network.client.onSuccess
 import com.contexts.pulse.data.network.request.CreateLikeRecordRequest
 import com.contexts.pulse.data.network.request.UnlikeRecordRequest
@@ -23,12 +29,14 @@ import com.contexts.pulse.domain.model.TimelinePost
 import com.contexts.pulse.domain.repository.FeedRepository
 import com.contexts.pulse.domain.repository.PostRepository
 import com.contexts.pulse.domain.repository.PreferencesRepository
+import com.contexts.pulse.domain.repository.ProfileRepository
 import com.contexts.pulse.domain.repository.UserRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -43,6 +51,7 @@ class HomeViewModel(
     private val feedRepository: FeedRepository,
     preferencesRepository: PreferencesRepository,
     private val postRepository: PostRepository,
+    private val profileRepository: ProfileRepository,
     userRepository: UserRepository,
 ) : ViewModel() {
     private val currentUser = preferencesRepository.getCurrentUserFlow()
@@ -63,9 +72,6 @@ class HomeViewModel(
     private val _feedStates =
         MutableStateFlow<Map<String, Flow<PagingData<TimelinePost>>>>(emptyMap())
     val feedStates = _feedStates.asStateFlow()
-
-    private val _showFeedConfig = MutableStateFlow(false)
-    val showFeedConfig = _showFeedConfig.asStateFlow()
 
     init {
         getFeeds()
@@ -89,8 +95,25 @@ class HomeViewModel(
         }
     }
 
-    fun showFeedConfig() {
-        _showFeedConfig.update { true }
+    fun updateVisibleFeeds(newVisibleFeeds: List<FeedEntity>) {
+        viewModelScope.launch {
+            val allFeeds = allFeedsFlow.first()
+            val savedFeeds =
+                allFeeds.map { feed ->
+                    SavedFeed(
+                        id = feed.id,
+                        type = Type.Feed,
+                        pinned = newVisibleFeeds.any { it.id == feed.id },
+                        value = feed.uri,
+                    )
+                }
+            val preferences =
+                PreferencesUnion.SavedFeedsPrefV2(
+                    value = SavedFeedsPrefV2(savedFeeds),
+                )
+            val putPreferencesRequest = PutPreferencesRequest(listOf(preferences))
+            profileRepository.putPreferences(putPreferencesRequest)
+        }
     }
 
     fun onLikeClicked(post: TimelinePost) {

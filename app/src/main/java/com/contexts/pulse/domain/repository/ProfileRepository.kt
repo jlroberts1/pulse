@@ -11,6 +11,7 @@ package com.contexts.pulse.domain.repository
 
 import androidx.paging.PagingData
 import app.bsky.actor.GetProfileResponse
+import app.bsky.actor.PutPreferencesRequest
 import com.contexts.pulse.data.local.database.entities.ProfileEntity
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.repository.RequestResult
@@ -26,4 +27,8 @@ interface ProfileRepository {
     suspend fun getProfileFeed(): RequestResult<Flow<PagingData<TimelinePost>>>
 
     suspend fun insertProfile(profile: ProfileEntity)
+
+    suspend fun refreshFeeds(did: String)
+
+    suspend fun putPreferences(putPreferencesRequest: PutPreferencesRequest): Response<Unit, NetworkError>
 }

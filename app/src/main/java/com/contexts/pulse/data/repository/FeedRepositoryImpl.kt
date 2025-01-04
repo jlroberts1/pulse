@@ -14,8 +14,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
-import app.bsky.actor.PreferencesUnion
-import app.bsky.actor.Type
 import app.bsky.feed.GeneratorView
 import app.bsky.feed.GetFeedResponse
 import app.bsky.feed.GetSuggestedFeedsResponse
@@ -27,7 +25,6 @@ import com.contexts.pulse.data.local.database.entities.toPost
 import com.contexts.pulse.data.network.api.FeedAPI
 import com.contexts.pulse.data.network.api.ProfileAPI
 import com.contexts.pulse.data.network.client.Response
-import com.contexts.pulse.data.network.client.onSuccess
 import com.contexts.pulse.domain.model.TimelinePost
 import com.contexts.pulse.domain.model.toPost
 import com.contexts.pulse.domain.repository.FeedRepository
@@ -80,32 +77,6 @@ class FeedRepositoryImpl(
             },
         ).flow.flowOn(appDispatchers.io)
     }
-
-    override suspend fun refreshFeeds(did: String): Unit =
-        withContext(appDispatchers.io) {
-            profileAPI.getPreferences().onSuccess { response ->
-                val savedFeeds =
-                    response.preferences
-                        .filterIsInstance<PreferencesUnion.SavedFeedsPrefV2>()
-                        .map { it.value.items.filter { item -> item.type is Type.Feed } }
-                        .firstOrNull()
-
-                savedFeeds?.forEach { savedFeed ->
-                    feedAPI.getFeedGenerator(savedFeed.value).onSuccess { response ->
-                        val feed =
-                            FeedEntity(
-                                id = savedFeed.id,
-                                userDid = did,
-                                type = savedFeed.type.value,
-                                uri = savedFeed.value,
-                                pinned = savedFeed.pinned,
-                                displayName = response.view.displayName,
-                            )
-                        feedDao.insertFeed(feed)
-                    }
-                }
-            }
-        }
 
     override fun getAvailableFeeds(did: String): Flow<List<FeedEntity>> {
         return feedDao.getFeedsForUser(did).flowOn(appDispatchers.io)

@@ -11,10 +11,12 @@ package com.contexts.pulse.data.network.api
 
 import app.bsky.actor.GetPreferencesResponse
 import app.bsky.actor.GetProfileResponse
+import app.bsky.actor.PutPreferencesRequest
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.network.client.safeRequest
 import com.contexts.pulse.exceptions.NetworkError
 import io.ktor.client.HttpClient
+import io.ktor.client.request.setBody
 import io.ktor.http.HttpMethod
 import io.ktor.http.Url
 import io.ktor.http.path
@@ -42,6 +44,18 @@ class ProfileAPI(
                 host = Url(pdsUrl).host
                 path("xrpc/app.bsky.actor.getPreferences")
             }
+        }
+    }
+
+    suspend fun putPreferences(putPreferencesRequest: PutPreferencesRequest): Response<Unit, NetworkError> {
+        val pdsUrl = UrlManager.getPdsUrl()
+        return client.safeRequest {
+            url {
+                method = HttpMethod.Post
+                host = Url(pdsUrl).host
+                path("xrpc/app.bsky.actor.putPreferences")
+            }
+            setBody(putPreferencesRequest)
         }
     }
 }

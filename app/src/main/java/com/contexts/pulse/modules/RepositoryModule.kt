@@ -100,10 +100,12 @@ val repositoryModule =
         single<ProfileRepository> {
             ProfileRepositoryImpl(
                 get<AppDispatchers>(),
+                get<FeedAPI>(),
+                get<FeedDao>(),
                 get<HttpClient>(),
+                get<PreferencesRepository>(),
                 get<ProfileAPI>(),
                 get<ProfileDao>(),
-                get<PreferencesRepository>(),
             )
         }
         single<TenorRepository> {

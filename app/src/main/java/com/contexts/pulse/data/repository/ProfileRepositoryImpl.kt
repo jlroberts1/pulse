@@ -13,10 +13,16 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import app.bsky.actor.GetProfileResponse
+import app.bsky.actor.PreferencesUnion
+import app.bsky.actor.PutPreferencesRequest
+import app.bsky.actor.Type
 import app.bsky.feed.GetAuthorFeedResponse
+import com.contexts.pulse.data.local.database.dao.FeedDao
 import com.contexts.pulse.data.local.database.dao.ProfileDao
+import com.contexts.pulse.data.local.database.entities.FeedEntity
 import com.contexts.pulse.data.local.database.entities.ProfileEntity
 import com.contexts.pulse.data.local.database.entities.toProfileEntity
+import com.contexts.pulse.data.network.api.FeedAPI
 import com.contexts.pulse.data.network.api.ProfileAPI
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.network.client.onSuccess
@@ -38,10 +44,12 @@ import kotlinx.coroutines.withContext
 
 class ProfileRepositoryImpl(
     private val appDispatchers: AppDispatchers,
+    private val feedAPI: FeedAPI,
+    private val feedDao: FeedDao,
     private val client: HttpClient,
+    private val preferencesRepository: PreferencesRepository,
     private val profileAPI: ProfileAPI,
     private val profileDao: ProfileDao,
-    private val preferencesRepository: PreferencesRepository,
 ) : ProfileRepository {
     override suspend fun getProfile(actor: String): Response<GetProfileResponse, NetworkError> =
         withContext(appDispatchers.io) {
@@ -84,5 +92,39 @@ class ProfileRepositoryImpl(
     override suspend fun insertProfile(profile: ProfileEntity) =
         withContext(appDispatchers.io) {
             profileDao.insertProfile(profile)
+        }
+
+    override suspend fun refreshFeeds(did: String): Unit =
+        withContext(appDispatchers.io) {
+            profileAPI.getPreferences().onSuccess { response ->
+                val savedFeeds =
+                    response.preferences
+                        .filterIsInstance<PreferencesUnion.SavedFeedsPrefV2>()
+                        .map { it.value.items.filter { item -> item.type is Type.Feed } }
+                        .firstOrNull()
+
+                savedFeeds?.forEach { savedFeed ->
+                    feedAPI.getFeedGenerator(savedFeed.value).onSuccess { response ->
+                        val feed =
+                            FeedEntity(
+                                id = savedFeed.id,
+                                userDid = did,
+                                type = savedFeed.type.value,
+                                uri = savedFeed.value,
+                                pinned = savedFeed.pinned,
+                                displayName = response.view.displayName,
+                            )
+                        feedDao.insertFeed(feed)
+                    }
+                }
+            }
+        }
+
+    override suspend fun putPreferences(putPreferencesRequest: PutPreferencesRequest) =
+        withContext(appDispatchers.io) {
+            profileAPI.putPreferences(putPreferencesRequest).onSuccess {
+                val current = preferencesRepository.getCurrentUser()
+                current?.let { refreshFeeds(current) }
+            }
         }
 }

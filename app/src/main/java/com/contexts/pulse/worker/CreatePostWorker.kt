@@ -60,24 +60,24 @@ class CreatePostWorker(
                 ?: return Result.failure(workDataOf())
 
         val facets = extractFacets(post.upload.text)
+
         val embed: PostEmbed =
             when {
                 post.mediaAttachments.all { it.type == MediaType.IMAGE } -> {
-                    ImageEmbed(
-                        images =
-                            post.mediaAttachments.map { media ->
-                                ImageRef(
-                                    alt = media.altText ?: "",
-                                    image =
-                                        Blob.StandardBlob(
-                                            ref = BlobRef(Cid(media.remoteLink ?: "")),
-                                            mimeType = media.mimeType ?: "",
-                                            size = 0L,
-                                        ),
-                                    aspectRatio = media.aspectRatio,
-                                )
-                            },
-                    )
+                    val images =
+                        post.mediaAttachments.map { media ->
+                            ImageRef(
+                                alt = media.altText ?: "",
+                                image =
+                                    Blob.StandardBlob(
+                                        ref = BlobRef(Cid(media.remoteLink ?: "")),
+                                        mimeType = media.mimeType ?: "",
+                                        size = media.size ?: 0L,
+                                    ),
+                                aspectRatio = media.aspectRatio,
+                            )
+                        }
+                    ImageEmbed(images = images)
                 }
 
                 post.mediaAttachments.all { it.type == MediaType.VIDEO } -> {

@@ -35,6 +35,7 @@ data class PendingMediaAttachment(
     val localUri: String,
     val mimeType: String? = null,
     val altText: String? = null,
+    val size: Long? = null,
     val uploadState: MediaUploadState = MediaUploadState.PENDING,
     val remoteLink: String? = null,
     val videoJobId: String? = null,

@@ -26,8 +26,6 @@ interface FeedRepository {
 
     fun getSuggestions(): Flow<PagingData<GeneratorView>>
 
-    suspend fun refreshFeeds(did: String)
-
     fun getAvailableFeeds(did: String): Flow<List<FeedEntity>>
 
     fun getFeedPagingFlow(

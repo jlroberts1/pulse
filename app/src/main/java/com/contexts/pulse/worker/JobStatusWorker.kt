@@ -38,6 +38,7 @@ class JobStatusWorker(
         val params = GetJobStatusQueryParams(jobId = jobId)
         when (val response = postRepository.getVideoProcessingStatus(params)) {
             is Response.Success -> {
+                if (response.data.jobStatus.blob == null) return Result.retry()
                 return when (response.data.jobStatus.state) {
                     is State.JOBSTATECOMPLETED -> {
                         pendingUploadRepository.updateMediaAttachment(
@@ -64,8 +65,6 @@ class JobStatusWorker(
                         )
                         Result.failure()
                     }
-
-                    else -> Result.retry()
                 }
             }
 

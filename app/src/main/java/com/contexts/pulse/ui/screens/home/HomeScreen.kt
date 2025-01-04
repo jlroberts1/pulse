@@ -14,20 +14,24 @@ import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DragIndicator
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -49,6 +53,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -77,10 +82,9 @@ import com.google.accompanist.permissions.rememberPermissionState
 import io.ktor.http.encodeURLParameter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import logcat.logcat
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
@@ -88,7 +92,6 @@ fun HomeScreen(
     onMediaOpen: (String) -> Unit,
     drawerState: DrawerState,
 ) {
-    logcat("Navigation") { "Feed composing" }
     val scope = rememberCoroutineScope()
     var showFeedConfig by remember { mutableStateOf(false) }
     val availableFeeds by viewModel.allFeedsFlow.collectAsStateWithLifecycle()
@@ -156,7 +159,6 @@ fun HomeScreen(
                             selected = true,
                             onClick = { },
                             text = { Text(feedType.displayName) },
-                            modifier = Modifier.weight(1f),
                         )
                     }
                 }
@@ -183,7 +185,7 @@ fun HomeScreen(
                     availableFeeds = availableFeeds,
                     onDismiss = { showFeedConfig = false },
                     onSaveConfiguration = { newVisibleFeeds ->
-                        // viewModel.updateVisibleFeeds(newVisibleFeeds)
+                        viewModel.updateVisibleFeeds(newVisibleFeeds)
                         showFeedConfig = false
                     },
                 )
@@ -260,35 +262,43 @@ fun TabletRow(
     onMediaOpen: (String) -> Unit,
     onLikeClick: (Pair<TimelinePost, String>) -> Unit,
 ) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize(),
     ) {
-        feeds.take(4).forEach { feed ->
-            val feedState = feedStates[feed.id] ?: return
-            val feedData = feedState.collectAsLazyPagingItems()
-            PullToRefreshBox(
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
-                isRefreshing = feedData.loadState.refresh is LoadState.Loading,
-                onRefresh = { feedData.refresh() },
-            ) {
+        val tabWidth = maxWidth / 4
+
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+                    .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            feeds.forEach { feed ->
+                val feedState = feedStates[feed.id] ?: return@forEach
+
+                val feedData = feedState.collectAsLazyPagingItems()
+
                 Box(
                     modifier =
-                        Modifier.fillMaxSize(),
+                        Modifier
+                            .width(tabWidth - 16.dp)
+                            .fillMaxHeight(),
                 ) {
-                    feedStates[feed.id]?.let { pagingFlow ->
-                        FeedContent(
-                            navController = navController,
-                            feedData = feedData,
-                            onMediaOpen = { onMediaOpen(it) },
-                            onLikeClick = { onLikeClick(Pair(it, feed.id)) },
-                        )
+                    key(feed.id) {
+                        PullToRefreshBox(
+                            modifier = Modifier.fillMaxSize(),
+                            isRefreshing = feedData.loadState.refresh is LoadState.Loading,
+                            onRefresh = { feedData.refresh() },
+                        ) {
+                            FeedContent(
+                                navController = navController,
+                                feedData = feedData,
+                                onMediaOpen = onMediaOpen,
+                                onLikeClick = { post -> onLikeClick(Pair(post, feed.id)) },
+                            )
+                        }
                     }
                 }
             }
@@ -383,7 +393,7 @@ private fun FeedContent(
         ) {
             items(
                 count = feedData.itemCount,
-                key = { feedData.itemKey { it.id } },
+                key = feedData.itemKey { it.id.toInt() },
                 contentType = feedData.itemContentType(),
             ) { item ->
                 feedData[item]?.let { post ->

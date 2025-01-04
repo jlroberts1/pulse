@@ -23,7 +23,6 @@ import androidx.compose.material3.DrawerState
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,7 +48,6 @@ import com.contexts.pulse.ui.screens.addpost.composables.TenorSearch
 import com.contexts.pulse.ui.screens.addpost.composables.rememberGalleryManager
 import com.contexts.pulse.ui.screens.postview.composables.PostViewItem
 import kotlinx.coroutines.launch
-import logcat.logcat
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -65,12 +63,6 @@ fun AddPostScreen(
     var launchImageGallery by remember { mutableStateOf(value = false) }
     var launchVideoGallery by remember { mutableStateOf(value = false) }
     var launchGif by remember { mutableStateOf(value = false) }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            logcat("Navigation") { "Add post disposing" }
-        }
-    }
 
     val imagePicker =
         rememberGalleryManager(pickType = PickType.IMAGES) {

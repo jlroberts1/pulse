@@ -28,9 +28,8 @@ import com.contexts.pulse.domain.repository.PostRepository
 import com.contexts.pulse.extensions.copyUriToTempFile
 import com.contexts.pulse.extensions.getAspectRatio
 import com.contexts.pulse.extensions.getMimeType
-import com.contexts.pulse.extensions.getRemoteLink
-import logcat.logcat
 import org.koin.core.component.KoinComponent
+import sh.christian.ozone.api.model.Blob
 
 class UploadBlobWorker(
     appContext: Context,
@@ -57,7 +56,7 @@ class UploadBlobWorker(
                     ),
                 )
 
-        var totalProgress = 0f
+        var totalProgress: Float
         val totalFiles = post.mediaAttachments.size
         try {
             suspend fun updateProgress(currentProgress: Float) {
@@ -88,11 +87,12 @@ class UploadBlobWorker(
                             }
                         when (response) {
                             is Response.Success -> {
-                                logcat { "Upload success: ${response.data}, ${response.data.blob.getRemoteLink()}" }
+                                val blob = response.data.blob as? Blob.StandardBlob
                                 pendingUploadRepository.updateMediaAttachment(
                                     mediaAttachment.copy(
-                                        remoteLink = response.data.blob.getRemoteLink(),
+                                        remoteLink = blob?.ref?.link?.cid,
                                         mimeType = mimeType,
+                                        size = blob?.size,
                                         aspectRatio = tempFile.getAspectRatio(context = applicationContext),
                                     ),
                                 )
