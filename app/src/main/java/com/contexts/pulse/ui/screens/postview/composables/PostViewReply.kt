@@ -10,14 +10,14 @@
 package com.contexts.pulse.ui.screens.postview.composables
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.contexts.pulse.domain.media.PlayerPoolManager
 import com.contexts.pulse.domain.model.TimelinePost
 import com.contexts.pulse.domain.model.TimelinePostFeature
 import com.contexts.pulse.ui.composables.EmbedExternalView
@@ -25,30 +25,27 @@ import com.contexts.pulse.ui.composables.EmbedImagesViewImage
 import com.contexts.pulse.ui.composables.EmbedRecordView
 import com.contexts.pulse.ui.composables.EmbedVideoView
 import com.contexts.pulse.ui.composables.FeedItemInteractions
-import com.contexts.pulse.ui.composables.PostHeader
 import com.contexts.pulse.ui.composables.PostMessageText
+import com.contexts.pulse.ui.composables.ReplyHeader
 import io.ktor.http.encodeURLParameter
-import org.koin.compose.koinInject
 
 @Composable
 fun PostViewReply(
     post: TimelinePost,
+    parent: TimelinePost,
     onPostClick: (String) -> Unit,
     onReplyClick: (String) -> Unit,
     onRepostClick: () -> Unit,
     onLikeClick: (TimelinePost) -> Unit,
     onMenuClick: () -> Unit,
-    playerPoolManager: PlayerPoolManager = koinInject(),
     onMediaOpen: (String) -> Unit,
     onProfileClick: () -> Unit,
 ) {
-    ElevatedCard(
+    Box(
         modifier =
-            Modifier
-                .clickable {
-                    onPostClick(post.uri.atUri)
-                }
-                .fillMaxWidth(),
+            Modifier.clickable(
+                onClick = { onPostClick(post.uri.atUri) },
+            ),
     ) {
         Column(
             modifier =
@@ -56,12 +53,13 @@ fun PostViewReply(
                     .fillMaxWidth()
                     .padding(top = 8.dp, start = 8.dp, end = 8.dp),
         ) {
-            PostHeader(
+            ReplyHeader(
                 avatar = post.author.avatar,
                 displayName = post.author.displayName,
                 handle = post.author.handle.handle,
                 indexedAt = post.indexedAt,
                 onProfileClick = { onProfileClick() },
+                parentHandle = parent.author.handle.handle,
             )
             PostMessageText(
                 text = post.text,
@@ -78,12 +76,14 @@ fun PostViewReply(
                             onMediaOpen = { onMediaOpen(it) },
                         )
                     }
+
                     is TimelinePostFeature.ImagesFeature -> {
                         EmbedImagesViewImage(
                             images = feature.images,
                             onMediaOpen = { onMediaOpen(it) },
                         )
                     }
+
                     is TimelinePostFeature.MediaPostFeature -> {
                         EmbedRecordView(
                             embedPost = feature.post,
@@ -92,6 +92,7 @@ fun PostViewReply(
                             onProfileClick = { onProfileClick() },
                         )
                     }
+
                     is TimelinePostFeature.PostFeature -> {
                         EmbedRecordView(
                             embedPost = feature.post,
@@ -99,6 +100,7 @@ fun PostViewReply(
                             onProfileClick = { onProfileClick() },
                         )
                     }
+
                     is TimelinePostFeature.VideoFeature -> {
                         EmbedVideoView(
                             thumbnail = feature.video.thumb,
@@ -118,6 +120,10 @@ fun PostViewReply(
                 liked = post.liked,
                 onLikeClick = { onLikeClick(post) },
                 reposted = post.reposted,
+            )
+
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
             )
         }
     }

@@ -9,18 +9,13 @@
 
 package com.contexts.pulse.ui.screens.postview.composables
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.contexts.pulse.domain.model.TimelinePost
@@ -37,7 +32,6 @@ import io.ktor.http.encodeURLParameter
 @Composable
 fun PostViewItem(
     post: TimelinePost,
-    isReply: Boolean = false,
     onPostClick: (String) -> Unit,
     onReplyClick: (String) -> Unit,
     onRepostClick: () -> Unit,
@@ -46,95 +40,88 @@ fun PostViewItem(
     onMediaOpen: (String) -> Unit,
     onProfileClick: () -> Unit,
 ) {
-    ElevatedCard(
+    Box(
         modifier =
-            Modifier
-                .clickable {
-                    onPostClick(post.uri.atUri)
-                }
-                .fillMaxWidth(),
+            Modifier.clickable(
+                onClick = { onPostClick(post.uri.atUri) },
+            ),
     ) {
-        Box {
-            if (isReply) {
-                Box(
-                    modifier =
-                        Modifier
-                            .width(2.dp)
-                            .fillMaxHeight()
-                            .background(MaterialTheme.colorScheme.primary)
-                            .align(Alignment.CenterStart),
-                )
-            }
-            Column(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp, start = 8.dp, end = 8.dp),
-            ) {
-                PostHeader(
-                    avatar = post.author.avatar,
-                    displayName = post.author.displayName,
-                    handle = post.author.handle.handle,
-                    indexedAt = post.indexedAt,
-                    onProfileClick = { onProfileClick() },
-                )
-                PostMessageText(
-                    text = post.text,
-                    onClick = { onPostClick(post.uri.atUri.encodeURLParameter()) },
-                )
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp, start = 8.dp, end = 8.dp),
+        ) {
+            PostHeader(
+                avatar = post.author.avatar,
+                displayName = post.author.displayName,
+                handle = post.author.handle.handle,
+                indexedAt = post.indexedAt,
+                onProfileClick = { onProfileClick() },
+            )
+            PostMessageText(
+                text = post.text,
+                onClick = { onPostClick(post.uri.atUri.encodeURLParameter()) },
+            )
 
-                post.feature?.let { feature ->
-                    when (feature) {
-                        is TimelinePostFeature.ExternalFeature -> {
-                            EmbedExternalView(
-                                uri = feature.uri,
-                                thumb = feature.thumb,
-                                title = feature.title,
-                                onMediaOpen = { onMediaOpen(it) },
-                            )
-                        }
-                        is TimelinePostFeature.ImagesFeature -> {
-                            EmbedImagesViewImage(
-                                images = feature.images,
-                                onMediaOpen = { onMediaOpen(it) },
-                            )
-                        }
-                        is TimelinePostFeature.MediaPostFeature -> {
-                            EmbedRecordView(
-                                embedPost = feature.post,
-                                timelinePostMedia = feature.media,
-                                onMediaOpen = { onMediaOpen(it) },
-                                onProfileClick = { onProfileClick() },
-                            )
-                        }
-                        is TimelinePostFeature.PostFeature -> {
-                            EmbedRecordView(
-                                embedPost = feature.post,
-                                onMediaOpen = { onMediaOpen(it) },
-                                onProfileClick = { onProfileClick() },
-                            )
-                        }
-                        is TimelinePostFeature.VideoFeature -> {
-                            EmbedVideoView(
-                                thumbnail = feature.video.thumb,
-                                playlist = feature.video.playlist,
-                                aspectRatio = feature.video.aspectRatio,
-                                onMediaOpen = { onMediaOpen(it) },
-                            )
-                        }
+            post.feature?.let { feature ->
+                when (feature) {
+                    is TimelinePostFeature.ExternalFeature -> {
+                        EmbedExternalView(
+                            uri = feature.uri,
+                            thumb = feature.thumb,
+                            title = feature.title,
+                            onMediaOpen = { onMediaOpen(it) },
+                        )
+                    }
+
+                    is TimelinePostFeature.ImagesFeature -> {
+                        EmbedImagesViewImage(
+                            images = feature.images,
+                            onMediaOpen = { onMediaOpen(it) },
+                        )
+                    }
+
+                    is TimelinePostFeature.MediaPostFeature -> {
+                        EmbedRecordView(
+                            embedPost = feature.post,
+                            timelinePostMedia = feature.media,
+                            onMediaOpen = { onMediaOpen(it) },
+                            onProfileClick = { onProfileClick() },
+                        )
+                    }
+
+                    is TimelinePostFeature.PostFeature -> {
+                        EmbedRecordView(
+                            embedPost = feature.post,
+                            onMediaOpen = { onMediaOpen(it) },
+                            onProfileClick = { onProfileClick() },
+                        )
+                    }
+
+                    is TimelinePostFeature.VideoFeature -> {
+                        EmbedVideoView(
+                            thumbnail = feature.video.thumb,
+                            playlist = feature.video.playlist,
+                            aspectRatio = feature.video.aspectRatio,
+                            onMediaOpen = { onMediaOpen(it) },
+                        )
                     }
                 }
-
-                FeedItemInteractions(
-                    onReplyClick = { onReplyClick(post.uri.atUri) },
-                    replyCount = post.replyCount,
-                    repostCount = post.repostCount,
-                    likeCount = post.likeCount,
-                    liked = post.liked,
-                    onLikeClick = { onLikeClick(post) },
-                    reposted = post.reposted,
-                )
             }
+
+            FeedItemInteractions(
+                onReplyClick = { onReplyClick(post.uri.atUri) },
+                replyCount = post.replyCount,
+                repostCount = post.repostCount,
+                likeCount = post.likeCount,
+                liked = post.liked,
+                onLikeClick = { onLikeClick(post) },
+                reposted = post.reposted,
+            )
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
     }
 }

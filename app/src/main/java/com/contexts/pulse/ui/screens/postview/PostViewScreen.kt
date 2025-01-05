@@ -11,14 +11,12 @@ package com.contexts.pulse.ui.screens.postview
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.DrawerState
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,9 +29,11 @@ import com.contexts.pulse.domain.model.Thread
 import com.contexts.pulse.domain.model.ThreadPost
 import com.contexts.pulse.ui.composables.PullToRefreshBox
 import com.contexts.pulse.ui.composables.ScaffoldedScreen
+import com.contexts.pulse.ui.screens.main.NavigationRoutes
 import com.contexts.pulse.ui.screens.postview.composables.PostViewItem
 import com.contexts.pulse.ui.screens.postview.composables.PostViewReply
 import com.contexts.pulse.ui.screens.postview.composables.ReplyField
+import io.ktor.http.encodeURLParameter
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,7 +57,7 @@ fun PostViewScreen(
             onRefresh = { viewModel.getThread() },
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
-                ThreadView(uiState.thread)
+                ThreadView(uiState.thread, navController)
                 ReplyField(
                     modifier =
                         Modifier
@@ -72,6 +72,7 @@ fun PostViewScreen(
 @Composable
 fun ThreadView(
     thread: Thread?,
+    navController: NavController,
     onPostClick: (String) -> Unit = {},
     onReplyClick: () -> Unit = {},
     onMediaOpen: (String) -> Unit = {},
@@ -83,7 +84,6 @@ fun ThreadView(
                 .fillMaxWidth()
                 .padding(bottom = 56.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(8.dp),
     ) {
         items(thread.parents) { parent ->
             when (parent) {
@@ -92,7 +92,11 @@ fun ThreadView(
                 is ThreadPost.ViewablePost -> {
                     PostViewItem(
                         post = parent.post,
-                        onPostClick = {},
+                        onPostClick = {
+                            navController.navigate(
+                                NavigationRoutes.Authenticated.PostView.createRoute(it.encodeURLParameter()),
+                            )
+                        },
                         onReplyClick = {},
                         onMediaOpen = {},
                         onRepostClick = {},
@@ -103,43 +107,67 @@ fun ThreadView(
                 }
             }
         }
-        item {
-            PostViewItem(
-                post = thread.post,
-                onPostClick = {},
-                onReplyClick = {},
-                onMediaOpen = {},
-                onRepostClick = {},
-                onLikeClick = {},
-                onMenuClick = {},
-                onProfileClick = {},
-            )
+
+        val lastParent = thread.parents.filterIsInstance<ThreadPost.ViewablePost>().lastOrNull()
+        if (lastParent != null) {
+            item {
+                PostViewReply(
+                    post = thread.post,
+                    parent = lastParent.post,
+                    onPostClick = {
+                        navController.navigate(
+                            NavigationRoutes.Authenticated.PostView.createRoute(it.encodeURLParameter()),
+                        )
+                    },
+                    onReplyClick = {},
+                    onMediaOpen = {},
+                    onRepostClick = {},
+                    onLikeClick = {},
+                    onMenuClick = {},
+                    onProfileClick = {},
+                )
+            }
+        } else {
+            item {
+                PostViewItem(
+                    post = thread.post,
+                    onPostClick = {
+                        navController.navigate(
+                            NavigationRoutes.Authenticated.PostView.createRoute(it.encodeURLParameter()),
+                        )
+                    },
+                    onReplyClick = {},
+                    onMediaOpen = {},
+                    onRepostClick = {},
+                    onLikeClick = {},
+                    onMenuClick = {},
+                    onProfileClick = {},
+                )
+            }
         }
         items(thread.replies) { reply ->
-            ElevatedCard(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(start = 40.dp),
-            ) {
-                when (reply) {
-                    is ThreadPost.ViewablePost -> {
-                        PostViewReply(
-                            post = reply.post,
-                            onPostClick = {},
-                            onReplyClick = {},
-                            onMediaOpen = {},
-                            onRepostClick = {},
-                            onLikeClick = {},
-                            onMenuClick = {},
-                            onProfileClick = {},
-                        )
-                    }
-
-                    ThreadPost.BlockedPost,
-                    ThreadPost.NotFoundPost,
-                    -> Unit
+            when (reply) {
+                is ThreadPost.ViewablePost -> {
+                    PostViewReply(
+                        post = reply.post,
+                        parent = thread.post,
+                        onPostClick = {
+                            navController.navigate(
+                                NavigationRoutes.Authenticated.PostView.createRoute(it.encodeURLParameter()),
+                            )
+                        },
+                        onReplyClick = {},
+                        onMediaOpen = {},
+                        onRepostClick = {},
+                        onLikeClick = {},
+                        onMenuClick = {},
+                        onProfileClick = {},
+                    )
                 }
+
+                ThreadPost.BlockedPost,
+                ThreadPost.NotFoundPost,
+                -> Unit
             }
         }
     }
