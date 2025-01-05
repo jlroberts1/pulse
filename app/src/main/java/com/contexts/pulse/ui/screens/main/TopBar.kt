@@ -21,8 +21,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,6 +40,13 @@ fun TopBar(
     drawerState: DrawerState,
 ) {
     val scope = rememberCoroutineScope()
+    val currentBackStack by navController.currentBackStackEntryAsState()
+    val topLevelRoutes = TopDestinations.entries.map { it.route }
+    val showBackButton = remember(currentBackStack) {
+        val currentRoute = currentBackStack?.destination?.route
+        currentRoute != null && !topLevelRoutes.contains(currentRoute)
+    }
+
     TopAppBar(
         colors =
             TopAppBarDefaults.topAppBarColors(),
@@ -48,10 +58,7 @@ fun TopBar(
             }
         },
         navigationIcon = {
-            val topLevelRoutes = TopDestinations.entries.map { it.route }
-            if (navController.previousBackStackEntry != null &&
-                !topLevelRoutes.contains(navController.currentDestination?.route)
-            ) {
+            if (showBackButton) {
                 IconButton(onClick = {
                     scope.launch {
                         if (!navController.popBackStack()) {
