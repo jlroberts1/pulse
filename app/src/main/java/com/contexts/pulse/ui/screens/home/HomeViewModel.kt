@@ -23,6 +23,7 @@ import com.contexts.pulse.data.local.database.entities.FeedEntity
 import com.contexts.pulse.data.network.client.onSuccess
 import com.contexts.pulse.data.network.request.CreateLikeRecordRequest
 import com.contexts.pulse.data.network.request.UnlikeRecordRequest
+import com.contexts.pulse.data.repository.TimelineManager
 import com.contexts.pulse.domain.model.LikeRecord
 import com.contexts.pulse.domain.model.LikeSubject
 import com.contexts.pulse.domain.model.TimelinePost
@@ -52,6 +53,7 @@ class HomeViewModel(
     preferencesRepository: PreferencesRepository,
     private val postRepository: PostRepository,
     private val profileRepository: ProfileRepository,
+    private val timelineManager: TimelineManager,
     userRepository: UserRepository,
 ) : ViewModel() {
     private val currentUser = preferencesRepository.getCurrentUserFlow()
@@ -83,7 +85,7 @@ class HomeViewModel(
                 _feedStates.update { current ->
                     feeds.associate { feed ->
                         feed.id to (
-                            current[feed.id] ?: feedRepository.getFeedPagingFlow(
+                            current[feed.id] ?: timelineManager.getFeedPagingFlow(
                                 feedId = feed.id,
                                 feedUri = feed.uri,
                             )

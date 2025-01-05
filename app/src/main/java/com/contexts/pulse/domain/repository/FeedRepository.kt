@@ -14,7 +14,6 @@ import app.bsky.feed.GeneratorView
 import app.bsky.feed.GetFeedResponse
 import com.contexts.pulse.data.local.database.entities.FeedEntity
 import com.contexts.pulse.data.network.client.Response
-import com.contexts.pulse.domain.model.TimelinePost
 import com.contexts.pulse.exceptions.NetworkError
 import kotlinx.coroutines.flow.Flow
 
@@ -27,11 +26,6 @@ interface FeedRepository {
     fun getSuggestions(): Flow<PagingData<GeneratorView>>
 
     fun getAvailableFeeds(did: String): Flow<List<FeedEntity>>
-
-    fun getFeedPagingFlow(
-        feedId: String,
-        feedUri: String,
-    ): Flow<PagingData<TimelinePost>>
 
     suspend fun likePost(
         postUri: String,

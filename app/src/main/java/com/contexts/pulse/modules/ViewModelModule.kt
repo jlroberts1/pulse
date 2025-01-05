@@ -12,6 +12,7 @@ package com.contexts.pulse.modules
 import androidx.lifecycle.SavedStateHandle
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.work.WorkManager
+import com.contexts.pulse.data.repository.TimelineManager
 import com.contexts.pulse.domain.repository.ActorRepository
 import com.contexts.pulse.domain.repository.AuthenticateRepository
 import com.contexts.pulse.domain.repository.ChatRepository
@@ -67,6 +68,7 @@ val viewModelModule =
                 get<PreferencesRepository>(),
                 get<PostRepository>(),
                 get<ProfileRepository>(),
+                get<TimelineManager>(),
                 get<UserRepository>(),
             )
         }

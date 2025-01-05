@@ -35,6 +35,8 @@ import com.contexts.pulse.data.repository.PostRepositoryImpl
 import com.contexts.pulse.data.repository.PreferencesRepositoryImpl
 import com.contexts.pulse.data.repository.ProfileRepositoryImpl
 import com.contexts.pulse.data.repository.TenorRepositoryImpl
+import com.contexts.pulse.data.repository.TimelineManager
+import com.contexts.pulse.data.repository.TimelineRemoteMediatorFactory
 import com.contexts.pulse.data.repository.UserRepositoryImpl
 import com.contexts.pulse.domain.repository.ActorRepository
 import com.contexts.pulse.domain.repository.AuthenticateRepository
@@ -80,9 +82,6 @@ val repositoryModule =
                 get<HttpClient>(),
                 get<FeedAPI>(),
                 get<FeedDao>(),
-                get<RemoteKeysDao>(),
-                get<PulseDatabase>(),
-                get<ProfileAPI>(),
             )
         }
         single<NotificationsRepository> {
@@ -132,6 +131,22 @@ val repositoryModule =
                 get<AppDispatchers>(),
                 get<PendingUploadDao>(),
                 get<UploadAPI>(),
+            )
+        }
+        single<TimelineManager> {
+            TimelineManager(
+                get<AppDispatchers>(),
+                get<FeedDao>(),
+                get<TimelineRemoteMediatorFactory>(),
+            )
+        }
+        single<TimelineRemoteMediatorFactory> {
+            TimelineRemoteMediatorFactory(
+                get<AppDispatchers>(),
+                get<FeedDao>(),
+                get<FeedRepository>(),
+                get<RemoteKeysDao>(),
+                get<PulseDatabase>(),
             )
         }
     }

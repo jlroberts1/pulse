@@ -127,7 +127,6 @@ fun LoginScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-
                     if (uiState.loading) {
                         CircularProgressIndicator()
                     }

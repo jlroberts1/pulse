@@ -42,10 +42,11 @@ fun TopBar(
     val scope = rememberCoroutineScope()
     val currentBackStack by navController.currentBackStackEntryAsState()
     val topLevelRoutes = TopDestinations.entries.map { it.route }
-    val showBackButton = remember(currentBackStack) {
-        val currentRoute = currentBackStack?.destination?.route
-        currentRoute != null && !topLevelRoutes.contains(currentRoute)
-    }
+    val showBackButton =
+        remember(currentBackStack) {
+            val currentRoute = currentBackStack?.destination?.route
+            currentRoute != null && !topLevelRoutes.contains(currentRoute)
+        }
 
     TopAppBar(
         colors =

@@ -22,12 +22,15 @@ import com.contexts.pulse.data.local.database.entities.TimelinePostEntity
 import com.contexts.pulse.data.local.database.entities.toTimelinePostEntity
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.domain.repository.FeedRepository
+import com.contexts.pulse.modules.AppDispatchers
+import kotlinx.coroutines.withContext
 import logcat.logcat
 
 @OptIn(ExperimentalPagingApi::class)
 class TimelineRemoteMediator(
     private val feedId: String,
     private val feedUri: String,
+    private val appDispatchers: AppDispatchers,
     private val feedDao: FeedDao,
     private val feedRepository: FeedRepository,
     private val remoteKeysDao: RemoteKeysDao,
@@ -36,53 +39,54 @@ class TimelineRemoteMediator(
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, TimelinePostEntity>,
-    ): MediatorResult {
-        try {
-            val loadKey =
-                when (loadType) {
-                    LoadType.REFRESH -> null
-                    LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
-                    LoadType.APPEND -> {
-                        val remoteKeys = getRemoteKey()
-                        if (remoteKeys?.nextKey == null) {
-                            return MediatorResult.Success(endOfPaginationReached = true)
-                        }
-                        remoteKeys.nextKey
-                    }
-                }
-            when (val response = feedRepository.getFeed(feedUri = feedUri, cursor = loadKey)) {
-                is Response.Success -> {
-                    db.withTransaction {
-                        if (loadType == LoadType.REFRESH) {
-                            remoteKeysDao.clearKeysByFeed(feedId)
-                            feedDao.clearFeed(feedId)
-                        }
-                        val key =
-                            RemoteKeysEntity(
-                                feedId = feedId,
-                                prevKey = null,
-                                nextKey = response.data.cursor,
-                            )
-                        remoteKeysDao.insertKey(key)
-                        val posts =
-                            response.data.feed.map {
-                                it.toTimelinePostEntity(feedId)
+    ): MediatorResult =
+        withContext(appDispatchers.io) {
+            try {
+                val loadKey =
+                    when (loadType) {
+                        LoadType.REFRESH -> null
+                        LoadType.PREPEND -> return@withContext MediatorResult.Success(endOfPaginationReached = true)
+                        LoadType.APPEND -> {
+                            val remoteKeys = getRemoteKey()
+                            if (remoteKeys?.nextKey == null) {
+                                return@withContext MediatorResult.Success(endOfPaginationReached = true)
                             }
-                        logcat { "posts: $posts" }
-                        feedDao.insertPosts(posts)
+                            remoteKeys.nextKey
+                        }
                     }
-                    return MediatorResult.Success(endOfPaginationReached = response.data.feed.isEmpty())
+                when (val response = feedRepository.getFeed(feedUri = feedUri, cursor = loadKey)) {
+                    is Response.Success -> {
+                        db.withTransaction {
+                            if (loadType == LoadType.REFRESH) {
+                                remoteKeysDao.clearKeysByFeed(feedId)
+                                feedDao.clearFeed(feedId)
+                            }
+                            val key =
+                                RemoteKeysEntity(
+                                    feedId = feedId,
+                                    prevKey = null,
+                                    nextKey = response.data.cursor,
+                                )
+                            remoteKeysDao.insertKey(key)
+                            val posts =
+                                response.data.feed.map {
+                                    it.toTimelinePostEntity(feedId)
+                                }
+                            logcat { "posts: $posts" }
+                            feedDao.insertPosts(posts)
+                        }
+                        return@withContext MediatorResult.Success(endOfPaginationReached = response.data.feed.isEmpty())
+                    }
+                    is Response.Error -> {
+                        logcat { "Error fetching feed, ${response.error.message}" }
+                        return@withContext MediatorResult.Error(Throwable(response.error.message))
+                    }
                 }
-                is Response.Error -> {
-                    logcat { "Error fetching feed, ${response.error.message}" }
-                    return MediatorResult.Error(Throwable(response.error.message))
-                }
+            } catch (e: Exception) {
+                logcat { "Error fetching feed, ${e.message}" }
+                return@withContext MediatorResult.Error(e)
             }
-        } catch (e: Exception) {
-            logcat { "Error fetching feed, ${e.message}" }
-            return MediatorResult.Error(e)
         }
-    }
 
     private suspend fun getRemoteKey(): RemoteKeysEntity? {
         return remoteKeysDao.getRemoteKeyForFeed(feedId)
