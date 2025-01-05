@@ -27,9 +27,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.contexts.pulse.domain.model.EmbedPost
+import com.contexts.pulse.domain.model.TimelinePostMedia
 
 @Composable
-fun EmbedRecordView(embedPost: EmbedPost) {
+fun EmbedRecordView(
+    embedPost: EmbedPost,
+    timelinePostMedia: TimelinePostMedia? = null,
+    onMediaOpen: (String) -> Unit,
+) {
     when (embedPost) {
         is EmbedPost.BlockedEmbedPost -> {
             Surface(
@@ -88,7 +93,11 @@ fun EmbedRecordView(embedPost: EmbedPost) {
         }
 
         is EmbedPost.VisibleEmbedPost -> {
-            EmbeddedRecordView(embedPost = embedPost)
+            EmbeddedRecordView(
+                embedPost = embedPost,
+                timelinePostMedia = timelinePostMedia,
+                onMediaOpen = { onMediaOpen(it) },
+            )
         }
 
         is EmbedPost.FeedGeneratorEmbed -> {

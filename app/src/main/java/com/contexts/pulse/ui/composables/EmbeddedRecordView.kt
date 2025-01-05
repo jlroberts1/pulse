@@ -21,10 +21,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.contexts.pulse.domain.model.EmbedPost
+import com.contexts.pulse.domain.model.TimelinePostFeature
+import com.contexts.pulse.domain.model.TimelinePostMedia
 
 @Composable
 fun EmbeddedRecordView(
     embedPost: EmbedPost.VisibleEmbedPost,
+    timelinePostMedia: TimelinePostMedia?,
+    onMediaOpen: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -54,6 +58,34 @@ fun EmbeddedRecordView(
                 text = embedPost.post.text,
                 onClick = { },
             )
+
+            timelinePostMedia?.let { mediaItem ->
+                when (mediaItem) {
+                    is TimelinePostFeature.ExternalFeature -> {
+                        EmbedExternalView(
+                            uri = mediaItem.uri,
+                            thumb = mediaItem.thumb,
+                            description = mediaItem.description,
+                            title = mediaItem.title,
+                            onMediaOpen = { onMediaOpen(it) },
+                        )
+                    }
+                    is TimelinePostFeature.ImagesFeature -> {
+                        EmbedImagesViewImage(
+                            images = mediaItem.images,
+                            onMediaOpen = { onMediaOpen(it) },
+                        )
+                    }
+                    is TimelinePostFeature.VideoFeature -> {
+                        EmbedVideoView(
+                            thumbnail = mediaItem.video.thumb,
+                            playlist = mediaItem.video.playlist,
+                            aspectRatio = mediaItem.video.aspectRatio,
+                            onMediaOpen = { onMediaOpen(it) },
+                        )
+                    }
+                }
+            }
         }
     }
 }
