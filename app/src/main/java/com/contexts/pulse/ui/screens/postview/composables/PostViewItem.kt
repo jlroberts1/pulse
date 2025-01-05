@@ -34,7 +34,7 @@ fun PostViewItem(
     post: TimelinePost,
     onPostClick: (String) -> Unit,
     onReplyClick: (String) -> Unit,
-    onRepostClick: () -> Unit,
+    onRepostClick: (TimelinePost) -> Unit,
     onLikeClick: (TimelinePost) -> Unit,
     onMenuClick: () -> Unit,
     onMediaOpen: (String) -> Unit,
@@ -117,6 +117,7 @@ fun PostViewItem(
                 likeCount = post.likeCount,
                 liked = post.liked,
                 onLikeClick = { onLikeClick(post) },
+                onRepostClick = { onRepostClick(post) },
                 reposted = post.reposted,
             )
             HorizontalDivider(

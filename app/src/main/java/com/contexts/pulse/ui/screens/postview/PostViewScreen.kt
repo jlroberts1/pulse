@@ -73,7 +73,6 @@ fun PostViewScreen(
 fun ThreadView(
     thread: Thread?,
     navController: NavController,
-    onPostClick: (String) -> Unit = {},
     onReplyClick: () -> Unit = {},
     onMediaOpen: (String) -> Unit = {},
 ) {
@@ -97,12 +96,20 @@ fun ThreadView(
                                 NavigationRoutes.Authenticated.PostView.createRoute(it.encodeURLParameter()),
                             )
                         },
-                        onReplyClick = {},
-                        onMediaOpen = {},
+                        onReplyClick = {
+                            navController.navigate(
+                                NavigationRoutes.Authenticated.AddPost.createRoute(it.encodeURLParameter()),
+                            )
+                        },
+                        onMediaOpen = { onMediaOpen(it) },
                         onRepostClick = {},
                         onLikeClick = {},
                         onMenuClick = {},
-                        onProfileClick = {},
+                        onProfileClick = {
+                            navController.navigate(
+                                NavigationRoutes.Authenticated.ViewProfile.createRoute(parent.post.author.did.did),
+                            )
+                        },
                     )
                 }
             }
@@ -119,12 +126,20 @@ fun ThreadView(
                             NavigationRoutes.Authenticated.PostView.createRoute(it.encodeURLParameter()),
                         )
                     },
-                    onReplyClick = {},
-                    onMediaOpen = {},
+                    onReplyClick = {
+                        navController.navigate(
+                            NavigationRoutes.Authenticated.AddPost.createRoute(it.encodeURLParameter()),
+                        )
+                    },
+                    onMediaOpen = { onMediaOpen(it) },
                     onRepostClick = {},
                     onLikeClick = {},
                     onMenuClick = {},
-                    onProfileClick = {},
+                    onProfileClick = {
+                        navController.navigate(
+                            NavigationRoutes.Authenticated.ViewProfile.createRoute(thread.post.author.did.did),
+                        )
+                    },
                 )
             }
         } else {
@@ -136,12 +151,20 @@ fun ThreadView(
                             NavigationRoutes.Authenticated.PostView.createRoute(it.encodeURLParameter()),
                         )
                     },
-                    onReplyClick = {},
-                    onMediaOpen = {},
+                    onReplyClick = {
+                        navController.navigate(
+                            NavigationRoutes.Authenticated.AddPost.createRoute(it.encodeURLParameter()),
+                        )
+                    },
+                    onMediaOpen = { onMediaOpen(it) },
                     onRepostClick = {},
                     onLikeClick = {},
                     onMenuClick = {},
-                    onProfileClick = {},
+                    onProfileClick = {
+                        navController.navigate(
+                            NavigationRoutes.Authenticated.ViewProfile.createRoute(thread.post.author.did.did),
+                        )
+                    },
                 )
             }
         }
@@ -156,12 +179,20 @@ fun ThreadView(
                                 NavigationRoutes.Authenticated.PostView.createRoute(it.encodeURLParameter()),
                             )
                         },
-                        onReplyClick = {},
-                        onMediaOpen = {},
+                        onReplyClick = {
+                            navController.navigate(
+                                NavigationRoutes.Authenticated.AddPost.createRoute(it.encodeURLParameter()),
+                            )
+                        },
+                        onMediaOpen = { onMediaOpen(it) },
                         onRepostClick = {},
                         onLikeClick = {},
                         onMenuClick = {},
-                        onProfileClick = {},
+                        onProfileClick = {
+                            navController.navigate(
+                                NavigationRoutes.Authenticated.ViewProfile.createRoute(reply.post.author.did.did),
+                            )
+                        },
                     )
                 }
 

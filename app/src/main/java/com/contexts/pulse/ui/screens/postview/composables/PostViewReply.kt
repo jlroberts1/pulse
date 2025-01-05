@@ -35,7 +35,7 @@ fun PostViewReply(
     parent: TimelinePost,
     onPostClick: (String) -> Unit,
     onReplyClick: (String) -> Unit,
-    onRepostClick: () -> Unit,
+    onRepostClick: (TimelinePost) -> Unit,
     onLikeClick: (TimelinePost) -> Unit,
     onMenuClick: () -> Unit,
     onMediaOpen: (String) -> Unit,
@@ -119,6 +119,7 @@ fun PostViewReply(
                 likeCount = post.likeCount,
                 liked = post.liked,
                 onLikeClick = { onLikeClick(post) },
+                onRepostClick = { onRepostClick(post) },
                 reposted = post.reposted,
             )
 
