@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
@@ -28,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
@@ -36,16 +38,20 @@ import com.contexts.pulse.ui.composables.FeedItem
 import com.contexts.pulse.ui.composables.PullToRefreshBox
 import com.contexts.pulse.ui.screens.profile.composables.Header
 import com.contexts.pulse.ui.screens.profile.composables.ProfileInfo
+import logcat.logcat
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel = koinViewModel(),
+    userDid: String? = null,
+    navController: NavController,
+    drawerState: DrawerState,
     onMediaOpen: (String) -> Unit,
 ) {
+    logcat("ProfileScreen") { "$userDid" }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val profile by viewModel.profile.collectAsStateWithLifecycle()
     val feed = viewModel.feedState.collectAsLazyPagingItems()
     val listState = rememberLazyListState()
     val adaptiveInfo = currentWindowAdaptiveInfo()
@@ -73,12 +79,12 @@ fun ProfileScreen(
                             .padding(end = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    profile?.let { profile ->
+                    uiState.profile?.let { profile ->
                         Header(
                             profile.banner,
                             profile.avatar,
                             profile.displayName,
-                            profile.handle,
+                            profile.handle.handle,
                         )
                         ProfileInfo(
                             profile.description,
@@ -113,6 +119,7 @@ fun ProfileScreen(
                                 onReplyClick = {},
                                 onMenuClick = {},
                                 onLikeClick = {},
+                                onProfileClick = {},
                             )
                         }
                     }
@@ -132,13 +139,13 @@ fun ProfileScreen(
                             .weight(1f, fill = false),
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    profile?.let {
+                    uiState.profile?.let {
                         item {
                             Header(
                                 it.banner,
                                 it.avatar,
                                 it.displayName,
-                                it.handle,
+                                it.handle.handle,
                             )
                         }
                         item {
@@ -165,6 +172,7 @@ fun ProfileScreen(
                                 onReplyClick = {},
                                 onMenuClick = {},
                                 onLikeClick = {},
+                                onProfileClick = {},
                             )
                         }
                     }

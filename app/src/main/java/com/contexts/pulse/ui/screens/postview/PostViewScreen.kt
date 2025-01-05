@@ -98,6 +98,7 @@ fun ThreadView(
                         onRepostClick = {},
                         onLikeClick = {},
                         onMenuClick = {},
+                        onProfileClick = {},
                     )
                 }
             }
@@ -111,6 +112,7 @@ fun ThreadView(
                 onRepostClick = {},
                 onLikeClick = {},
                 onMenuClick = {},
+                onProfileClick = {},
             )
         }
         items(thread.replies) { reply ->
@@ -130,6 +132,7 @@ fun ThreadView(
                             onRepostClick = {},
                             onLikeClick = {},
                             onMenuClick = {},
+                            onProfileClick = {},
                         )
                     }
 

@@ -30,6 +30,7 @@ fun EmbeddedRecordView(
     timelinePostMedia: TimelinePostMedia?,
     onMediaOpen: (String) -> Unit,
     modifier: Modifier = Modifier,
+    onProfileClick: () -> Unit,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -52,6 +53,7 @@ fun EmbeddedRecordView(
                 displayName = embedPost.author.displayName,
                 handle = embedPost.author.handle.handle,
                 indexedAt = embedPost.post.createdAt,
+                onProfileClick = { onProfileClick() },
             )
 
             PostMessageText(

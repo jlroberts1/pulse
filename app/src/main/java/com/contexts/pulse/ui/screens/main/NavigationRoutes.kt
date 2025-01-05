@@ -69,6 +69,12 @@ sealed class NavigationRoutes {
 
         data object Notifications : Authenticated("notifications")
 
+        data object ViewProfile : Authenticated("viewprofile/{userDid}") {
+            const val ARG_USER_DID = "userDid"
+
+            fun createRoute(userDid: String?) = "viewprofile/$userDid"
+        }
+
         data object Profile : Authenticated("profile")
 
         data object Settings : Authenticated("settings")
@@ -150,7 +156,36 @@ fun NavGraphBuilder.authenticatedGraph(
             enterTransition = { fadeIn(topLevelTransitionSpec) },
             exitTransition = { fadeOut(topLevelTransitionSpec) },
         ) {
+            ProfileScreen(navController = navController, drawerState = drawerState, onMediaOpen = { onMediaOpen(it) })
+        }
+        composable(
+            route = NavigationRoutes.Authenticated.ViewProfile.route,
+            arguments =
+                listOf(
+                    navArgument(NavigationRoutes.Authenticated.ViewProfile.ARG_USER_DID) {
+                        type = NavType.StringType
+                        nullable = true
+                    },
+                ),
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(300),
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(300),
+                )
+            },
+        ) { backStackEntry ->
+            val userDid =
+                backStackEntry.arguments?.getString(NavigationRoutes.Authenticated.ViewProfile.ARG_USER_DID)
             ProfileScreen(
+                userDid = userDid,
+                navController = navController,
+                drawerState = drawerState,
                 onMediaOpen = { onMediaOpen(it) },
             )
         }

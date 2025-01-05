@@ -80,7 +80,13 @@ val viewModelModule =
         viewModel {
             NotificationViewModel(get<NotificationsRepository>(), get<PreferencesRepository>())
         }
-        viewModel { ProfileViewModel(get<ProfileRepository>()) }
+        viewModel {
+            ProfileViewModel(
+                get<PreferencesRepository>(),
+                get<ProfileRepository>(),
+                get(),
+            )
+        }
         viewModel { SearchViewModel(get<ActorRepository>(), get<FeedRepository>()) }
         viewModel { SettingsViewModel(get<PreferencesRepository>()) }
         viewModel { PlayerViewModel(get<ExoPlayer>()) }

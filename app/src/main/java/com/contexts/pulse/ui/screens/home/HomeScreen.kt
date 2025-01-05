@@ -413,6 +413,11 @@ private fun FeedContent(
                         onLikeClick = { onLikeClick(it) },
                         onMenuClick = {},
                         onMediaOpen = { onMediaOpen(it) },
+                        onProfileClick = {
+                            navController.navigate(
+                                NavigationRoutes.Authenticated.ViewProfile.createRoute(post.author.did.did),
+                            )
+                        },
                     )
                 }
             }

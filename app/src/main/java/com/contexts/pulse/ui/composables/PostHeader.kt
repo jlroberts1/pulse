@@ -9,6 +9,7 @@
 
 package com.contexts.pulse.ui.composables
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,12 +34,16 @@ fun PostHeader(
     displayName: String? = null,
     handle: String? = null,
     indexedAt: Timestamp? = null,
+    onProfileClick: () -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        BorderedCircularAvatar(avatar, modifier = Modifier.padding(4.dp))
+        BorderedCircularAvatar(
+            imageUri = avatar,
+            modifier = Modifier.padding(4.dp).clickable { onProfileClick() },
+        )
         Row(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.weight(1f),

@@ -65,9 +65,13 @@ class ProfileRepositoryImpl(
             profileDao.getProfileByDid(it)
         }.flowOn(appDispatchers.io)
 
-    override suspend fun getProfileFeed(): RequestResult<Flow<PagingData<TimelinePost>>> {
-        val current = preferencesRepository.getCurrentUser() ?: return RequestResult.NoCurrentUser
-        val request = PagedRequest.AuthorFeed(current)
+    override suspend fun insertProfile(profile: ProfileEntity) =
+        withContext(appDispatchers.io) {
+            profileDao.insertProfile(profile)
+        }
+
+    override suspend fun getProfileFeed(actor: String): RequestResult<Flow<PagingData<TimelinePost>>> {
+        val request = PagedRequest.AuthorFeed(actor)
         return RequestResult.Success(
             Pager(
                 config =
@@ -88,11 +92,6 @@ class ProfileRepositoryImpl(
             ).flow.flowOn(Dispatchers.IO),
         )
     }
-
-    override suspend fun insertProfile(profile: ProfileEntity) =
-        withContext(appDispatchers.io) {
-            profileDao.insertProfile(profile)
-        }
 
     override suspend fun refreshFeeds(did: String): Unit =
         withContext(appDispatchers.io) {

@@ -24,7 +24,7 @@ interface ProfileRepository {
 
     fun getMyProfile(): Flow<ProfileEntity?>
 
-    suspend fun getProfileFeed(): RequestResult<Flow<PagingData<TimelinePost>>>
+    suspend fun getProfileFeed(actor: String): RequestResult<Flow<PagingData<TimelinePost>>>
 
     suspend fun insertProfile(profile: ProfileEntity)
 

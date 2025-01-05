@@ -134,6 +134,7 @@ fun AddPostScreen(
                         onMediaOpen = {},
                         onRepostClick = {},
                         onMenuClick = {},
+                        onProfileClick = {},
                     )
                 }
                 OutlinedTextField(

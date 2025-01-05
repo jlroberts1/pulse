@@ -28,6 +28,7 @@ fun FeedItem(
     onRepostClick: () -> Unit,
     onLikeClick: (TimelinePost) -> Unit,
     onMenuClick: () -> Unit,
+    onProfileClick: () -> Unit,
     onMediaOpen: (String) -> Unit,
 ) {
     ElevatedCard(
@@ -50,6 +51,7 @@ fun FeedItem(
                 displayName = post.author.displayName,
                 handle = post.author.handle.handle,
                 indexedAt = post.indexedAt,
+                onProfileClick = { onProfileClick() },
             )
             PostMessageText(
                 text = post.text,
@@ -77,12 +79,14 @@ fun FeedItem(
                             embedPost = feature.post,
                             timelinePostMedia = feature.media,
                             onMediaOpen = { onMediaOpen(it) },
+                            onProfileClick = { onProfileClick() },
                         )
                     }
                     is TimelinePostFeature.PostFeature -> {
                         EmbedRecordView(
                             embedPost = feature.post,
                             onMediaOpen = { onMediaOpen(it) },
+                            onProfileClick = { onProfileClick() },
                         )
                     }
                     is TimelinePostFeature.VideoFeature -> {

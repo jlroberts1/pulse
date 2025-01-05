@@ -34,6 +34,7 @@ fun EmbedRecordView(
     embedPost: EmbedPost,
     timelinePostMedia: TimelinePostMedia? = null,
     onMediaOpen: (String) -> Unit,
+    onProfileClick: () -> Unit,
 ) {
     when (embedPost) {
         is EmbedPost.BlockedEmbedPost -> {
@@ -97,6 +98,7 @@ fun EmbedRecordView(
                 embedPost = embedPost,
                 timelinePostMedia = timelinePostMedia,
                 onMediaOpen = { onMediaOpen(it) },
+                onProfileClick = { onProfileClick() },
             )
         }
 
