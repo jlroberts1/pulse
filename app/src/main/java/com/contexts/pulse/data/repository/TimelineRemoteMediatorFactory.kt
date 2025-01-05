@@ -9,6 +9,7 @@
 
 package com.contexts.pulse.data.repository
 
+import app.bsky.actor.Type
 import com.contexts.pulse.data.local.database.PulseDatabase
 import com.contexts.pulse.data.local.database.dao.FeedDao
 import com.contexts.pulse.data.local.database.dao.RemoteKeysDao
@@ -25,10 +26,12 @@ class TimelineRemoteMediatorFactory(
     fun create(
         feedId: String,
         feedUri: String,
+        feedType: Type,
     ) = TimelineRemoteMediator(
         appDispatchers = appDispatchers,
         feedId = feedId,
         feedUri = feedUri,
+        feedType = feedType,
         feedDao = feedDao,
         remoteKeysDao = remoteKeysDao,
         feedRepository = feedRepository,

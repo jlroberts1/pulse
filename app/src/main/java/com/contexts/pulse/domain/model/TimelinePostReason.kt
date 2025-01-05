@@ -15,6 +15,7 @@ import sh.christian.ozone.api.model.Timestamp
 
 @Serializable
 sealed interface TimelinePostReason {
+    @Serializable
     data class TimelinePostRepost(
         val repostAuthor: Profile,
         val indexedAt: Timestamp,

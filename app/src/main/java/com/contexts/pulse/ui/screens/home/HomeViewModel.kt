@@ -32,6 +32,7 @@ import com.contexts.pulse.domain.repository.PostRepository
 import com.contexts.pulse.domain.repository.PreferencesRepository
 import com.contexts.pulse.domain.repository.ProfileRepository
 import com.contexts.pulse.domain.repository.UserRepository
+import com.contexts.pulse.extensions.toType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -88,6 +89,7 @@ class HomeViewModel(
                             current[feed.id] ?: timelineManager.getFeedPagingFlow(
                                 feedId = feed.id,
                                 feedUri = feed.uri,
+                                feedType = feed.type.toType(),
                             )
                                 .cachedIn(viewModelScope)
                         )

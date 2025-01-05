@@ -103,6 +103,18 @@ class ProfileRepositoryImpl(
                         .map { it.value.items.filter { item -> item.type is Type.Feed } }
                         .firstOrNull()
 
+                val timelines =
+                    response.preferences
+                        .filterIsInstance<PreferencesUnion.SavedFeedsPrefV2>()
+                        .map { it.value.items.filter { item -> item.type is Type.Timeline } }
+                        .firstOrNull()
+
+                val lists =
+                    response.preferences
+                        .filterIsInstance<PreferencesUnion.SavedFeedsPrefV2>()
+                        .map { it.value.items.filter { item -> item.type is Type.List } }
+                        .firstOrNull()
+
                 savedFeeds?.forEach { savedFeed ->
                     feedAPI.getFeedGenerator(savedFeed.value).onSuccess { response ->
                         val feed =
@@ -115,6 +127,34 @@ class ProfileRepositoryImpl(
                                 displayName = response.view.displayName,
                             )
                         feedDao.insertFeed(feed)
+                    }
+                }
+
+                timelines?.forEach { savedTimeline ->
+                    val timeline =
+                        FeedEntity(
+                            id = savedTimeline.id,
+                            userDid = did,
+                            type = savedTimeline.type.value,
+                            uri = savedTimeline.value,
+                            pinned = savedTimeline.pinned,
+                            displayName = "Following",
+                        )
+                    feedDao.insertFeed(timeline)
+                }
+
+                lists?.forEach { savedList ->
+                    feedAPI.getFeedGenerator(savedList.value).onSuccess { response ->
+                        val list =
+                            FeedEntity(
+                                id = savedList.id,
+                                userDid = did,
+                                type = savedList.type.value,
+                                uri = savedList.value,
+                                pinned = savedList.pinned,
+                                displayName = response.view.displayName,
+                            )
+                        feedDao.insertFeed(list)
                     }
                 }
             }

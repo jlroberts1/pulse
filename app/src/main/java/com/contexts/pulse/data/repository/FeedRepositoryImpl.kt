@@ -14,7 +14,9 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import app.bsky.feed.GeneratorView
 import app.bsky.feed.GetFeedResponse
+import app.bsky.feed.GetListFeedResponse
 import app.bsky.feed.GetSuggestedFeedsResponse
+import app.bsky.feed.GetTimelineResponse
 import com.contexts.pulse.data.local.database.dao.FeedDao
 import com.contexts.pulse.data.local.database.entities.FeedEntity
 import com.contexts.pulse.data.network.api.FeedAPI
@@ -40,6 +42,19 @@ class FeedRepositoryImpl(
     ): Response<GetFeedResponse, NetworkError> =
         withContext(appDispatchers.io) {
             feedAPI.getFeed(feedUri = feedUri, cursor = cursor)
+        }
+
+    override suspend fun getTimeline(cursor: String?): Response<GetTimelineResponse, NetworkError> =
+        withContext(appDispatchers.io) {
+            feedAPI.getTimeline(cursor = cursor)
+        }
+
+    override suspend fun getListFeed(
+        feedUri: String,
+        cursor: String?,
+    ): Response<GetListFeedResponse, NetworkError> =
+        withContext(appDispatchers.io) {
+            feedAPI.getListFeed(feedUri = feedUri, cursor = cursor)
         }
 
     override fun getSuggestions(): Flow<PagingData<GeneratorView>> {

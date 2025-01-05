@@ -11,6 +11,8 @@ package com.contexts.pulse.data.network.api
 
 import app.bsky.feed.GetFeedGeneratorResponse
 import app.bsky.feed.GetFeedResponse
+import app.bsky.feed.GetListFeedResponse
+import app.bsky.feed.GetTimelineResponse
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.network.client.safeRequest
 import com.contexts.pulse.exceptions.NetworkError
@@ -33,6 +35,40 @@ class FeedAPI(
                 method = HttpMethod.Get
                 host = Url(pdsUrl).host
                 path("xrpc/app.bsky.feed.getFeed")
+                parameters.append("feed", feedUri)
+                parameters.append("limit", limit.toString())
+                cursor?.let { parameters.append("cursor", it) }
+            }
+        }
+    }
+
+    suspend fun getTimeline(
+        limit: Int = 20,
+        cursor: String? = null,
+    ): Response<GetTimelineResponse, NetworkError> {
+        val pdsUrl = UrlManager.getPdsUrl()
+        return client.safeRequest {
+            url {
+                method = HttpMethod.Get
+                host = Url(pdsUrl).host
+                path("xrpc/app.bsky.feed.getTimeline")
+                parameters.append("limit", limit.toString())
+                cursor?.let { parameters.append("cursor", it) }
+            }
+        }
+    }
+
+    suspend fun getListFeed(
+        feedUri: String,
+        limit: Int = 20,
+        cursor: String? = null,
+    ): Response<GetListFeedResponse, NetworkError> {
+        val pdsUrl = UrlManager.getPdsUrl()
+        return client.safeRequest {
+            url {
+                method = HttpMethod.Get
+                host = Url(pdsUrl).host
+                path("xrpc/app.bsky.feed.getListFeed")
                 parameters.append("feed", feedUri)
                 parameters.append("limit", limit.toString())
                 cursor?.let { parameters.append("cursor", it) }

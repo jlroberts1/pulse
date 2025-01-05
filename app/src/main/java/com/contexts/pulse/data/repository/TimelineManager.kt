@@ -14,6 +14,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import app.bsky.actor.Type
 import com.contexts.pulse.data.local.database.dao.FeedDao
 import com.contexts.pulse.data.local.database.entities.toPost
 import com.contexts.pulse.domain.model.TimelinePost
@@ -33,9 +34,10 @@ class TimelineManager(
     private fun getOrCreateMediator(
         feedId: String,
         feedUri: String,
+        feedType: Type,
     ): TimelineRemoteMediator {
         return feedMediators.getOrPut(feedId) {
-            timelineRemoteMediatorFactory.create(feedId, feedUri)
+            timelineRemoteMediatorFactory.create(feedId, feedUri, feedType)
         }
     }
 
@@ -43,6 +45,7 @@ class TimelineManager(
     fun getFeedPagingFlow(
         feedId: String,
         feedUri: String,
+        feedType: Type,
     ): Flow<PagingData<TimelinePost>> {
         return Pager(
             config =
@@ -51,7 +54,7 @@ class TimelineManager(
                     prefetchDistance = 5,
                     enablePlaceholders = false,
                 ),
-            remoteMediator = getOrCreateMediator(feedId, feedUri),
+            remoteMediator = getOrCreateMediator(feedId, feedUri, feedType),
         ) {
             feedDao.getPostsForFeed(feedId)
         }.flow.map { data -> data.map { it.toPost() } }.flowOn(appDispatchers.io)
