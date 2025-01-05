@@ -265,7 +265,7 @@ fun NavigationDrawer(
                 }
             }
         },
-        gesturesEnabled = true,
+        gesturesEnabled = false,
         content = content,
     )
 }

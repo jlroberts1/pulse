@@ -99,10 +99,6 @@ fun LoginScreen(
                     ),
         )
 
-        if (uiState.loading) {
-            CircularProgressIndicator()
-        }
-
         if (uiState.success) {
             LaunchedEffect(Unit) {
                 onNavigateToHome()
@@ -131,6 +127,11 @@ fun LoginScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
+
+                    if (uiState.loading) {
+                        CircularProgressIndicator()
+                    }
+
                     Image(
                         painter = painterResource(R.mipmap.ic_launcher_foreground),
                         "Pulse",
