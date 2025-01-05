@@ -82,10 +82,17 @@ fun PostViewReply(
                             onMediaOpen = { onMediaOpen(it) },
                         )
                     }
-                    is TimelinePostFeature.MediaPostFeature -> Unit
+                    is TimelinePostFeature.MediaPostFeature -> {
+                        EmbedRecordView(
+                            embedPost = feature.post,
+                            timelinePostMedia = feature.media,
+                            onMediaOpen = { onMediaOpen(it) },
+                        )
+                    }
                     is TimelinePostFeature.PostFeature -> {
                         EmbedRecordView(
                             embedPost = feature.post,
+                            onMediaOpen = { onMediaOpen(it) },
                         )
                     }
                     is TimelinePostFeature.VideoFeature -> {
