@@ -15,7 +15,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import app.bsky.actor.Type
-import com.contexts.pulse.data.local.database.dao.FeedDao
+import com.contexts.pulse.data.local.database.PulseDatabase
 import com.contexts.pulse.data.local.database.entities.toPost
 import com.contexts.pulse.domain.model.TimelinePost
 import com.contexts.pulse.modules.AppDispatchers
@@ -26,9 +26,10 @@ import java.util.concurrent.ConcurrentHashMap
 
 class TimelineManager(
     private val appDispatchers: AppDispatchers,
-    private val feedDao: FeedDao,
     private val timelineRemoteMediatorFactory: TimelineRemoteMediatorFactory,
+    private val db: PulseDatabase,
 ) {
+    private val feedDao get() = db.feedDao()
     private val feedMediators = ConcurrentHashMap<String, TimelineRemoteMediator>()
 
     private fun getOrCreateMediator(

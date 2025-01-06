@@ -10,7 +10,7 @@
 package com.contexts.pulse.data.network.client
 
 import com.atproto.server.RefreshSessionResponse
-import com.contexts.pulse.data.local.database.dao.UserDao
+import com.contexts.pulse.data.local.database.PulseDatabase
 import com.contexts.pulse.data.local.database.entities.TokenPair
 import com.contexts.pulse.domain.repository.PreferencesRepository
 import com.contexts.pulse.exceptions.NetworkError
@@ -24,8 +24,10 @@ import kotlinx.coroutines.flow.Flow
 
 class AuthManager(
     private val preferencesRepository: PreferencesRepository,
-    private val userDao: UserDao,
+    private val db: PulseDatabase,
 ) {
+    private val userDao get() = db.userDao()
+
     fun getCurrentUserFlow(): Flow<String?> {
         return preferencesRepository.getCurrentUserFlow()
     }

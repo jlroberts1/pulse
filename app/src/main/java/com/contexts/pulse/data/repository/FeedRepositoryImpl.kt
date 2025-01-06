@@ -17,7 +17,7 @@ import app.bsky.feed.GetFeedResponse
 import app.bsky.feed.GetListFeedResponse
 import app.bsky.feed.GetSuggestedFeedsResponse
 import app.bsky.feed.GetTimelineResponse
-import com.contexts.pulse.data.local.database.dao.FeedDao
+import com.contexts.pulse.data.local.database.PulseDatabase
 import com.contexts.pulse.data.local.database.entities.FeedEntity
 import com.contexts.pulse.data.network.api.FeedAPI
 import com.contexts.pulse.data.network.client.Response
@@ -34,8 +34,10 @@ class FeedRepositoryImpl(
     private val appDispatchers: AppDispatchers,
     private val client: HttpClient,
     private val feedAPI: FeedAPI,
-    private val feedDao: FeedDao,
+    private val db: PulseDatabase,
 ) : FeedRepository {
+    private val feedDao get() = db.feedDao()
+
     override suspend fun getFeed(
         feedUri: String,
         cursor: String?,

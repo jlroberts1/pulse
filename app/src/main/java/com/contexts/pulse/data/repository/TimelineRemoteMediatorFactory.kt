@@ -11,18 +11,17 @@ package com.contexts.pulse.data.repository
 
 import app.bsky.actor.Type
 import com.contexts.pulse.data.local.database.PulseDatabase
-import com.contexts.pulse.data.local.database.dao.FeedDao
-import com.contexts.pulse.data.local.database.dao.RemoteKeysDao
 import com.contexts.pulse.domain.repository.FeedRepository
 import com.contexts.pulse.modules.AppDispatchers
 
 class TimelineRemoteMediatorFactory(
     private val appDispatchers: AppDispatchers,
-    private val feedDao: FeedDao,
     private val feedRepository: FeedRepository,
-    private val remoteKeysDao: RemoteKeysDao,
     private val db: PulseDatabase,
 ) {
+    private val feedDao get() = db.feedDao()
+    private val remoteKeysDao get() = db.remoteKeysDao()
+
     fun create(
         feedId: String,
         feedUri: String,

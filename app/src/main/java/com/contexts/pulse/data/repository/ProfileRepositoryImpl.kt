@@ -17,8 +17,7 @@ import app.bsky.actor.PreferencesUnion
 import app.bsky.actor.PutPreferencesRequest
 import app.bsky.actor.Type
 import app.bsky.feed.GetAuthorFeedResponse
-import com.contexts.pulse.data.local.database.dao.FeedDao
-import com.contexts.pulse.data.local.database.dao.ProfileDao
+import com.contexts.pulse.data.local.database.PulseDatabase
 import com.contexts.pulse.data.local.database.entities.FeedEntity
 import com.contexts.pulse.data.local.database.entities.ProfileEntity
 import com.contexts.pulse.data.local.database.entities.toProfileEntity
@@ -45,12 +44,14 @@ import kotlinx.coroutines.withContext
 class ProfileRepositoryImpl(
     private val appDispatchers: AppDispatchers,
     private val feedAPI: FeedAPI,
-    private val feedDao: FeedDao,
     private val client: HttpClient,
     private val preferencesRepository: PreferencesRepository,
     private val profileAPI: ProfileAPI,
-    private val profileDao: ProfileDao,
+    private val db: PulseDatabase,
 ) : ProfileRepository {
+    private val profileDao get() = db.profileDao()
+    private val feedDao get() = db.feedDao()
+
     override suspend fun getProfile(actor: String): Response<GetProfileResponse, NetworkError> =
         withContext(appDispatchers.io) {
             profileAPI.getProfile(actor)

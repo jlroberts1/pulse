@@ -49,7 +49,7 @@ val viewModelModule =
                 get<PendingUploadRepository>(),
                 get<UploadWorkerManager>(),
                 get<PostRepository>(),
-                get(),
+                get<SavedStateHandle>(),
             )
         }
         viewModel {
@@ -84,7 +84,7 @@ val viewModelModule =
             ProfileViewModel(
                 get<PreferencesRepository>(),
                 get<ProfileRepository>(),
-                get(),
+                get<SavedStateHandle>(),
             )
         }
         viewModel { SearchViewModel(get<ActorRepository>(), get<FeedRepository>()) }

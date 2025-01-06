@@ -23,13 +23,13 @@ import org.koin.dsl.module
 
 val apiModule =
     module {
-        single { ActorAPI(get<HttpClient>()) }
-        single { AuthenticateAPI(get<HttpClient>()) }
-        single { ChatAPI(get<HttpClient>()) }
-        single { FeedAPI(get<HttpClient>()) }
-        single { NotificationsAPI(get<HttpClient>()) }
-        single { ProfileAPI(get<HttpClient>()) }
-        single { TenorAPI() }
-        single { PostAPI(get<HttpClient>()) }
-        single { UploadAPI(get<HttpClient>()) }
+        single<ActorAPI>(createdAtStart = false) { ActorAPI(get<HttpClient>()) }
+        single<AuthenticateAPI>(createdAtStart = false) { AuthenticateAPI(get<HttpClient>()) }
+        single<ChatAPI>(createdAtStart = false) { ChatAPI(get<HttpClient>()) }
+        single<FeedAPI>(createdAtStart = false) { FeedAPI(get<HttpClient>()) }
+        single<NotificationsAPI>(createdAtStart = false) { NotificationsAPI(get<HttpClient>()) }
+        single<ProfileAPI>(createdAtStart = false) { ProfileAPI(get<HttpClient>()) }
+        single<TenorAPI>(createdAtStart = false) { TenorAPI() }
+        single<PostAPI>(createdAtStart = false) { PostAPI(get<HttpClient>()) }
+        single<UploadAPI>(createdAtStart = false) { UploadAPI(get<HttpClient>()) }
     }

@@ -47,7 +47,7 @@ val workerModule =
                 get<PostRepository>(),
             )
         }
-        single<UploadWorkerManager> {
+        single<UploadWorkerManager>(createdAtStart = false) {
             UploadWorkerManager(get<PendingUploadRepository>(), get<WorkManager>())
         }
     }

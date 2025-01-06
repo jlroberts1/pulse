@@ -9,7 +9,7 @@
 
 package com.contexts.pulse.data.repository
 
-import com.contexts.pulse.data.local.database.dao.UserDao
+import com.contexts.pulse.data.local.database.PulseDatabase
 import com.contexts.pulse.data.local.database.entities.toUserEntity
 import com.contexts.pulse.domain.model.User
 import com.contexts.pulse.domain.repository.UserRepository
@@ -20,8 +20,10 @@ import kotlinx.coroutines.withContext
 
 class UserRepositoryImpl(
     private val appDispatchers: AppDispatchers,
-    private val userDao: UserDao,
+    private val db: PulseDatabase,
 ) : UserRepository {
+    private val userDao get() = db.userDao()
+
     override suspend fun insertUser(user: User) =
         withContext(appDispatchers.io) {
             userDao.insertUser(user.toUserEntity())

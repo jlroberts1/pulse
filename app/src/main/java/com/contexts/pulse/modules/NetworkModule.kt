@@ -13,7 +13,7 @@ import com.chuckerteam.chucker.api.ChuckerCollector
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.chuckerteam.chucker.api.RetentionManager
 import com.contexts.pulse.BuildConfig
-import com.contexts.pulse.data.local.database.dao.UserDao
+import com.contexts.pulse.data.local.database.PulseDatabase
 import com.contexts.pulse.data.network.client.AuthInterceptor
 import com.contexts.pulse.data.network.client.AuthManager
 import com.contexts.pulse.data.network.client.setupContentNegotiation
@@ -21,6 +21,8 @@ import com.contexts.pulse.data.network.client.setupDefaultRequest
 import com.contexts.pulse.domain.repository.PreferencesRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.dsl.module
@@ -51,26 +53,28 @@ val networkModule =
                     }
             }
         }
-        single {
-            AuthManager(get<PreferencesRepository>(), get<UserDao>())
+        single(createdAtStart = false) {
+            AuthManager(get<PreferencesRepository>(), get<PulseDatabase>())
         }
-        single {
+        single(createdAtStart = false) {
             AuthInterceptor(get<AuthManager>())
         }
-        single {
+        single(createdAtStart = false) {
             OkHttpClient.Builder()
                 .addInterceptor(get<AuthInterceptor>())
                 .addInterceptor(get<HttpLoggingInterceptor>())
                 .addInterceptor(get<ChuckerInterceptor>())
                 .build()
         }
-        single {
-            HttpClient(OkHttp) {
-                expectSuccess = true
-                setupContentNegotiation()
-                setupDefaultRequest()
-                engine {
-                    preconfigured = get<OkHttpClient>()
+        single(createdAtStart = false) {
+            runBlocking(Dispatchers.IO) {
+                HttpClient(OkHttp) {
+                    expectSuccess = true
+                    setupContentNegotiation()
+                    setupDefaultRequest()
+                    engine {
+                        preconfigured = get<OkHttpClient>()
+                    }
                 }
             }
         }

@@ -12,11 +12,7 @@ package com.contexts.pulse.modules
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.contexts.pulse.data.local.database.PulseDatabase
-import com.contexts.pulse.data.local.database.dao.FeedDao
 import com.contexts.pulse.data.local.database.dao.PendingUploadDao
-import com.contexts.pulse.data.local.database.dao.ProfileDao
-import com.contexts.pulse.data.local.database.dao.RemoteKeysDao
-import com.contexts.pulse.data.local.database.dao.UserDao
 import com.contexts.pulse.data.network.api.AuthenticateAPI
 import com.contexts.pulse.data.network.api.ChatAPI
 import com.contexts.pulse.data.network.api.FeedAPI
@@ -54,14 +50,14 @@ import org.koin.dsl.module
 
 val repositoryModule =
     module {
-        single<ActorRepository> {
+        single<ActorRepository>(createdAtStart = false) {
             ActorRepositoryImpl(
                 get<AppDispatchers>(),
                 get<HttpClient>(),
                 get(),
             )
         }
-        single<AuthenticateRepository> {
+        single<AuthenticateRepository>(createdAtStart = false) {
             AuthenticateRepositoryImpl(
                 get<AppDispatchers>(),
                 get<AuthenticateAPI>(),
@@ -70,82 +66,79 @@ val repositoryModule =
                 get<ProfileRepository>(),
             )
         }
-        single<ChatRepository> {
+        single<ChatRepository>(createdAtStart = false) {
             ChatRepositoryImpl(
                 get<AppDispatchers>(),
                 get<ChatAPI>(),
             )
         }
-        single<FeedRepository> {
+        single<FeedRepository>(createdAtStart = false) {
             FeedRepositoryImpl(
                 get<AppDispatchers>(),
                 get<HttpClient>(),
                 get<FeedAPI>(),
-                get<FeedDao>(),
+                get<PulseDatabase>(),
             )
         }
-        single<NotificationsRepository> {
+        single<NotificationsRepository>(createdAtStart = false) {
             NotificationsRepositoryImpl(
                 get<AppDispatchers>(),
                 get<NotificationsAPI>(),
             )
         }
-        single<PreferencesRepository> {
+        single<PreferencesRepository>(createdAtStart = false) {
             PreferencesRepositoryImpl(
                 get<AppDispatchers>(),
                 get<DataStore<Preferences>>(),
             )
         }
-        single<ProfileRepository> {
+        single<ProfileRepository>(createdAtStart = false) {
             ProfileRepositoryImpl(
                 get<AppDispatchers>(),
                 get<FeedAPI>(),
-                get<FeedDao>(),
                 get<HttpClient>(),
                 get<PreferencesRepository>(),
                 get<ProfileAPI>(),
-                get<ProfileDao>(),
+                get<PulseDatabase>(),
             )
         }
-        single<TenorRepository> {
+        single<TenorRepository>(createdAtStart = false) {
             TenorRepositoryImpl(
                 get<AppDispatchers>(),
                 get<TenorAPI>(),
             )
         }
-        single<UserRepository> {
+        single<UserRepository>(createdAtStart = false) {
             UserRepositoryImpl(
                 get<AppDispatchers>(),
-                get<UserDao>(),
+                get<PulseDatabase>(),
             )
         }
-        single<PostRepository> {
+        single<PostRepository>(createdAtStart = false) {
             PostRepositoryImpl(
                 get<AppDispatchers>(),
                 get<PostAPI>(),
                 get<UploadAPI>(),
             )
         }
-        single<PendingUploadRepository> {
+        single<PendingUploadRepository>(createdAtStart = false) {
             PendingUploadRepositoryImpl(
                 get<AppDispatchers>(),
                 get<PendingUploadDao>(),
                 get<UploadAPI>(),
             )
         }
-        single<TimelineManager> {
+        single<TimelineManager>(createdAtStart = false) {
             TimelineManager(
                 get<AppDispatchers>(),
-                get<FeedDao>(),
                 get<TimelineRemoteMediatorFactory>(),
+                get<PulseDatabase>(),
             )
         }
-        single<TimelineRemoteMediatorFactory> {
+        single<TimelineRemoteMediatorFactory>(createdAtStart = false) {
             TimelineRemoteMediatorFactory(
                 get<AppDispatchers>(),
-                get<FeedDao>(),
                 get<FeedRepository>(),
-                get<RemoteKeysDao>(),
                 get<PulseDatabase>(),
             )
         }
