@@ -90,5 +90,12 @@ val viewModelModule =
         viewModel { SearchViewModel(get<ActorRepository>(), get<FeedRepository>()) }
         viewModel { SettingsViewModel(get<PreferencesRepository>()) }
         viewModel { PlayerViewModel(get<ExoPlayer>()) }
-        viewModel { PostViewModel(get<SavedStateHandle>(), get<PostRepository>()) }
+        viewModel {
+            PostViewModel(
+                get<SavedStateHandle>(),
+                get<FeedRepository>(),
+                get<PostRepository>(),
+                get<PreferencesRepository>(),
+            )
+        }
     }

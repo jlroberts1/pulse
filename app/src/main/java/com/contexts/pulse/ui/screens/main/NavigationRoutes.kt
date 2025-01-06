@@ -269,6 +269,7 @@ fun NavGraphBuilder.authenticatedGraph(
                 postId = postId,
                 navController = navController,
                 drawerState = drawerState,
+                onMediaOpen = { onMediaOpen(it) },
             )
         }
     }

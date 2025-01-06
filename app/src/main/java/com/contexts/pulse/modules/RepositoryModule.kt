@@ -12,7 +12,6 @@ package com.contexts.pulse.modules
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.contexts.pulse.data.local.database.PulseDatabase
-import com.contexts.pulse.data.local.database.dao.PendingUploadDao
 import com.contexts.pulse.data.network.api.AuthenticateAPI
 import com.contexts.pulse.data.network.api.ChatAPI
 import com.contexts.pulse.data.network.api.FeedAPI
@@ -124,8 +123,8 @@ val repositoryModule =
         single<PendingUploadRepository>(createdAtStart = false) {
             PendingUploadRepositoryImpl(
                 get<AppDispatchers>(),
-                get<PendingUploadDao>(),
                 get<UploadAPI>(),
+                get<PulseDatabase>(),
             )
         }
         single<TimelineManager>(createdAtStart = false) {

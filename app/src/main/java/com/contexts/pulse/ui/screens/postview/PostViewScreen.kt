@@ -24,9 +24,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.contexts.pulse.domain.model.Thread
 import com.contexts.pulse.domain.model.ThreadPost
+import com.contexts.pulse.domain.model.TimelinePost
 import com.contexts.pulse.ui.composables.PullToRefreshBox
 import com.contexts.pulse.ui.composables.ScaffoldedScreen
 import com.contexts.pulse.ui.screens.main.NavigationRoutes
@@ -43,6 +45,7 @@ fun PostViewScreen(
     postId: String,
     navController: NavController,
     drawerState: DrawerState,
+    onMediaOpen: (String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -57,12 +60,23 @@ fun PostViewScreen(
             onRefresh = { viewModel.getThread() },
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
-                ThreadView(uiState.thread, navController)
+                ThreadView(
+                    thread = uiState.thread,
+                    navController = navController,
+                    onLikeClick = { viewModel.onLikeClicked(it) },
+                    onMediaOpen = { onMediaOpen(it) },
+                )
                 ReplyField(
                     modifier =
                         Modifier
                             .align(Alignment.BottomCenter),
-                    onClick = {},
+                    onClick = {
+                        uiState.thread?.post?.uri?.atUri?.encodeURLParameter()?.let {
+                            navController.navigate(
+                                NavigationRoutes.Authenticated.AddPost.createRoute(it),
+                            )
+                        }
+                    },
                 )
             }
         }
@@ -73,7 +87,7 @@ fun PostViewScreen(
 fun ThreadView(
     thread: Thread?,
     navController: NavController,
-    onReplyClick: () -> Unit = {},
+    onLikeClick: (TimelinePost) -> Unit,
     onMediaOpen: (String) -> Unit = {},
 ) {
     if (thread == null) return
@@ -103,7 +117,7 @@ fun ThreadView(
                         },
                         onMediaOpen = { onMediaOpen(it) },
                         onRepostClick = {},
-                        onLikeClick = {},
+                        onLikeClick = { onLikeClick(parent.post) },
                         onMenuClick = {},
                         onProfileClick = {
                             navController.navigate(
@@ -133,7 +147,7 @@ fun ThreadView(
                     },
                     onMediaOpen = { onMediaOpen(it) },
                     onRepostClick = {},
-                    onLikeClick = {},
+                    onLikeClick = { onLikeClick(thread.post) },
                     onMenuClick = {},
                     onProfileClick = {
                         navController.navigate(
@@ -158,7 +172,7 @@ fun ThreadView(
                     },
                     onMediaOpen = { onMediaOpen(it) },
                     onRepostClick = {},
-                    onLikeClick = {},
+                    onLikeClick = { onLikeClick(thread.post) },
                     onMenuClick = {},
                     onProfileClick = {
                         navController.navigate(
@@ -176,7 +190,7 @@ fun ThreadView(
                         parent = thread.post,
                         onPostClick = {
                             navController.navigate(
-                                NavigationRoutes.Authenticated.PostView.createRoute(it.encodeURLParameter()),
+                                NavigationRoutes.Authenticated.PostView.createRoute(reply.post.uri.atUri.encodeURLParameter()),
                             )
                         },
                         onReplyClick = {
@@ -186,7 +200,7 @@ fun ThreadView(
                         },
                         onMediaOpen = { onMediaOpen(it) },
                         onRepostClick = {},
-                        onLikeClick = {},
+                        onLikeClick = { onLikeClick(reply.post) },
                         onMenuClick = {},
                         onProfileClick = {
                             navController.navigate(

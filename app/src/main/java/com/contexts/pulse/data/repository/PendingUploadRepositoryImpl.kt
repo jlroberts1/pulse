@@ -13,7 +13,7 @@ import app.bsky.video.GetJobStatusQueryParams
 import app.bsky.video.GetJobStatusResponse
 import app.bsky.video.UploadVideoResponse
 import com.atproto.repo.UploadBlobResponse
-import com.contexts.pulse.data.local.database.dao.PendingUploadDao
+import com.contexts.pulse.data.local.database.PulseDatabase
 import com.contexts.pulse.data.local.database.entities.PendingExternalEmbed
 import com.contexts.pulse.data.local.database.entities.PendingMediaAttachment
 import com.contexts.pulse.data.local.database.entities.PendingUploadEntity
@@ -28,9 +28,11 @@ import kotlinx.coroutines.withContext
 
 class PendingUploadRepositoryImpl(
     private val appDispatchers: AppDispatchers,
-    private val pendingUploadDao: PendingUploadDao,
     private val uploadAPI: UploadAPI,
+    private val db: PulseDatabase,
 ) : PendingUploadRepository {
+    private val pendingUploadDao get() = db.pendingUploadDao()
+
     override suspend fun getPendingUploadsWithMedia(): List<PendingUploadWithMedia>? =
         withContext(appDispatchers.io) {
             pendingUploadDao.getPendingUploadsWithMedia()
