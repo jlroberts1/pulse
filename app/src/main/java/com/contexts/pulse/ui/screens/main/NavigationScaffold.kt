@@ -86,6 +86,7 @@ fun NavigationScaffold(
             navController.currentBackStackEntryAsState().value?.destination?.route
                 ?: TopDestinations.HOME.route,
         )
+
     val nestedScrollConnection =
         remember {
             object : NestedScrollConnection {

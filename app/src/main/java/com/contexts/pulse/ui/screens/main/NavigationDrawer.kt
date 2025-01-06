@@ -78,6 +78,10 @@ fun NavigationDrawer(
     drawerState: DrawerState,
     content: @Composable () -> Unit,
 ) {
+    val topDestinationRoutes =
+        remember {
+            TopDestinations.entries.map { it.route }.toSet()
+        }
     val onNavigate = { route: String ->
         navController.navigate(route) {
             popUpTo(navController.graph.findStartDestination().id) {
@@ -87,13 +91,15 @@ fun NavigationDrawer(
             restoreState = true
         }
     }
-
     val currentRoute =
         rememberUpdatedState(
             navController.currentBackStackEntryAsState().value?.destination?.route
                 ?: TopDestinations.HOME.route,
         )
-
+    val isTopDestination =
+        remember(currentRoute.value) {
+            currentRoute.value in topDestinationRoutes
+        }
     val items =
         remember(unreadNotificationCount) {
             listOf(
@@ -265,7 +271,7 @@ fun NavigationDrawer(
                 }
             }
         },
-        gesturesEnabled = false,
+        gesturesEnabled = isTopDestination,
         content = content,
     )
 }
