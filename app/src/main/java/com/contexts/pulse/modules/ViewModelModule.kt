@@ -25,6 +25,7 @@ import com.contexts.pulse.domain.repository.ProfileRepository
 import com.contexts.pulse.domain.repository.TenorRepository
 import com.contexts.pulse.domain.repository.UserRepository
 import com.contexts.pulse.ui.components.PlayerViewModel
+import com.contexts.pulse.ui.components.SnackbarDelegate
 import com.contexts.pulse.ui.screens.addpost.AddPostViewModel
 import com.contexts.pulse.ui.screens.chat.ChatViewModel
 import com.contexts.pulse.ui.screens.home.HomeViewModel
@@ -59,6 +60,7 @@ val viewModelModule =
                 get<ProfileRepository>(),
                 get<UserRepository>(),
                 get<WorkManager>(),
+                get<SnackbarDelegate>(),
             )
         }
         viewModel { ChatViewModel(get<ChatRepository>(), get<PreferencesRepository>()) }

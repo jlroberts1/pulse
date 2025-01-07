@@ -13,6 +13,7 @@ import android.content.Context
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.work.WorkManager
 import com.contexts.pulse.domain.media.PlayerPoolManager
+import com.contexts.pulse.ui.components.SnackbarDelegate
 import org.koin.dsl.module
 
 val appModule =
@@ -25,5 +26,8 @@ val appModule =
         }
         single<WorkManager>(createdAtStart = false) {
             WorkManager.getInstance(get<Context>())
+        }
+        single<SnackbarDelegate>(createdAtStart = false) {
+            SnackbarDelegate()
         }
     }

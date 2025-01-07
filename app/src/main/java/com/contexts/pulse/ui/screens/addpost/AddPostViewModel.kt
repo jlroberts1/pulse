@@ -23,7 +23,6 @@ import com.contexts.pulse.data.local.database.entities.ReplyReference
 import com.contexts.pulse.data.network.client.onError
 import com.contexts.pulse.data.network.client.onSuccess
 import com.contexts.pulse.domain.model.TenorGif
-import com.contexts.pulse.domain.model.TimelinePost
 import com.contexts.pulse.domain.model.toPost
 import com.contexts.pulse.domain.repository.ActorRepository
 import com.contexts.pulse.domain.repository.PendingUploadRepository
@@ -40,21 +39,6 @@ import kotlinx.coroutines.launch
 import sh.christian.ozone.api.AtUri
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
-
-data class AddPostUiState(
-    val text: String = "",
-    val cursorPosition: Int = 0,
-    val suggestions: List<ProfileViewBasic> = emptyList(),
-    val showSuggestions: Boolean = false,
-    val loading: Boolean = false,
-    val charactersLeft: Int = 300,
-    val mediaItems: List<MediaItem> = emptyList(),
-    val gifSearchResults: List<TenorGif> = emptyList(),
-    val selectedGif: TenorGif? = null,
-    val error: String? = null,
-    val uploadSent: Boolean = false,
-    val replyPost: TimelinePost? = null,
-)
 
 data class MediaItem(
     val uri: Uri,
@@ -185,6 +169,14 @@ class AddPostViewModel(
         _uiState.update {
             it.copy(
                 selectedGif = gif,
+            )
+        }
+    }
+
+    fun onClearSelectedGif() {
+        _uiState.update {
+            it.copy(
+                selectedGif = null,
             )
         }
     }

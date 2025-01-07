@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -43,6 +42,7 @@ import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -51,6 +51,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -65,18 +66,25 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.window.core.layout.WindowWidthSizeClass
+import com.contexts.pulse.ui.components.SnackbarDelegate
 import com.contexts.pulse.ui.composables.ViewMedia
+import org.koin.compose.koinInject
 
 @Composable
 fun NavigationScaffold(
     modifier: Modifier = Modifier,
     viewModel: AppViewModel,
     navController: NavHostController,
-    snackbarHostState: SnackbarHostState,
     unreadNotificationCount: Long,
     mediaState: MediaState,
     drawerState: DrawerState,
+    snackbarDelegate: SnackbarDelegate = koinInject(),
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    snackbarDelegate.apply {
+        this.snackbarHostState = snackbarHostState
+        coroutineScope = rememberCoroutineScope()
+    }
     var controlsVisible by remember { mutableStateOf(true) }
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val isExpandedScreen =
@@ -126,7 +134,15 @@ fun NavigationScaffold(
         modifier =
             modifier
                 .nestedScroll(nestedScrollConnection),
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) {
+                val backgroundColor = snackbarDelegate.snackbarBackgroundColor
+                Snackbar(
+                    snackbarData = it,
+                    containerColor = backgroundColor,
+                )
+            }
+        },
         floatingActionButton = {
             AnimatedVisibility(
                 visible = routeUiState.showFab && controlsVisible && mediaState.url == null,
@@ -199,9 +215,8 @@ fun NavigationScaffold(
         Box(
             modifier =
                 Modifier
-                    .fillMaxSize()
                     .navigationBarsPadding()
-                    .imePadding()
+                    .fillMaxSize()
                     .padding(newPadding),
         ) {
             Row {

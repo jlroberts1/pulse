@@ -21,6 +21,7 @@ import com.contexts.pulse.domain.repository.NotificationsRepository
 import com.contexts.pulse.domain.repository.PreferencesRepository
 import com.contexts.pulse.domain.repository.ProfileRepository
 import com.contexts.pulse.domain.repository.UserRepository
+import com.contexts.pulse.ui.components.SnackbarDelegate
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -42,6 +43,7 @@ class AppViewModel(
     private val profileRepository: ProfileRepository,
     private val userRepository: UserRepository,
     private val workManager: WorkManager,
+    private val snackbarDelegate: SnackbarDelegate,
 ) : ViewModel() {
     val theme =
         preferencesRepository.getTheme()
@@ -66,9 +68,6 @@ class AppViewModel(
     val profile =
         profileRepository.getMyProfile()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), null)
-
-    private val _snackbarMessages = MutableStateFlow<String?>(null)
-    val snackbarMessages = _snackbarMessages.asStateFlow()
 
     init {
         bindAccount()
@@ -108,23 +107,23 @@ class AppViewModel(
                         WorkInfo.State.SUCCEEDED -> {
                             val uploadId = workInfo.outputData.getLong("upload_id", -1)
                             if (uploadId != -1L) {
-                                _snackbarMessages.update { "Post uploaded successfully!" }
+                                snackbarDelegate.showSnackbar(
+                                    message = "Post uploaded successfully!",
+                                )
                             }
                         }
 
                         WorkInfo.State.FAILED -> {
                             val error = workInfo.outputData.getString("error") ?: "Upload failed"
-                            _snackbarMessages.update { error }
+                            snackbarDelegate.showSnackbar(
+                                message = error,
+                            )
                         }
 
                         else -> {}
                     }
                 }
             }.launchIn(viewModelScope)
-    }
-
-    fun clearSnackbar() {
-        _snackbarMessages.update { null }
     }
 
     private fun checkAuthState() {
