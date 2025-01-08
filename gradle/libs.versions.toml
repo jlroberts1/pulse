@@ -11,12 +11,12 @@ activityCompose = "1.9.3"
 composeBom = "2024.12.01"
 ktlint = "12.1.2"
 splashscreen = "1.0.1"
-ozone = "0.3.0"
+ozone = "0.3.1"
 datastore = "1.1.1"
 koin = "4.0.0"
 navigation = "2.8.5"
 accompanist-permissions = "0.37.0"
-ktor = "3.0.1"
+ktor = "3.0.3"
 coil = "3.0.4"
 room = "2.6.1"
 okhttp-logging = "4.12.0"
@@ -60,16 +60,13 @@ koin-android = { group = "io.insert-koin", name = "koin-android" }
 koin-android-work-manager = { group = "io.insert-koin", name = "koin-androidx-workmanager" }
 koin-compose-viewmodel = { group = "io.insert-koin", name = "koin-compose-viewmodel" }
 datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
+lexicons = { module = "sh.christian.ozone:lexicons", version.ref = "ozone" }
 splashscreen-android = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist-permissions" }
-ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
-ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktor" }
 ktor-client-serialization = { group = "io.ktor", name = "ktor-client-serialization", version.ref = "ktor" }
 ktor-client-json = { group = "io.ktor", name = "ktor-client-json", version.ref = "ktor" }
-ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
 ktor-serialization-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
-ktor-client-auth = { group = "io.ktor", name = "ktor-client-auth", version.ref = "ktor" }
 ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
 coil = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
 coil-compose-core = { group = "io.coil-kt.coil3", name = "coil-compose-core", version.ref = "coil" }
@@ -125,14 +122,10 @@ coil-common = [
 ]
 
 ktor-common = [
-    "ktor-client-core",
     "ktor-client-serialization",
     "ktor-client-json",
-    "ktor-client-logging",
     "ktor-serialization-json",
     "ktor-content-negotiation",
-    "ktor-client-auth",
-    "ktor-client-android",
     "ktor-client-okhttp"
 ]
 
