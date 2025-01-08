@@ -41,6 +41,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -49,28 +50,53 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.paging.LoadState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import app.bsky.actor.ProfileView
+import com.contexts.pulse.ui.components.SnackbarDelegate
 import com.contexts.pulse.ui.composables.BorderedCircularAvatar
-import logcat.logcat
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
+fun SearchScreen(
+    viewModel: SearchViewModel = koinViewModel(),
+    snackbarDelegate: SnackbarDelegate = koinInject(),
+) {
+    val scope = rememberCoroutineScope()
     val suggestedAccounts = viewModel.suggestedAccounts.collectAsLazyPagingItems()
     val suggestedFeeds = viewModel.suggestedFeeds.collectAsLazyPagingItems()
+    val refreshAccounts = viewModel.refreshAccounts.collectAsStateWithLifecycle()
+    val refreshFeeds = viewModel.refreshFeeds.collectAsStateWithLifecycle()
 
-    LaunchedEffect(suggestedAccounts.loadState) {
-        when (suggestedAccounts.loadState.refresh) {
-            is LoadState.Loading -> logcat("Search") { "Loading" }
-            is LoadState.Error -> logcat("Search") { "Error: ${(suggestedAccounts.loadState.refresh as LoadState.Error).error}" }
-            is LoadState.NotLoading -> logcat("Search") { "Loaded: ${suggestedAccounts.itemCount} items" }
+    LaunchedEffect(refreshAccounts.value) {
+        refreshAccounts.value?.let {
+            scope.launch {
+                suggestedAccounts.refresh()
+                snackbarDelegate.showSnackbar(
+                    message = "Followed @$it",
+                )
+                viewModel.clearRefreshedAccount()
+            }
         }
     }
+
+    LaunchedEffect(refreshFeeds.value) {
+        refreshFeeds.value?.let {
+            scope.launch {
+                suggestedFeeds.refresh()
+                snackbarDelegate.showSnackbar(
+                    message = "Saved $it to feeds",
+                )
+                viewModel.clearRefreshedFeed()
+            }
+        }
+    }
+
     Scaffold { padding ->
         Column(modifier = Modifier.padding(padding).fillMaxSize()) {
             SearchBox(
@@ -80,7 +106,12 @@ fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
             )
             LazyColumn {
                 item { SuggestedAccountHeader() }
-                item { SuggestedAccountCarousel(pagingItems = suggestedAccounts) }
+                item {
+                    SuggestedAccountCarousel(
+                        pagingItems = suggestedAccounts,
+                        onClick = { viewModel.followAccount(it.did, it.handle.handle) },
+                    )
+                }
                 item { SuggestedFeedHeader() }
                 items(
                     count = suggestedFeeds.itemCount,
@@ -89,11 +120,12 @@ fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
                 ) { index ->
                     suggestedFeeds[index]?.let {
                         SuggestedFeedItem(
-                            it.avatar?.uri,
-                            it.displayName,
-                            it.creator.handle.handle,
-                            it.description,
-                            it.likeCount,
+                            avatar = it.avatar?.uri,
+                            feedTitle = it.displayName,
+                            feedAuthor = it.creator.handle.handle,
+                            feedDescription = it.description,
+                            likeCount = it.likeCount,
+                            onClick = { viewModel.addFeed(it) },
                         )
                     }
                 }
@@ -162,6 +194,7 @@ fun SuggestedFeedItem(
     feedAuthor: String,
     feedDescription: String?,
     likeCount: Long?,
+    onClick: () -> Unit,
 ) {
     Column(
         modifier =
@@ -200,9 +233,8 @@ fun SuggestedFeedItem(
                     )
                 }
             }
-
             IconButton(
-                onClick = {},
+                onClick = { onClick() },
                 modifier = Modifier.padding(start = 8.dp),
             ) {
                 Icon(Icons.Filled.Add, "Add feed")
@@ -286,7 +318,10 @@ fun SuggestedFeedHeader() {
 }
 
 @Composable
-fun SuggestedAccountCarousel(pagingItems: LazyPagingItems<ProfileView>) {
+fun SuggestedAccountCarousel(
+    pagingItems: LazyPagingItems<ProfileView>,
+    onClick: (ProfileView) -> Unit,
+) {
     LazyRow(
         modifier =
             Modifier
@@ -348,8 +383,9 @@ fun SuggestedAccountCarousel(pagingItems: LazyPagingItems<ProfileView>) {
                                 overflow = TextOverflow.Ellipsis,
                             )
                             Spacer(modifier = Modifier.weight(1f))
-                            Button(onClick = {}) {
-                                Text("Follow")
+                            val buttonText = if (item.viewer?.following != null) "Following" else "Follow"
+                            Button(onClick = { onClick(item) }) {
+                                Text(buttonText)
                             }
                         }
                     }

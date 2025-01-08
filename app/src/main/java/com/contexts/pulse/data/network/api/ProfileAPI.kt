@@ -12,8 +12,10 @@ package com.contexts.pulse.data.network.api
 import app.bsky.actor.GetPreferencesResponse
 import app.bsky.actor.GetProfileResponse
 import app.bsky.actor.PutPreferencesRequest
+import com.atproto.repo.CreateRecordResponse
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.network.client.safeRequest
+import com.contexts.pulse.data.network.request.CreateFollowRecordRequest
 import com.contexts.pulse.exceptions.NetworkError
 import io.ktor.client.HttpClient
 import io.ktor.client.request.setBody
@@ -56,6 +58,18 @@ class ProfileAPI(
                 path("xrpc/app.bsky.actor.putPreferences")
             }
             setBody(putPreferencesRequest)
+        }
+    }
+
+    suspend fun followUser(createFollowRecordRequest: CreateFollowRecordRequest): Response<CreateRecordResponse, NetworkError> {
+        val pdsUrl = UrlManager.getPdsUrl()
+        return client.safeRequest {
+            url {
+                method = HttpMethod.Post
+                host = Url(pdsUrl).host
+                path("xrpc/com.atproto.repo.createRecord")
+                setBody(createFollowRecordRequest)
+            }
         }
     }
 }

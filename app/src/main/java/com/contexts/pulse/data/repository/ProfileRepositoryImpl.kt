@@ -17,6 +17,7 @@ import app.bsky.actor.PreferencesUnion
 import app.bsky.actor.PutPreferencesRequest
 import app.bsky.actor.Type
 import app.bsky.feed.GetAuthorFeedResponse
+import com.atproto.repo.CreateRecordResponse
 import com.contexts.pulse.data.local.database.PulseDatabase
 import com.contexts.pulse.data.local.database.entities.FeedEntity
 import com.contexts.pulse.data.local.database.entities.ProfileEntity
@@ -25,6 +26,7 @@ import com.contexts.pulse.data.network.api.FeedAPI
 import com.contexts.pulse.data.network.api.ProfileAPI
 import com.contexts.pulse.data.network.client.Response
 import com.contexts.pulse.data.network.client.onSuccess
+import com.contexts.pulse.data.network.request.CreateFollowRecordRequest
 import com.contexts.pulse.domain.model.TimelinePost
 import com.contexts.pulse.domain.model.toPost
 import com.contexts.pulse.domain.repository.PreferencesRepository
@@ -166,5 +168,10 @@ class ProfileRepositoryImpl(
                 val current = preferencesRepository.getCurrentUser()
                 current?.let { refreshFeeds(current) }
             }
+        }
+
+    override suspend fun followUser(createFollowRecordRequest: CreateFollowRecordRequest): Response<CreateRecordResponse, NetworkError> =
+        withContext(appDispatchers.io) {
+            profileAPI.followUser(createFollowRecordRequest)
         }
 }

@@ -89,7 +89,14 @@ val viewModelModule =
                 get<SavedStateHandle>(),
             )
         }
-        viewModel { SearchViewModel(get<ActorRepository>(), get<FeedRepository>()) }
+        viewModel {
+            SearchViewModel(
+                get<ActorRepository>(),
+                get<FeedRepository>(),
+                get<PreferencesRepository>(),
+                get<ProfileRepository>(),
+            )
+        }
         viewModel { SettingsViewModel(get<PreferencesRepository>()) }
         viewModel { PlayerViewModel(get<ExoPlayer>()) }
         viewModel {
