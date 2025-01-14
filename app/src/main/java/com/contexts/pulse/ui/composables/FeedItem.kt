@@ -25,7 +25,7 @@ fun FeedItem(
     post: TimelinePost,
     onPostClick: (String) -> Unit,
     onReplyClick: (String) -> Unit,
-    onRepostClick: () -> Unit,
+    onRepostClick: (TimelinePost) -> Unit,
     onLikeClick: (TimelinePost) -> Unit,
     onMenuClick: () -> Unit,
     onProfileClick: () -> Unit,
@@ -103,6 +103,7 @@ fun FeedItem(
             FeedItemInteractions(
                 onReplyClick = { onReplyClick(post.uri.atUri) },
                 onLikeClick = { onLikeClick(post) },
+                onRepostClick = { onRepostClick(post) },
                 replyCount = post.replyCount,
                 repostCount = post.repostCount,
                 likeCount = post.likeCount,

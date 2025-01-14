@@ -124,6 +124,9 @@ class HomeViewModel(
         if (post.liked) unlikePost(post) else likePost(post)
     }
 
+    fun onRepostClicked(post: TimelinePost?) {
+    }
+
     private fun likePost(post: TimelinePost) {
         viewModelScope.launch {
             val currentUser = currentUser.firstOrNull()

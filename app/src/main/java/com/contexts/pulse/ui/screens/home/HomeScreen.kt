@@ -17,7 +17,6 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -60,6 +59,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -74,6 +74,7 @@ import com.contexts.pulse.data.local.database.entities.FeedEntity
 import com.contexts.pulse.domain.model.TimelinePost
 import com.contexts.pulse.ui.composables.FeedItem
 import com.contexts.pulse.ui.composables.PullToRefreshBox
+import com.contexts.pulse.ui.composables.QuoteSelectionBottomSheet
 import com.contexts.pulse.ui.composables.ScaffoldedScreen
 import com.contexts.pulse.ui.screens.main.NavigationRoutes
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -84,7 +85,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
@@ -101,6 +102,9 @@ fun HomeScreen(
     val isExpandedScreen =
         adaptiveInfo.windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED
     val isLoggedIn by viewModel.isLoggedIn.collectAsStateWithLifecycle()
+
+    var showRepostSelection by remember { mutableStateOf(false) }
+    var currentRepost by remember { mutableStateOf<TimelinePost?>(null) }
 
     val notificationPermissionState =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -168,6 +172,10 @@ fun HomeScreen(
                     feedStates = feedStates,
                     onMediaOpen = { onMediaOpen(it) },
                     onLikeClick = { viewModel.onLikeClicked(it.first) },
+                    onRepostClick = {
+                        currentRepost = it.first
+                        showRepostSelection = true
+                    },
                 )
             } else {
                 TabPagerFeeds(
@@ -176,6 +184,10 @@ fun HomeScreen(
                     feedStates = feedStates,
                     onMediaOpen = { onMediaOpen(it) },
                     onLikeClick = { viewModel.onLikeClicked(it.first) },
+                    onRepostClick = {
+                        currentRepost = it.first
+                        showRepostSelection = true
+                    },
                 )
             }
 
@@ -188,6 +200,17 @@ fun HomeScreen(
                         viewModel.updateVisibleFeeds(newVisibleFeeds)
                         showFeedConfig = false
                     },
+                )
+            }
+
+            if (showRepostSelection) {
+                QuoteSelectionBottomSheet(
+                    onDismissRepostSelection = {
+                        currentRepost = null
+                        showRepostSelection = false
+                    },
+                    onRepost = { viewModel.onRepostClicked(currentRepost) },
+                    onQuotePost = {},
                 )
             }
         }
@@ -261,44 +284,42 @@ fun TabletRow(
     feedStates: Map<String, Flow<PagingData<TimelinePost>>>,
     onMediaOpen: (String) -> Unit,
     onLikeClick: (Pair<TimelinePost, String>) -> Unit,
+    onRepostClick: (Pair<TimelinePost, String>) -> Unit,
 ) {
-    BoxWithConstraints(
-        modifier = Modifier.fillMaxSize(),
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val tabWidth = screenWidth / 4
+
+    Row(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+                .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        val tabWidth = maxWidth / 4
+        feeds.forEach { feed ->
+            val feedState = feedStates[feed.id] ?: return@forEach
+            val feedData = feedState.collectAsLazyPagingItems()
 
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
-                    .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            feeds.forEach { feed ->
-                val feedState = feedStates[feed.id] ?: return@forEach
-
-                val feedData = feedState.collectAsLazyPagingItems()
-
-                Box(
-                    modifier =
-                        Modifier
-                            .width(tabWidth - 16.dp)
-                            .fillMaxHeight(),
-                ) {
-                    key(feed.id) {
-                        PullToRefreshBox(
-                            modifier = Modifier.fillMaxSize(),
-                            isRefreshing = feedData.loadState.refresh is LoadState.Loading,
-                            onRefresh = { feedData.refresh() },
-                        ) {
-                            FeedContent(
-                                navController = navController,
-                                feedData = feedData,
-                                onMediaOpen = onMediaOpen,
-                                onLikeClick = { post -> onLikeClick(Pair(post, feed.id)) },
-                            )
-                        }
+            Box(
+                modifier =
+                    Modifier
+                        .width(tabWidth - 16.dp)
+                        .fillMaxHeight(),
+            ) {
+                key(feed.id) {
+                    PullToRefreshBox(
+                        modifier = Modifier.fillMaxSize(),
+                        isRefreshing = feedData.loadState.refresh is LoadState.Loading,
+                        onRefresh = { feedData.refresh() },
+                    ) {
+                        FeedContent(
+                            navController = navController,
+                            feedData = feedData,
+                            onMediaOpen = onMediaOpen,
+                            onLikeClick = { post -> onLikeClick(Pair(post, feed.id)) },
+                            onRepostClick = { post -> onRepostClick(Pair(post, feed.id)) },
+                        )
                     }
                 }
             }
@@ -314,6 +335,7 @@ fun TabPagerFeeds(
     feedStates: Map<String, Flow<PagingData<TimelinePost>>>,
     onMediaOpen: (String) -> Unit,
     onLikeClick: (Pair<TimelinePost, String>) -> Unit,
+    onRepostClick: (Pair<TimelinePost, String>) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState { feeds.size }
@@ -360,6 +382,7 @@ fun TabPagerFeeds(
                     feedData = feedData,
                     onMediaOpen = { onMediaOpen(it) },
                     onLikeClick = { onLikeClick(Pair(it, feedId)) },
+                    onRepostClick = { onRepostClick(Pair(it, feedId)) },
                 )
             }
         }
@@ -372,6 +395,7 @@ private fun FeedContent(
     feedData: LazyPagingItems<TimelinePost>,
     onMediaOpen: (String) -> Unit,
     onLikeClick: (TimelinePost) -> Unit,
+    onRepostClick: (TimelinePost) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
@@ -409,8 +433,8 @@ private fun FeedContent(
                                 NavigationRoutes.Authenticated.AddPost.createRoute(replyUri.encodeURLParameter()),
                             )
                         },
-                        onRepostClick = {},
                         onLikeClick = { onLikeClick(it) },
+                        onRepostClick = { onRepostClick(it) },
                         onMenuClick = {},
                         onMediaOpen = { onMediaOpen(it) },
                         onProfileClick = {

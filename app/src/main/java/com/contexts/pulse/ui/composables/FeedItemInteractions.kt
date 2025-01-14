@@ -79,7 +79,7 @@ fun FeedItemInteractions(
             }
         }
         IconButton(
-            onClick = onRepostClick,
+            onClick = { onRepostClick() },
             modifier = Modifier.weight(1f),
         ) {
             Row(
